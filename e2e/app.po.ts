@@ -1,6 +1,6 @@
 import { browser, element, by } from 'protractor';
 
-export class AnalyticsBuilderPage {
+export class IotBuilderPage {
   navigateTo() {
     return browser.get('/');
   }

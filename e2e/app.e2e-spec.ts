@@ -1,10 +1,10 @@
-import { AnalyticsBuilderPage } from './app.po';
+import { IotBuilderPage } from './app.po';
 
-describe('analytics-builder App', function() {
-  let page: AnalyticsBuilderPage;
+describe('iot-builder App', () => {
+  let page: IotBuilderPage;
 
   beforeEach(() => {
-    page = new AnalyticsBuilderPage();
+    page = new IotBuilderPage();
   });
 
   it('should display message saying app works', () => {
