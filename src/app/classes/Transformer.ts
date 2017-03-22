@@ -1,6 +1,7 @@
 import {Channel} from "./Channel";
 import {MatchesPredicate} from "../decorators/MatchesPredicate";
 import {ValidateNested, Validator, IsIn, IsNotEmpty, IsString, ArrayUnique} from "class-validator";
+import {ArrayUniqueBy} from "../decorators/ArrayUniqueBy";
 
 const validator = new Validator();
 
@@ -46,7 +47,7 @@ export class Transformer {
   inputChannels: Channel[] = [];
   outputChannels: Channel[] = [];
   @ValidateNested({each: true})
-  @ArrayUnique()
+  @ArrayUniqueBy(value => { return value.name; })
   readonly properties: ReadonlyArray<Property>;
 
   constructor(properties: ReadonlyArray<Property> = []) {

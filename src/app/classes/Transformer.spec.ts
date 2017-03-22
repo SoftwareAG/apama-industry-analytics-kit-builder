@@ -95,10 +95,12 @@ describe('Property', () => {
 
 describe('Transformer', () => {
   const validPropObj = Object.freeze({ name: "validName", type: "integer", optional: false, value: 1 });
+  const validPropObj2 = Object.freeze({ name: "validName2", type: "integer", optional: false, value: 1 });
   const invalidPropObj = Object.freeze(Object.assign({}, validPropObj, { name: undefined }));
   const validProp1 = Object.freeze(new Property(validPropObj));
-  const validProp2 = Object.freeze(new Property(validPropObj));
+  const validProp2 = Object.freeze(new Property(validPropObj2));
   const invalidProp = Object.freeze(new Property(invalidPropObj));
+  const validProp1NameDuplicate = Object.freeze(new Property(validPropObj));
 
   it('should be valid if all properties are valid', () => {
     const transformer = new Transformer([validProp1, validProp2]);
@@ -107,6 +109,16 @@ describe('Transformer', () => {
 
   it('should be invalid if any properties are invalid', () => {
     const transformer = new Transformer([validProp1, invalidProp, validProp2]);
+    expect(validateSync(transformer)).toContain(jasmine.any(ValidationError));
+  });
+
+  it('should not allow the same property (by name) multiple times', () => {
+    const transformer = new Transformer([validProp1, validProp1NameDuplicate]);
+    expect(validateSync(transformer)).toContain(jasmine.any(ValidationError));
+  });
+
+  it('should not allow the same property multiple times', () => {
+    const transformer = new Transformer([validProp1, validProp1]);
     expect(validateSync(transformer)).toContain(jasmine.any(ValidationError));
   });
 });
