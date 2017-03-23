@@ -1,61 +1,44 @@
 
-import {Transformer} from "./Transformer";
-import {Channel} from "./Channel";
+import {Transformer, TransformerInterface} from "./Transformer";
 import {Row} from "./Row";
-import {validateSync, ValidationError} from "class-validator";
+import deepFreeze = require("deep-freeze");
 describe('Row', () => {
-  const inCh1 = Object.freeze(new Channel("inputChannel1"));
-  const inCh2 = Object.freeze(new Channel("inputChannel2"));
-  const inChans : ReadonlyArray<Channel> = Object.freeze([inCh1, inCh2]);
-  const outCh1 = Object.freeze(new Channel("outChannel1"));
-  const outCh2 = Object.freeze(new Channel("outChannel2"));
-  const outChans : ReadonlyArray<Channel> = Object.freeze([outCh1, outCh2]);
+  const transformerObj = Object.freeze({name: "validName"}) as TransformerInterface;
+  const transIn = deepFreeze(new Transformer({ name: "validName", inputChannels: [{name: "inputChannel1"}, {name: "inputChannel2"}] }));
+  const transOut = deepFreeze(new Transformer({ name: "validName", inputChannels: [{name: "outputChannel1"}, {name: "outputChannel2"}] }));
 
-  const transIn = new Transformer();
-  transIn.inputChannels = inChans as Channel[];
-  const transOut = new Transformer();
-  transOut.outputChannels = outChans as Channel[];
-  Object.freeze(transIn);
-  Object.freeze(transOut);
+  describe("Should throw an error if constructed with an invalid object", () => {
+    [null, [], {}, ''].forEach((obj) => {
+      it(`Construction Object: ${obj}`, () => {
+        expect(() => { new Row(obj as any); }).toThrowError();
+      })
+    });
+  });
 
-  it('should add transformers and still be valid', () => {
-    const row = new Row(5);
-
+  it('should allow multiple transformers during construction', () => {
     for (let i = 1; i <= 5; i ++) {
-      row.transformers.push(transIn);
-      expect(validateSync(row)).toEqual([]);
-      expect(row.transformers).toEqual((new Array(i)).fill(transIn));
+      const row = new Row({ maxTransformerCount: 5, transformers: (new Array(i)).fill(transformerObj) })
+      expect(row.transformers).toBeArrayOfSize(i);
+      for (let transformer of row.transformers) {
+        expect(transformer.name).toEqual("validName");
+      }
     }
   });
 
-  it('should remove transformers and still be valid', () => {
-    const row = new Row(5);
-    row.transformers.push(transIn, transIn, transIn, transIn, transIn);
-
-    for (let i = 5; i > 0; i --) {
-      row.transformers.pop();
-      expect(validateSync(row)).toEqual([]);
-      expect(row.transformers).toEqual((new Array(i-1)).fill(transIn));
-    }
-  });
-
-  it('should be invalid if there are too many transforms', () => {
+  it('should throw an error if there are too many transforms', () => {
     for (let i = 1; i <= 2; i++) {
-      const row = new Row(i-1);
-
-      row.transformers.push(...(new Array(i)).fill(transIn));
-      expect(validateSync(row)).toContain(jasmine.any(ValidationError));
+     expect(() => { new Row({ maxTransformerCount: i-1, transformers: (new Array(i)).fill(transformerObj) }); }).toThrowError();
     }
   });
 
-  it('should test getInChannels with a single transformer', () => {
+  it('should correctly getInChannels with a single transformer', () => {
     const row = new Row();
 
     row.transformers.push(transIn);
     expect(row.getInChannels()).toBe(transIn.inputChannels);
   });
 
-  it('should test getInChannels with multiple transformers', () => {
+  it('should correctly getInChannels with multiple transformers', () => {
     const row = new Row();
 
     row.transformers.push(transIn);
@@ -64,13 +47,13 @@ describe('Row', () => {
     expect(row.getInChannels()).toBe(transIn.inputChannels);
   });
 
-  it('should test getOutChannels with a single transformer', () => {
+  it('should correctly getOutChannels with a single transformer', () => {
     const row = new Row();
     row.transformers.push(transOut);
     expect(row.getOutChannels()).toBe(transOut.outputChannels);
   });
 
-  it('should test getOutChannels with multiple transformers', () => {
+  it('should correctly getOutChannels with multiple transformers', () => {
     const row = new Row();
 
     row.transformers.push(transIn);
@@ -79,25 +62,25 @@ describe('Row', () => {
     expect(row.getOutChannels()).toBe(transOut.outputChannels);
   });
 
-  it('should test getInChannels without tranformers', () => {
+  it('should correctly getInChannels without tranformers', () => {
     const row = new Row();
     expect(row.getInChannels()).toEqual([]);
   });
 
-  it('should test getOutChannels without tranformers', () => {
+  it('should correctly getOutChannels without tranformers', () => {
     const row = new Row();
     expect(row.getOutChannels()).toEqual([]);
   });
 
-  it('should test getInChannels with empty transformer', () => {
-    const transformerWithoutInChannels = new Transformer();
+  it('should correctly getInChannels with empty transformer', () => {
+    const transformerWithoutInChannels = new Transformer(transformerObj);
     const row = new Row();
     row.transformers.push(transformerWithoutInChannels);
     expect(row.getInChannels()).toEqual([]);
   });
 
-  it('should test getOutChannels with empty transformer', () => {
-    const transformerWithoutOutChannels = new Transformer();
+  it('should correctly getOutChannels with empty transformer', () => {
+    const transformerWithoutOutChannels = new Transformer(transformerObj);
     const row = new Row();
     row.transformers.push(transformerWithoutOutChannels);
     expect(row.getOutChannels()).toEqual([]);

@@ -1,18 +1,30 @@
-import {Transformer} from "./Transformer";
+import {Transformer, TransformerInterface} from "./Transformer";
 import {Channel} from "./Channel";
-import {IsInt, IsPositive} from "class-validator";
-import {MatchesPredicate} from "../decorators/MatchesPredicate";
+import {Validator} from "class-validator";
+import * as _ from "lodash";
+
+const validator = new Validator();
+
+export interface RowInterface {
+  maxTransformerCount: number
+  transformers?: TransformerInterface[]
+}
+
 export class Row {
 
-  @IsInt()
-  @IsPositive()
   readonly maxTransformerCount: number;
 
-  @MatchesPredicate(function(value) { return value.length <= this.maxTransformerCount; }, { message: "There cannot be more transformers than the maxCount" })
   transformers : Transformer[] = [];
 
-  constructor(maxTransformerCount: number = 3) {
-    this.maxTransformerCount = maxTransformerCount;
+  constructor(obj: RowInterface = { maxTransformerCount: 3 }) {
+    if (!_.isPlainObject(obj)) { throw new Error('must have an object to construct from'); }
+    if (!validator.isInt(obj.maxTransformerCount)) { throw new Error('Unable to parse json object'); }
+    if (!validator.isPositive(obj.maxTransformerCount)) { throw new Error('Unable to parse json object'); }
+    const transformers = obj.transformers || [];
+    if (!validator.isArray(transformers)) { throw new Error('Unable to parse json object'); }
+    if (transformers.length > obj.maxTransformerCount) { throw new Error('Unable to parse json object'); }
+    this.maxTransformerCount = obj.maxTransformerCount;
+    this.transformers = transformers.map((transformerObj) => { return new Transformer(transformerObj); });
   }
 
   getInChannels(): Channel[] {

@@ -1,10 +1,22 @@
-import {Row} from "./Row";
-import {ArrayUnique} from "class-validator";
+import {Row, RowInterface} from "./Row";
+import {Validator} from "class-validator";
+import * as _ from "lodash";
+
+const validator = new Validator();
+
+export interface ConfigInterface {
+  rows?: RowInterface[]
+}
 
 export class Config {
+  rows : Row[];
 
-  @ArrayUnique()
-  rows : Row[] = [];
+  constructor(obj: ConfigInterface = {}) {
+    if (!_.isPlainObject(obj)) { throw new Error('must have an object to construct from'); }
+    const rows = obj.rows || [];
+    if (!validator.isArray(rows)) { throw new Error('Unable to parse json object'); }
+    this.rows = rows.map((rowObj) => { return new Row(rowObj); });
+  }
 
   /**
    * Removes a row if it is present
@@ -27,10 +39,10 @@ export class Config {
    * @param toIndex
    */
   moveRow(fromIndex: number, toIndex : number) {
-    console.assert(fromIndex >= 0, "From index must be greater than zero");
-    console.assert(toIndex >= 0, "To index must be greater than zero");
-    console.assert(fromIndex < this.rows.length, "From index must be less than the size of the array");
-    console.assert(toIndex < this.rows.length, "To index must be less than the size of the array");
+    if (fromIndex < 0) { throw new Error("From index must be greater than zero"); }
+    if (toIndex < 0) { throw new Error("To index must be greater than zero"); }
+    if (fromIndex >= this.rows.length) { throw new Error("From index must be less than the size of the array"); }
+    if (toIndex >= this.rows.length) { throw new Error("To index must be less than the size of the array"); }
 
     this.rows.splice(toIndex, 0, this.rows.splice(fromIndex, 1)[0]);
   }
