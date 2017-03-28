@@ -1,5 +1,5 @@
 import {Channel} from "./Channel";
-import {validateSync, ValidationError} from "class-validator";
+
 describe('Channel', () => {
   it("should be valid if using a correct name", () => {
     const chan = new Channel({name: 'Test Channel'});

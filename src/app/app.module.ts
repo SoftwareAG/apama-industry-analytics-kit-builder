@@ -4,18 +4,27 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
-import {MetadataService} from "./services/AbstractMetadataService";
-
+import { ChannelSelectorComponent } from './widgets/channel-selector/channel-selector.component';
+import {AbstractMetadataService} from "./services/AbstractMetadataService";
+import {TransformerSelectorComponent} from "./widgets/transformer-selector/transformer-selector.component";
+import {AsyncMetadataServiceMock} from "app/services/AsyncMetadataServiceMock";
+import {AbstractChannelDataService} from "./services/AbstractChannelDataService";
+import {AsyncChannelDataServiceMock} from "./services/AsyncChannelMetadataServiceMock";
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ChannelSelectorComponent,
+    TransformerSelectorComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpModule
   ],
-  providers: [MetadataService],
+  providers: [
+    {provide: AbstractMetadataService, useClass: AsyncMetadataServiceMock},
+    {provide: AbstractChannelDataService, useClass: AsyncChannelDataServiceMock}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
