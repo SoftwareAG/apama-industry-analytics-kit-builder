@@ -1,19 +1,42 @@
-import * as _ from "lodash";
-import {Validator} from "class-validator";
-
-const validator = new Validator();
+import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
 
 export interface ChannelInterface {
   name: string;
 }
 
-export class Channel {
+export class Channel implements ChannelInterface {
   name: string;
 
   constructor(obj: ChannelInterface) {
-    if (!_.isPlainObject(obj)) { throw new Error('must have an object to construct from'); }
-    if (!validator.isString(obj.name)) { throw new Error('Unable to parse json object'); }
-    if (!obj.name) { throw new Error('Unable to parse json object'); }
     this.name = obj.name;
+  }
+}
+
+export class ChannelBuilder extends ClassBuilder<Channel> implements ChannelInterface {
+  name: string;
+
+  Name(name: string): this {
+    this.name = name;
+    return this
+  }
+
+  build(): Channel {
+    return new Channel(this);
+  }
+}
+
+export class NestedChannelBuilder<Parent> extends ChannelBuilder implements NestedClassBuilder<Parent> {
+  constructor(private callback: (channel: Channel) => Parent) {
+    super();
+  }
+
+  endWith(): Parent {
+    return this.callback(this.build());
+  }
+}
+
+export class ChannelArrayBuilder extends ClassArrayBuilder<Channel, NestedChannelBuilder<ChannelArrayBuilder>> {
+  constructor() {
+    super(NestedChannelBuilder);
   }
 }

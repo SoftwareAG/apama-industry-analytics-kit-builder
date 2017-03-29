@@ -3,7 +3,7 @@ import {TransformerSelectorComponent} from "./transformer-selector.component";
 import {Injectable} from "@angular/core";
 import {AbstractDataService} from "../../services/AbstractDataService";
 import {BehaviorSubject, Observable} from "rxjs";
-import {TransformerDef} from "../../classes/TransformerDef";
+import {TransformerDef, TransformerDefArrayBuilder} from "../../classes/TransformerDef";
 import {Channel} from "../../classes/Channel";
 import {Config} from "../../classes/Config";
 
@@ -20,7 +20,7 @@ class DataServiceMock implements AbstractDataService {
   }
 }
 
-fdescribe('TransformerSelectorComponent', () => {
+describe('TransformerSelectorComponent', () => {
   let component: TransformerSelectorComponent;
   let fixture: ComponentFixture<TransformerSelectorComponent>;
   let el: HTMLElement;
@@ -49,17 +49,14 @@ fdescribe('TransformerSelectorComponent', () => {
   });
 
   it('should create transformer elements', () => {
-    const transformers = [{
-      name: "MyFirstAnalytic",
-      properties: [{ name: "Property1", description: "validDescription1", optional: true, type: "integer" as "integer" }]
-    },{
-      name: "MySecondAnalytic",
-      properties: [{ name: "Property1", description: "validDescription1", optional: true, type: "integer" as "integer" }]
-    }].map(transDefObj => { return new TransformerDef(transDefObj)});
+    const transformers = new TransformerDefArrayBuilder()
+      .with().Name("MyFirstAnalytic").endWith()
+      .with().Name("MySecondAnalytic").endWith()
+      .build();
     dataService.updateTransformers(transformers);
-    expect(el.querySelectorAll('.transformer').length).toEqual(2);
-    Array.from(el.querySelectorAll('.transformer')).forEach((transformerEl, i) => {
-      expect((transformerEl.querySelector('text') as Element).textContent).toEqual(transformers[i].name);
+    const textContents = Array.from(el.querySelectorAll('.transformer')).map((transformerEl) => {
+      return (transformerEl.querySelector('text') as Element).textContent;
     });
+    expect(textContents).toEqual(['MyFirstAnalytic', 'MySecondAnalytic'])
   });
 });

@@ -1,34 +1,75 @@
-import {Channel, ChannelInterface} from "./Channel";
-import {Validator} from "class-validator";
-import {PropertyInterface, Property, ValidProperty} from "./Property";
-import * as _ from "lodash";
+import {NestedPropertyBuilder, ValidProperty} from "./Property";
 import {TransformerDef, TransformerDefInterface} from "./TransformerDef";
-
-const validator = new Validator();
+import {ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
+import {NestedTransformerChannelDefBuilder, TransformerChannelDef} from "app/classes/TransformerChannelDef";
 
 export interface TransformerInterface extends TransformerDefInterface {
-  inputChannels?: ReadonlyArray<ChannelInterface>,
-  outputChannels?: ReadonlyArray<ChannelInterface>,
-  properties?: ReadonlyArray<PropertyInterface>
+  properties: ValidProperty[];
 }
 
-export class Transformer extends TransformerDef {
-  inputChannels: Channel[];
-  outputChannels: Channel[];
-  readonly properties: ReadonlyArray<ValidProperty>;
+export class Transformer extends TransformerDef implements TransformerInterface {
+  readonly properties: ValidProperty[];
 
   constructor(obj: TransformerInterface) {
-    if (!_.isPlainObject(obj)) { throw new Error('must have an object to construct from'); }
-    const inputChannels = obj.inputChannels || [];
-    const outputChannels = obj.outputChannels || [];
-    const properties = obj.properties || [];
-    if (!validator.isArray(inputChannels)) { throw new Error(`Unable to construct Transformer, invalid inputChannels: ${obj.inputChannels}`); }
-    if (!validator.isArray(outputChannels)) { throw new Error(`Unable to construct Transformer, invalid outputChannels: ${obj.outputChannels}`); }
-    if (!validator.isArray(properties)) { throw new Error(`Unable to construct Transformer, invalid properties: ${obj.properties}`); }
     super(obj);
-    this.inputChannels = inputChannels.map(channelObj => { return new Channel(channelObj); });
-    this.outputChannels = outputChannels.map(channelObj => { return new Channel(channelObj); });
-    this.properties = properties.map(propertyObj => { return Property.fromObject(propertyObj); });
-    if (!validator.arrayUnique(this.properties.map(prop => { return prop.name }))) { throw new Error('Unable to parse json object'); }
+    this.properties = obj.properties;
+  }
+}
+
+export class TransformerBuilder extends ClassBuilder<Transformer> implements TransformerInterface {
+  name: string;
+  properties: ValidProperty[] = [];
+  inputChannels: TransformerChannelDef[] = [];
+  outputChannels: TransformerChannelDef[] = [];
+
+  Name(name): this {
+    this.name = name;
+    return this;
+  }
+  Properties(properties: ValidProperty[]): this {
+    this.properties = properties;
+    return this;
+  }
+  pushProperty(...property: ValidProperty[]): this {
+    this.properties.push(...property);
+    return this;
+  }
+  withProperty(): NestedPropertyBuilder<this> {
+    return new NestedPropertyBuilder((property) => { this.properties.push(property); return this; })
+  }
+  InputChannels(inputChannels: TransformerChannelDef[]): this {
+    this.inputChannels = inputChannels;
+    return this;
+  }
+  pushInputChannel(...inputChannel: TransformerChannelDef[]): this {
+    this.inputChannels.push(...inputChannel);
+    return this;
+  }
+  withInputChannel(): NestedTransformerChannelDefBuilder<this> {
+    return new NestedTransformerChannelDefBuilder((channel) => { this.inputChannels.push(channel); return this;});
+  }
+  OutputChannels(outputChannels: TransformerChannelDef[]): this {
+    this.outputChannels = outputChannels;
+    return this;
+  }
+  pushOutputChannel(...outputChannels: TransformerChannelDef[]): this {
+    this.outputChannels.push(...outputChannels);
+    return this;
+  }
+  withOutputChannel(): NestedTransformerChannelDefBuilder<this> {
+    return new NestedTransformerChannelDefBuilder((channel) => {this.outputChannels.push(channel); return this; });
+  }
+  build(): Transformer {
+    return new Transformer(this);
+  }
+}
+
+export class NestedTransformerBuilder<Parent> extends TransformerBuilder implements NestedClassBuilder<Parent> {
+  constructor(private callback: (transformer: Transformer) => Parent) {
+    super();
+  }
+
+  endWith(): Parent {
+    return this.callback(this.build());
   }
 }

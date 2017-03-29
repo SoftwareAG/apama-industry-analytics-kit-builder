@@ -1,6 +1,7 @@
 import {Validator} from "class-validator";
-import {PropertyDef, PropertyDefInterface} from "./PropertyDef";
+import {PropertyDef, PropertyDefBuilder, PropertyDefInterface} from "./PropertyDef";
 import * as _ from "lodash";
+import {NestedClassBuilder, ClassArrayBuilder} from "./ClassBuilder";
 
 const validator = new Validator();
 
@@ -8,11 +9,10 @@ export interface PropertyInterface extends PropertyDefInterface {
   value?: number | string | boolean;
 }
 
-export abstract class Property extends PropertyDef {
+export abstract class Property extends PropertyDef implements PropertyInterface {
   value?: number | string | boolean;
 
   static fromObject(obj: PropertyInterface) : ValidProperty {
-    if (!_.isPlainObject(obj)) { throw new Error('must have an object to construct from'); }
     if (!validator.isIn(typeof obj.value, ['undefined', 'number', 'string', 'boolean'])) {  throw new Error('Unable to parse json object'); }
     if (!validator.isIn(obj.type, ['integer', 'string', 'float', 'boolean', 'decimal'])) {  throw new Error('Unable to parse json object'); }
     if (!validator.isIn(obj.optional, [true, false, undefined])) {  throw new Error('Unable to parse json object'); }
@@ -27,6 +27,35 @@ export abstract class Property extends PropertyDef {
   }
 }
 
+export class PropertyBuilder extends PropertyDefBuilder implements PropertyInterface {
+  value?: number | string | boolean;
+
+  Value(value:  number | string | boolean): this {
+    this.value = value;
+    return this;
+  }
+
+  build(): ValidProperty {
+    return Property.fromObject(this);
+  }
+}
+
+export class NestedPropertyBuilder<Parent> extends PropertyBuilder implements NestedClassBuilder<Parent> {
+  constructor(private callback: (property: ValidProperty) => Parent) {
+    super();
+  }
+
+  endWith(): Parent {
+    return this.callback(this.build());
+  }
+}
+
+export class PropertyArrayBuilder extends ClassArrayBuilder<ValidProperty, NestedPropertyBuilder<PropertyArrayBuilder>> {
+  constructor() {
+    super(NestedPropertyBuilder);
+  }
+}
+
 class StringProperty extends Property {
   value: string;
   readonly type = "string";
@@ -34,7 +63,6 @@ class StringProperty extends Property {
 
   constructor(obj: PropertyInterface) {
     super(obj);
-    if (!_.isPlainObject(obj)) { throw new Error('must have an object to construct from'); }
     if (!validator.isString(obj.value)) { throw new Error('Unable to parse json object'); }
     if (obj.type != 'string') { throw new Error('Unable to parse json object'); }
     if (!validator.isIn(obj.optional, [false, undefined])) { throw new Error('Unable to parse json object'); }
@@ -49,7 +77,6 @@ class OptionalStringProperty extends Property {
 
   constructor(obj: PropertyInterface) {
     super(obj);
-    if (!_.isPlainObject(obj)) { throw new Error('must have an object to construct from'); }
     if (obj.value != undefined && !validator.isString(obj.value)) { throw new Error('Unable to parse json object'); }
     if (obj.type != 'string') { throw new Error('Unable to parse json object'); }
     if (!validator.isBoolean(obj.optional) || !obj.optional) { throw new Error('Unable to parse json object'); }
@@ -64,7 +91,6 @@ class BooleanProperty extends Property {
 
   constructor(obj: PropertyInterface) {
     super(obj);
-    if (!_.isPlainObject(obj)) { throw new Error('must have an object to construct from'); }
     if (!validator.isBoolean(obj.value)) { throw new Error('Unable to parse json object'); }
     if (obj.type != 'boolean') { throw new Error('Unable to parse json object'); }
     if (!validator.isIn(obj.optional, [false, undefined])) { throw new Error('Unable to parse json object'); }
@@ -79,7 +105,6 @@ class OptionalBooleanProperty extends Property {
 
   constructor(obj: PropertyInterface) {
     super(obj);
-    if (!_.isPlainObject(obj)) { throw new Error('must have an object to construct from'); }
     if (obj.value != undefined && !validator.isBoolean(obj.value)) { throw new Error('Unable to parse json object'); }
     if (obj.type != 'boolean') { throw new Error('Unable to parse json object'); }
     if (!validator.isBoolean(obj.optional) || !obj.optional) { throw new Error('Unable to parse json object'); }
@@ -94,7 +119,6 @@ class NumberProperty extends Property {
 
   constructor(obj: PropertyInterface) {
     super(obj);
-    if (!_.isPlainObject(obj)) { throw new Error('must have an object to construct from'); }
     if (!validator.isNumber(obj.value)) { throw new Error('Unable to parse json object'); }
     if (!validator.isIn(obj.type, ["float", "decimal", "integer"])) { throw new Error('Unable to parse json object'); }
     if (!validator.isIn(obj.optional, [false, undefined])) { throw new Error('Unable to parse json object'); }
@@ -111,7 +135,6 @@ class OptionalNumberProperty extends Property {
 
   constructor(obj: PropertyInterface) {
     super(obj);
-    if (!_.isPlainObject(obj)) { throw new Error('must have an object to construct from'); }
     if (obj.value != undefined && !validator.isNumber(obj.value)) { throw new Error('Unable to parse json object'); }
     if (!validator.isIn(obj.type, ["float", "decimal", "integer"])) { throw new Error('Unable to parse json object'); }
     if (!validator.isBoolean(obj.optional) || !obj.optional) { throw new Error('Unable to parse json object'); }

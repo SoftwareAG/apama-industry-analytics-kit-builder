@@ -1,6 +1,5 @@
 import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 import {Injectable} from "@angular/core";
-import {AbstractChannelDataService} from "../../services/AbstractChannelDataService";
 import {Channel} from "../../classes/Channel";
 import {ChannelSelectorComponent} from "./channel-selector.component";
 import {AbstractDataService} from "../../services/AbstractDataService";
@@ -22,7 +21,7 @@ class DataServiceMock implements AbstractDataService {
   }
 }
 
-fdescribe('ChannelSelectorComponent', () => {
+describe('ChannelSelectorComponent', () => {
   let component: ChannelSelectorComponent;
   let fixture: ComponentFixture<ChannelSelectorComponent>;
   let el: HTMLElement;

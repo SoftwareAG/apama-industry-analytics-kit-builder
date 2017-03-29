@@ -1,21 +1,50 @@
-import { Validator} from "class-validator";
-import * as _ from "lodash";
-import {TransformerDef, TransformerDefInterface} from "./TransformerDef";
-
-const validator = new Validator();
+import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
+import {NestedTransformerDefBuilder, TransformerDef} from "./TransformerDef";
 
 export interface MetadataInterface {
-  transformers?: TransformerDefInterface[]
+  transformers: TransformerDef[]
 }
 
-export class Metadata {
-  readonly transformers: ReadonlyArray<TransformerDef>;
+export class Metadata implements MetadataInterface {
+  readonly transformers: TransformerDef[] = [];
 
-  constructor(obj: MetadataInterface = {}) {
-    if (!_.isPlainObject(obj)) { throw new Error('must have an object to construct from'); }
-    const transformers = obj.transformers || [];
-    if (!validator.isArray(transformers)) { throw new Error('Unable to parse json object'); }
-    this.transformers = transformers.map((transformerObj) => { return new TransformerDef(transformerObj); });
-    if (!validator.arrayUnique(this.transformers.map((transformer: TransformerDef) => { return transformer.name }))) { throw new Error('Transformers must be unique by name'); }
+  constructor(obj: MetadataInterface) {
+    this.transformers = obj.transformers;
+  }
+}
+
+export class MetadataBuilder extends ClassBuilder<Metadata> implements MetadataInterface {
+  transformers: TransformerDef[];
+
+  Transformers(transformers: TransformerDef[]): this {
+    this.transformers = transformers;
+    return this;
+  }
+  pushTransformer(...transformer: TransformerDef[]): this {
+    this.transformers.push(...transformer);
+    return this;
+  }
+  withTransformer(): NestedTransformerDefBuilder<this> {
+    return new NestedTransformerDefBuilder<this>((transformer) => { this.transformers.push(transformer); return this; });
+  }
+
+  build(): Metadata {
+    return new Metadata(this);
+  }
+}
+
+export class NestedMetadataBuilder<Parent> extends MetadataBuilder implements NestedClassBuilder<Parent> {
+  constructor(private callback: (metadata: Metadata) => Parent) {
+    super();
+  }
+
+  endWith(): Parent {
+    return this.callback(this.build());
+  }
+}
+
+export class MetadataArrayBuilder extends ClassArrayBuilder<Metadata, NestedMetadataBuilder<MetadataArrayBuilder>> {
+  constructor() {
+    super(NestedMetadataBuilder);
   }
 }

@@ -1,16 +1,12 @@
-import { TestBed, async } from '@angular/core/testing';
+import {async, TestBed} from "@angular/core/testing";
 
-import { AppComponent } from './app.component';
+import {AppComponent} from "./app.component";
 import {ChannelSelectorComponent} from "./widgets/channel-selector/channel-selector.component";
 import {TransformerSelectorComponent} from "./widgets/transformer-selector/transformer-selector.component";
-import {AbstractMetadataService} from "./services/AbstractMetadataService";
-import {AbstractChannelDataService} from "./services/AbstractChannelDataService";
-import {AsyncMetadataServiceMock} from "./services/AsyncMetadataServiceMock";
-import {AsyncChannelDataServiceMock} from "./services/AsyncChannelMetadataServiceMock";
 import {TransformerPropertySelectorComponent} from "./widgets/transformer-property-selector/transformer-property-selector.component";
-import {AbstractTransformerPropertyService} from "./services/AbstractTransformerPropertyService";
-import {AsyncTransformerPropertyServiceMock} from "./services/AsyncTransformerPropertyServiceMock";
-
+import {LadderDiagramComponent} from "./widgets/ladder-diagram/ladder-diagram.component";
+import {AbstractDataService} from "./services/AbstractDataService";
+import {DataService} from "./services/DataService";
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
@@ -19,12 +15,12 @@ describe('AppComponent', () => {
         AppComponent,
         ChannelSelectorComponent,
         TransformerSelectorComponent,
+        LadderDiagramComponent,
+        TransformerSelectorComponent,
         TransformerPropertySelectorComponent
       ],
       providers: [
-        {provide: AbstractMetadataService, useClass: AsyncMetadataServiceMock},
-        {provide: AbstractChannelDataService, useClass: AsyncChannelDataServiceMock},
-        {provide: AbstractTransformerPropertyService, useClass: AsyncTransformerPropertyServiceMock}
+        {provide: AbstractDataService, useClass: DataService}
       ],
     }).compileComponents();
   }));
