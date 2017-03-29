@@ -1,4 +1,4 @@
-
+import * as _ from "lodash";
 import {Validator} from "class-validator";
 
 const validator = new Validator();
