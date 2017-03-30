@@ -1,0 +1,20 @@
+label {
+  height: 25px;
+  width: 300px;
+  text-align: right;
+}
+
+input {
+  height: 25px;
+  width: 300px;
+}
+
+[type='checkbox'] {
+  width: 15px;
+}
+
+select {
+  background: transparent;
+  height: 30px;
+  width: 200px;
+}

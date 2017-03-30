@@ -7,6 +7,10 @@ import {AbstractMetadataService} from "./services/AbstractMetadataService";
 import {AbstractChannelDataService} from "./services/AbstractChannelDataService";
 import {AsyncMetadataServiceMock} from "./services/AsyncMetadataServiceMock";
 import {AsyncChannelDataServiceMock} from "./services/AsyncChannelMetadataServiceMock";
+import {TransformerPropertySelectorComponent} from "./widgets/transformer-property-selector/transformer-property-selector.component";
+import {AbstractTransformerPropertyService} from "./services/AbstractTransformerPropertyService";
+import {AsyncTransformerPropertyServiceMock} from "./services/AsyncTransformerPropertyServiceMock";
+
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
@@ -14,11 +18,13 @@ describe('AppComponent', () => {
       declarations: [
         AppComponent,
         ChannelSelectorComponent,
-        TransformerSelectorComponent
+        TransformerSelectorComponent,
+        TransformerPropertySelectorComponent
       ],
       providers: [
         {provide: AbstractMetadataService, useClass: AsyncMetadataServiceMock},
-        {provide: AbstractChannelDataService, useClass: AsyncChannelDataServiceMock}
+        {provide: AbstractChannelDataService, useClass: AsyncChannelDataServiceMock},
+        {provide: AbstractTransformerPropertyService, useClass: AsyncTransformerPropertyServiceMock}
       ],
     }).compileComponents();
   }));

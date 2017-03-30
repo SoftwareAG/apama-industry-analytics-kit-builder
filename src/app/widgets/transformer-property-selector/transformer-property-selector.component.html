@@ -1,0 +1,50 @@
+
+<form>
+
+  <div *ngFor="let transformerProperty of transformerProperties" class="transformer-property">
+
+    <div class="transformer-property-group">
+
+      <div [ngSwitch]="transformerProperty.type">
+
+        <ng-template [ngSwitchCase]="'string'">
+          <label class="transformer-property-name">{{transformerProperty.name}}
+            <select class="transformer-property-value">
+              <option>
+                {{transformerProperty.value}}
+              </option>
+            </select>
+          </label>
+        </ng-template>
+
+        <ng-template [ngSwitchCase]="'decimal' || 'integer' || 'float'">
+          <label class="transformer-property-name">{{transformerProperty.name}}
+            <input class="transformer-property-value" type="number" value="{{transformerProperty.value}}"/>
+          </label>
+        </ng-template>
+
+        <ng-template [ngSwitchCase]="'integer'">
+          <label class="transformer-property-name">{{transformerProperty.name}}
+            <input class="transformer-property-value" type="number" value="{{transformerProperty.value}}"/>
+          </label>
+        </ng-template>
+
+        <ng-template [ngSwitchCase]="'float'">
+          <label class="transformer-property-name">{{transformerProperty.name}}
+            <input class="transformer-property-value" type="number" value="{{transformerProperty.value}}"/>
+          </label>
+        </ng-template>
+
+        <ng-template [ngSwitchCase]="'boolean'">
+          <label class="transformer-property-name">{{transformerProperty.name}}
+            <input class="transformer-property-value" type="checkbox" [checked]="transformerProperty.value">
+          </label>
+        </ng-template>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</form>
