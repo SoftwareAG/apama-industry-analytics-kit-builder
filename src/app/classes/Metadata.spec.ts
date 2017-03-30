@@ -8,7 +8,7 @@ describe('Metadata', () => {
   const validDeepMetadata = deepFreeze({
     transformers: [{
       name: "MyFirstAnalytic",
-      properties: [{ name: "Property1", optional: true, type: "integer" as "integer" }]
+      properties: [{ name: "Property1", description: "PropertyDescription1", optional: true, type: "integer" as "integer" }]
     }]
   });
 
@@ -51,6 +51,7 @@ describe('Metadata', () => {
     const property = transformer.properties[0];
     expect(property).toEqual(jasmine.any(PropertyDef));
     expect(property.name).toEqual("Property1");
+    expect(property.description).toEqual("PropertyDescription1");
     expect(property.optional).toEqual(true);
     expect(property.type).toEqual("integer");
   });

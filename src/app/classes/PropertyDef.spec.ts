@@ -1,7 +1,7 @@
 
 import {PropertyDef} from "./PropertyDef";
 describe('PropertyDef', () => {
-  const propertyDefObj = Object.freeze({name: "validName", type: "integer" as "integer", optional: false});
+  const propertyDefObj = Object.freeze({name: "validName", description: "validDescription", type: "integer" as "integer", optional: false});
 
   describe("Should throw an error if constructed with an invalid object", () => {
     [null, [], {}, ''].forEach((obj) => {
@@ -15,6 +15,7 @@ describe('PropertyDef', () => {
     const propertyDef = new PropertyDef(propertyDefObj);
     expect(propertyDef).toEqual(jasmine.any(PropertyDef));
     expect(propertyDef.name).toEqual("validName");
+    expect(propertyDef.description).toEqual("validDescription");
     expect(propertyDef.type).toEqual("integer");
     expect(propertyDef.optional).toEqual(false);
   });

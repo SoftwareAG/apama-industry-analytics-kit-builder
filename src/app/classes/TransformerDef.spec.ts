@@ -2,8 +2,8 @@ import {TransformerDef} from "./TransformerDef";
 import {PropertyDef} from "./PropertyDef";
 
 describe('TransformerDefDef', () => {
-  const validPropObj = Object.freeze({ name: "validName", type: "integer" as "integer", optional: false });
-  const validPropObj2 = Object.freeze({ name: "validName2", type: "integer" as "integer", optional: false });
+  const validPropObj = Object.freeze({ name: "validName", description: "validDescription", type: "integer" as "integer", optional: false });
+  const validPropObj2 = Object.freeze({ name: "validName2", description: "validDescription2", type: "integer" as "integer", optional: false });
   const invalidPropObj = Object.freeze(Object.assign({}, validPropObj, { name: undefined }));
   const validTransformerDefObj = Object.freeze({name: "validName"});
 

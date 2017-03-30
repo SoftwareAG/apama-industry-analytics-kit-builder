@@ -9,10 +9,10 @@ export class AsyncMetadataServiceMock implements AbstractMetadataService {
     return new Metadata({
       transformers: [{
         name: "MyFirstAnalytic",
-        properties: [{ name: "Property1", optional: true, type: "integer" as "integer" }]
+        properties: [{ name: "Property1", description: "validDescription1", optional: true, type: "integer" as "integer" }]
       },{
         name: "MySecondAnalytic",
-        properties: [{ name: "Property1", optional: true, type: "integer" as "integer" }]
+        properties: [{ name: "Property1", description: "validDescription1", optional: true, type: "integer" as "integer" }]
       }]
     });
   }

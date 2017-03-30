@@ -1,7 +1,7 @@
 
 import {Property} from "./Property";
 describe('Property', () => {
-  const propertyObj = Object.freeze({name: "validName", type: "integer" as "integer", optional: false, value: 0});
+  const propertyObj = Object.freeze({name: "validName", description: "validDescription", type: "integer" as "integer", optional: false, value: 0});
 
   describe("Should throw an error if constructed with an invalid object", () => {
     [null, [], {}, ''].forEach((obj) => {
@@ -15,6 +15,7 @@ describe('Property', () => {
     const property = Property.fromObject(propertyObj);
     expect(property).toEqual(jasmine.any(Property));
     expect(property.name).toEqual("validName");
+    expect(property.description).toEqual("validDescription");
     expect(property.type).toEqual("integer");
     expect(property.optional).toEqual(false);
     expect(property.value).toEqual(0);
@@ -24,6 +25,14 @@ describe('Property', () => {
     [null, undefined, {}, ''].forEach((name) => {
       it(`Name: ${name}`, () => {
         expect(() => { Property.fromObject(Object.assign({}, propertyObj, {name: name})); }).toThrowError();
+      });
+    });
+  });
+
+  describe('should be invalid when provided incorrect description', () => {
+    [null, undefined, {}, ''].forEach((description) => {
+      it(`Description: ${description}`, () => {
+        expect(() => { Property.fromObject(Object.assign({}, propertyObj, {description: description})); }).toThrowError();
       });
     });
   });
@@ -48,6 +57,7 @@ describe('Property', () => {
             const property = Property.fromObject(Object.assign({}, propertyObj, {type: type, optional: optional, value: value}));
             expect(property).toEqual(jasmine.any(Property));
             expect(property.name).toEqual("validName");
+            expect(property.description).toEqual("validDescription");
             expect(property.type).toEqual(type);
             expect(property.optional).toEqual(!!optional);
             expect(property.value).toEqual(value);
@@ -91,6 +101,7 @@ describe('Property', () => {
             const property = Property.fromObject(Object.assign({}, propertyObj, {optional: optional, type: validType, value: value}));
             expect(property).toEqual(jasmine.any(Property));
             expect(property.name).toEqual("validName");
+            expect(property.description).toEqual("validDescription");
             expect(property.type).toEqual(validType);
             expect(property.optional).toEqual(optional);
             expect(property.value).toEqual(value);

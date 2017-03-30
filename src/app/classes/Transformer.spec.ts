@@ -3,8 +3,8 @@ import {Channel} from "./Channel";
 import {Property} from "./Property";
 
 describe('Transformer', () => {
-  const validPropObj = Object.freeze({ name: "validName", type: "integer" as "integer", optional: false, value: 1 });
-  const validPropObj2 = Object.freeze({ name: "validName2", type: "integer" as "integer", optional: false, value: 1 });
+  const validPropObj = Object.freeze({ name: "validName", description: "validDescription", type: "integer" as "integer", optional: false, value: 1 });
+  const validPropObj2 = Object.freeze({ name: "validName2", description: "validDescription2", type: "integer" as "integer", optional: false, value: 1 });
   const invalidPropObj = Object.freeze(Object.assign({}, validPropObj, { name: undefined }));
   const validTransformerObj = Object.freeze({name: "validName"});
   const validChannelObj = Object.freeze({ name: "validChannelName" });
