@@ -1,7 +1,8 @@
 import {Component, ElementRef, OnInit} from "@angular/core";
 import * as d3 from "d3";
 import {Channel} from "../../classes/Channel";
-import {AbstractChannelDataService} from "../../services/AbstractChannelDataService";
+import {Observable} from "rxjs";
+import {AbstractDataService} from "../../services/AbstractDataService";
 
 @Component({
   template: '',
@@ -9,21 +10,20 @@ import {AbstractChannelDataService} from "../../services/AbstractChannelDataServ
 })
 export class ChannelSelectorComponent implements OnInit {
   readonly nativeElement;
-  readonly channelDataService;
+  readonly channels: Observable<Channel[]>;
 
-  constructor(myElement: ElementRef, channelDataService: AbstractChannelDataService) {
+  constructor(myElement: ElementRef, dataService: AbstractDataService) {
     this.nativeElement = myElement.nativeElement;
-    this.channelDataService = channelDataService;
+    this.channels = dataService.channels;
   }
 
   ngOnInit() {
 
-    const svg = d3.select(this.nativeElement)
-      .append('svg')
+    const svg = d3.select(this.nativeElement).append('svg')
       .attr("width", 800)
       .attr("height", 800);
 
-    this.channelDataService.withChannels((channels: Channel[]) => {
+    this.channels.subscribe((channels: Channel[]) => {
       const groups = svg.selectAll("g").data(channels);
       groups.exit().remove();
       const groupsEnter = groups.enter().append("g")

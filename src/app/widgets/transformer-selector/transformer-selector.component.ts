@@ -1,9 +1,9 @@
-import {Component, ElementRef, OnInit} from '@angular/core';
-import * as d3 from 'd3';
-import * as deepFreeze from 'deep-freeze';
-import {AbstractMetadataService} from "../../services/AbstractMetadataService";
-import {Metadata} from "../../classes/Metadata";
+import {Component, ElementRef, OnInit} from "@angular/core";
+import * as d3 from "d3";
+import * as deepFreeze from "deep-freeze";
 import {TransformerDef} from "../../classes/TransformerDef";
+import {Observable} from "rxjs";
+import {AbstractDataService} from "../../services/AbstractDataService";
 
 @Component({
   selector: 'transformer-selector',
@@ -11,11 +11,11 @@ import {TransformerDef} from "../../classes/TransformerDef";
 })
 export class TransformerSelectorComponent implements OnInit {
   readonly nativeElement;
-  readonly metadataService;
+  readonly transformers: Observable<TransformerDef[]>;
 
-  constructor(myElement: ElementRef, metadataService: AbstractMetadataService) {
+  constructor(myElement: ElementRef, dataService: AbstractDataService) {
     this.nativeElement = myElement.nativeElement;
-    this.metadataService = metadataService;
+    this.transformers = dataService.transformers;
   }
 
   ngOnInit() {
@@ -28,10 +28,8 @@ export class TransformerSelectorComponent implements OnInit {
       .attr('width', width + padding.left + padding.right)
       .attr('height', height + padding.top + padding.bottom);
 
-    this.metadataService.withMeta((meta: Metadata) => {
-      svg.datum(meta);
-
-      const transformers = svg.selectAll('g').data((d: Metadata) => { return d.transformers as TransformerDef[]; });
+    this.transformers.subscribe(transformerDefs => {
+      const transformers = svg.selectAll('g').data(transformerDefs);
       transformers.exit().remove();
       const transformersEnter = transformers.enter().append('g')
         .classed('transformer', true)

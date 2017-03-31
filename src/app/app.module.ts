@@ -13,6 +13,8 @@ import { AsyncChannelDataServiceMock } from "./services/AsyncChannelMetadataServ
 import { AbstractTransformerPropertyService } from "./services/AbstractTransformerPropertyService";
 import { AsyncTransformerPropertyServiceMock } from "./services/AsyncTransformerPropertyServiceMock";
 import { TransformerPropertySelectorComponent } from "./widgets/transformer-property-selector/transformer-property-selector.component";
+import {DataService} from "app/services/DataService";
+import {AbstractDataService} from "./services/AbstractDataService";
 
 @NgModule({
   declarations: [
@@ -29,7 +31,8 @@ import { TransformerPropertySelectorComponent } from "./widgets/transformer-prop
   providers: [
     {provide: AbstractMetadataService, useClass: AsyncMetadataServiceMock},
     {provide: AbstractChannelDataService, useClass: AsyncChannelDataServiceMock},
-    {provide: AbstractTransformerPropertyService, useClass: AsyncTransformerPropertyServiceMock}
+    {provide: AbstractTransformerPropertyService, useClass: AsyncTransformerPropertyServiceMock},
+    {provide: AbstractDataService, useClass: DataService}
   ],
   bootstrap: [AppComponent]
 })

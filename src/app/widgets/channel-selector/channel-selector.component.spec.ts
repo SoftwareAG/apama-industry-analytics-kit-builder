@@ -3,49 +3,48 @@ import {Injectable} from "@angular/core";
 import {AbstractChannelDataService} from "../../services/AbstractChannelDataService";
 import {Channel} from "../../classes/Channel";
 import {ChannelSelectorComponent} from "./channel-selector.component";
+import {AbstractDataService} from "../../services/AbstractDataService";
+import {BehaviorSubject, Observable} from "rxjs";
+import {TransformerDef} from "../../classes/TransformerDef";
+import {Config} from "../../classes/Config";
 
 
 @Injectable()
-class SynchronousChannelDataServiceMock implements AbstractChannelDataService {
-  //noinspection JSMethodCanBeStatic
-  getChannels() {
+class DataServiceMock implements AbstractDataService {
+  private _channels: BehaviorSubject<Channel[]> = new BehaviorSubject([]);
 
-    return [
-      new Channel({name: 'Default'}),
-      new Channel({name: 'Channel 1'}),
-      new Channel({name: 'Channel 2'}),
-      new Channel({name: 'Channel 3'}),
-      new Channel({name: 'Channel 4'})
-    ]
-  };
+  readonly channels: Observable<Channel[]> = this._channels.asObservable();
+  readonly transformers: Observable<TransformerDef[]>;
+  readonly hierarchy: Observable<Config>;
 
-  withChannels(callback: (channels: Channel[]) => void) {
-    callback(this.getChannels());
+  updateChannels(channels: Channel[]) {
+    this._channels.next(channels);
   }
 }
 
-describe('ChannelSelectorComponent', () => {
+fdescribe('ChannelSelectorComponent', () => {
   let component: ChannelSelectorComponent;
   let fixture: ComponentFixture<ChannelSelectorComponent>;
   let el: HTMLElement;
-  let channelDataService: AbstractChannelDataService;
+  let channelDataService: DataServiceMock;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ ChannelSelectorComponent ],
       providers: [
-        {provide: AbstractChannelDataService, useClass: SynchronousChannelDataServiceMock}
+        {provide: AbstractDataService, useClass: DataServiceMock}
       ]
     })
-      .compileComponents();
+    .compileComponents();
   }));
 
   beforeEach(() => {
+    channelDataService = TestBed.get(AbstractDataService) as DataServiceMock;
+    channelDataService.updateChannels([]);
     fixture = TestBed.createComponent(ChannelSelectorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
     el = fixture.debugElement.nativeElement;
-    channelDataService = TestBed.get(AbstractChannelDataService);
   });
 
   it('should have an svg child element', () => {
@@ -53,8 +52,16 @@ describe('ChannelSelectorComponent', () => {
   });
 
   it('should create transformer elements', () => {
+    const channels = [
+      new Channel({name: 'Default'}),
+      new Channel({name: 'Channel 1'}),
+      new Channel({name: 'Channel 2'}),
+      new Channel({name: 'Channel 3'}),
+      new Channel({name: 'Channel 4'})
+    ];
+    channelDataService.updateChannels(channels);
+    fixture.detectChanges();
     expect(el.querySelectorAll('.channel').length).toEqual(5);
-    const channels = channelDataService.getChannels();
     Array.from(el.querySelectorAll('.channel')).forEach((channelEl, i) => {
       expect((channelEl.querySelector('text') as Element).textContent).toEqual(channels[i].name);
     });

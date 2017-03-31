@@ -1,51 +1,47 @@
 import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 import {TransformerSelectorComponent} from "./transformer-selector.component";
-import {AbstractMetadataService} from "../../services/AbstractMetadataService";
 import {Injectable} from "@angular/core";
-import {Metadata} from "../../classes/Metadata";
+import {AbstractDataService} from "../../services/AbstractDataService";
+import {BehaviorSubject, Observable} from "rxjs";
+import {TransformerDef} from "../../classes/TransformerDef";
+import {Channel} from "../../classes/Channel";
+import {Config} from "../../classes/Config";
 
 @Injectable()
-class SynchronousMetadataServiceMock implements AbstractMetadataService {
-  //noinspection JSMethodCanBeStatic
-  getMeta() {
-    return new Metadata({
-      transformers: [{
-        name: "MyFirstAnalytic",
-        properties: []
-      },{
-        name: "MySecondAnalytic",
-        properties: []
-      }]
-    });
-  }
+class DataServiceMock implements AbstractDataService {
+  private _transformers: BehaviorSubject<TransformerDef[]> = new BehaviorSubject([]);
 
-  withMeta(callback: (meta: Metadata) => void) {
-    callback(this.getMeta());
+  readonly channels: Observable<Channel[]>;
+  readonly transformers: Observable<TransformerDef[]> = this._transformers.asObservable();
+  readonly hierarchy: Observable<Config>;
+
+  updateTransformers(transformers: TransformerDef[]) {
+    this._transformers.next(transformers);
   }
 }
 
-describe('TransformerSelectorComponent', () => {
+fdescribe('TransformerSelectorComponent', () => {
   let component: TransformerSelectorComponent;
   let fixture: ComponentFixture<TransformerSelectorComponent>;
   let el: HTMLElement;
-  let metadataService: AbstractMetadataService;
+  let dataService: DataServiceMock;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ TransformerSelectorComponent ],
       providers: [
-        {provide: AbstractMetadataService, useClass: SynchronousMetadataServiceMock}
+        {provide: AbstractDataService, useClass: DataServiceMock}
       ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
+    dataService = TestBed.get(AbstractDataService) as DataServiceMock;
     fixture = TestBed.createComponent(TransformerSelectorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
     el = fixture.debugElement.nativeElement;
-    metadataService = TestBed.get(AbstractMetadataService);
   });
 
   it('should have an svg child element', () => {
@@ -53,10 +49,17 @@ describe('TransformerSelectorComponent', () => {
   });
 
   it('should create transformer elements', () => {
+    const transformers = [{
+      name: "MyFirstAnalytic",
+      properties: [{ name: "Property1", description: "validDescription1", optional: true, type: "integer" as "integer" }]
+    },{
+      name: "MySecondAnalytic",
+      properties: [{ name: "Property1", description: "validDescription1", optional: true, type: "integer" as "integer" }]
+    }].map(transDefObj => { return new TransformerDef(transDefObj)});
+    dataService.updateTransformers(transformers);
     expect(el.querySelectorAll('.transformer').length).toEqual(2);
-    const metadata = metadataService.getMeta();
     Array.from(el.querySelectorAll('.transformer')).forEach((transformerEl, i) => {
-      expect((transformerEl.querySelector('text') as Element).textContent).toEqual(metadata.transformers[i].name);
+      expect((transformerEl.querySelector('text') as Element).textContent).toEqual(transformers[i].name);
     });
   });
 });
