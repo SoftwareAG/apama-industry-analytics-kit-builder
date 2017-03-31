@@ -1,11 +1,38 @@
 import {Config} from "./Config";
 import {Row} from "./Row";
+
 describe('Config', () => {
 
   describe("Should throw an error if constructed with an invalid object", () => {
     [null, [], ''].forEach((obj) => {
       it(`Construction Object: ${obj}`, () => {
         expect(() => { new Config(obj as any); }).toThrowError();
+      })
+    });
+  });
+
+  describe("Should throw an error if constructed with invalid name", () => {
+    [null, [], ''].forEach((name) => {
+      it(`Name: ${name}`, () => {
+        expect(() => { new Config({ name: name } as any); }).toThrowError();
+      })
+    });
+  });
+
+  describe("Should ignore null or empty string descriptions", () => {
+    [null, ''].forEach((description) => {
+      it(`Description: ${description}`, () => {
+
+        let config = new Config({ name: 'validName', description: description } as any);
+        expect(config.description).not.toBeDefined();
+      })
+    });
+  });
+
+  describe("Should throw an error if constructed with invalid description", () => {
+    [{}, []].forEach((description) => {
+      it(`Description: ${description}`, () => {
+        expect(() => { new Config({ name: 'validName', description: description } as any); }).toThrowError();
       })
     });
   });
@@ -19,7 +46,7 @@ describe('Config', () => {
   });
 
   it("should allow removing a row that exists", () => {
-    const config = new Config();
+    const config = new Config({name: 'validName'});
     const row = new Row();
     config.rows.push(row);
 
@@ -28,7 +55,9 @@ describe('Config', () => {
   });
 
   it("should allow removing a row that doesn't exist", () => {
-    const config = new Config();
+    const config = new Config({name: 'validName'});
+    config.name = 'validateName';
+    config.description = 'validDescription';
     const row = new Row();
     config.rows.push(row);
 
@@ -37,7 +66,7 @@ describe('Config', () => {
   });
 
   it("should allow moving a row", () => {
-    const config = new Config();
+    const config = new Config({name: 'validName'});
     const row = new Row();
     const row2 = new Row();
     config.rows.push(row, row2);
@@ -48,7 +77,7 @@ describe('Config', () => {
   });
 
   it("should allow moving a row from and to the same index", () => {
-    const config = new Config();
+    const config = new Config({name: 'validName'});
     const row = new Row();
     config.rows.push(row);
 
@@ -58,7 +87,7 @@ describe('Config', () => {
   });
 
   it("should prevent moving negative row index", () => {
-    const config = new Config();
+    const config = new Config({name: 'validName'});
     const row = new Row();
     config.rows.push(row);
 
@@ -68,7 +97,7 @@ describe('Config', () => {
 
   for (let [fromIndex, toIndex] of [[1,1], [0,1], [1,0]]) {
     it(`should throw an error when moving from row index that ${fromIndex?"doesn't":"does"} exist to an index that ${toIndex?"doesn't":"does"} exist`, () => {
-      const config = new Config();
+      const config = new Config({name: 'validName'});
       config.rows.push(new Row());
       expect(() => { config.moveRow(fromIndex, toIndex) }).toThrowError();
     });
