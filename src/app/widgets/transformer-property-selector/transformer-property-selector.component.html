@@ -1,6 +1,7 @@
 
 <form>
 
+  <!--suppress HtmlUnknownAttribute -->
   <div *ngFor="let transformerProperty of transformerProperties" class="transformer-property">
 
     <div class="transformer-property-group">
@@ -17,7 +18,7 @@
           </label>
         </ng-template>
 
-        <ng-template [ngSwitchCase]="'decimal' || 'integer' || 'float'">
+        <ng-template [ngSwitchCase]="'decimal'">
           <label class="transformer-property-name">{{transformerProperty.name}}
             <input class="transformer-property-value" type="number" value="{{transformerProperty.value}}"/>
           </label>
