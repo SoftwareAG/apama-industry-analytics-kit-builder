@@ -1,6 +1,5 @@
-import {Component, ElementRef, OnInit} from '@angular/core';
-import {Property} from "../../classes/Property";
-import {AbstractTransformerPropertyService} from "../../services/AbstractTransformerPropertyService";
+import {Component, ElementRef, Input, OnInit} from '@angular/core';
+import {Transformer} from "../../classes/Transformer";
 
 @Component({
   selector: 'transformer-property-selector',
@@ -9,18 +8,13 @@ import {AbstractTransformerPropertyService} from "../../services/AbstractTransfo
 })
 export class TransformerPropertySelectorComponent implements OnInit {
   readonly nativeElement;
-  readonly transformerPropertyService;
 
-  transformerProperties;
+  @Input()
+  transformer: Transformer;
 
-  constructor(myElement: ElementRef, transformerPropertyService: AbstractTransformerPropertyService) {
+  constructor(myElement: ElementRef) {
     this.nativeElement = myElement;
-    this.transformerPropertyService = transformerPropertyService;
   }
 
-  ngOnInit() {
-    this.transformerPropertyService.withTransformerProperties( (transformerProperties: Property[]) => {
-      this.transformerProperties = transformerProperties;
-    });
-  }
+  ngOnInit() { }
 }
