@@ -10,6 +10,10 @@ export class ClassArrayBuilder<ClassToBuild, BuilderForClass extends ClassBuilde
   with(): BuilderForClass {
     return new this.classBuilderConstructor((a: ClassToBuild) => { this.arrayValues.push(a); return this; });
   }
+  push(...value: ClassToBuild[]): this {
+    this.arrayValues.push(...value);
+    return this;
+  }
 
   build(): ClassToBuild[] {
     return this.arrayValues;

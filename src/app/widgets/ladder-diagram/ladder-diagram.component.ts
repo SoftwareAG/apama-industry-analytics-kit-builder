@@ -79,7 +79,7 @@ export class LadderDiagramComponent implements OnInit {
     }
 
     const container = svg.append('g')
-      .attr('transform', 'translate(' + padding.left + ',' + padding.top + ')');
+      .attr('transform', `translate(${padding.left},${padding.top})`);
 
     const inputLine = container.append('line')
       .attr('stroke', 'black')
@@ -128,6 +128,12 @@ export class LadderDiagramComponent implements OnInit {
         .attr('dx', '-20')
         .attr('dy', '.3em');
 
+      inChannelUpdate.selectAll('line')
+        .attr('x1', 0)
+        .attr('y1', 0)
+        .attr('x2', (d: {lastTransformerX: number}) => { return d.lastTransformerX })
+        .attr('y2', 0);
+
       const outChannel = channels.selectAll('.outChannel').data((d: Row) => {
         const transWidth = transformerWidth(d.maxTransformerCount);
         const firstTransformerX = transformerX(transWidth, 0);
@@ -150,6 +156,12 @@ export class LadderDiagramComponent implements OnInit {
         .attr('text-anchor', 'start')
         .attr('dx', '20')
         .attr('dy', '.3em');
+
+      outChannelUpdate.selectAll('line')
+        .attr('x1', (d: {firstTransformerX: number}) => { return d.firstTransformerX })
+        .attr('y1', 0)
+        .attr('x2', width)
+        .attr('y2', 0);
 
       rowEnter.append('g')
         .classed('transformers', true);
@@ -208,17 +220,6 @@ export class LadderDiagramComponent implements OnInit {
       const transformerOutChanUpdate = transformerOutChan.merge(transformerOutChanEnter)
         .attr('cx', 0)
         .attr('cy', (d,i) => { return (i+1) * defaultTransformerHeight/2});
-
-      inChannelUpdate.selectAll('line')
-        .attr('x1', 0)
-        .attr('y1', 0)
-        .attr('x2', (d: {lastTransformerX: number}) => { return d.lastTransformerX })
-        .attr('y2', 0);
-      outChannelUpdate.selectAll('line')
-        .attr('x1', (d: {firstTransformerX: number}) => { return d.firstTransformerX })
-        .attr('y1', 0)
-        .attr('x2', width)
-        .attr('y2', 0);
 
       function rowChannelUpdate(selection) {
         selection
