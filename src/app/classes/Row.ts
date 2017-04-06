@@ -32,9 +32,9 @@ export class Row  implements AsObservable, BehaviorSubjectify<RowInterface>  {
       this.transformers,
       this.inputChannelOverrides,
       this.outputChannelOverrides,
-      this.transformers.switchMap(transformers => Observable.merge(transformers.toArray().map(transformer => transformer.asObservable()))),
-      this.inputChannelOverrides.switchMap(inChannels => Observable.merge(inChannels.toArray().map(inChan => inChan ? inChan.asObservable() : Observable.of(undefined)))),
-      this.outputChannelOverrides.switchMap(outChannels => Observable.merge(outChannels.toArray().map(outChan => outChan ? outChan.asObservable() : Observable.of(undefined)))),
+      this.transformers.switchMap(transformers => Observable.merge(...transformers.toArray().map(transformer => transformer.asObservable()))),
+      this.inputChannelOverrides.switchMap(inChannels => Observable.merge(...inChannels.toArray().map(inChan => inChan ? inChan.asObservable() : Observable.of(undefined)))),
+      this.outputChannelOverrides.switchMap(outChannels => Observable.merge(...outChannels.toArray().map(outChan => outChan ? outChan.asObservable() : Observable.of(undefined)))),
     ).mapTo(this);
   }
 

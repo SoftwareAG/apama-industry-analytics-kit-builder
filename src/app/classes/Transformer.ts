@@ -20,8 +20,9 @@ export class Transformer extends TransformerDef implements AsObservable, Behavio
 
   asObservable(): Observable<this> {
     return Observable.merge(
+      super.asObservable(),
       this.properties,
-      this.properties.switchMap(properties => Observable.merge(properties.toArray().map(property => (property as Property).asObservable())))
+      this.properties.switchMap(properties => Observable.merge(...properties.toArray().map(property => (property as Property).asObservable())))
     ).mapTo(this);
   }
 }

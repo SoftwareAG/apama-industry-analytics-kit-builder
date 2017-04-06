@@ -31,9 +31,9 @@ export class TransformerDef implements AsObservable, BehaviorSubjectify<Transfor
       this.properties,
       this.inputChannels,
       this.outputChannels,
-      this.properties.switchMap(properties => Observable.merge(properties.map(property => (property as PropertyDef).asObservable()).toArray())),
-      this.inputChannels.switchMap(inChannels => Observable.merge(inChannels.toArray().map(inChan => inChan.asObservable()))),
-      this.outputChannels.switchMap(outChannels => Observable.merge(outChannels.toArray().map(outChan => outChan.asObservable())))
+      this.properties.switchMap(properties => Observable.merge(...properties.map(property => (property as PropertyDef).asObservable()).toArray())),
+      this.inputChannels.switchMap(inChannels => Observable.merge(...inChannels.toArray().map(inChan => inChan.asObservable()))),
+      this.outputChannels.switchMap(outChannels => Observable.merge(...outChannels.toArray().map(outChan => outChan.asObservable())))
     ).mapTo(this)
   }
 }

@@ -26,7 +26,7 @@ export class Config implements AsObservable, BehaviorSubjectify<ConfigInterface>
       this.name,
       this.description,
       this.rows,
-      this.rows.switchMap(rows => Observable.merge(rows.toArray().map(row => row.asObservable())))
+      this.rows.switchMap(rows => Observable.merge(...rows.toArray().map(row => row.asObservable())))
     ).mapTo(this);
   }
 }
