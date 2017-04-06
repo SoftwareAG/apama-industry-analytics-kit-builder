@@ -3,6 +3,7 @@ import {Channel} from "../classes/Channel";
 import {TransformerDef} from "../classes/TransformerDef";
 import {BehaviorSubject, Observable} from "rxjs";
 import {AbstractDataService} from "./AbstractDataService";
+import {Transformer} from "../classes/Transformer";
 
 export class DataService implements AbstractDataService {
   private _channels: BehaviorSubject<Channel[]> = new BehaviorSubject([]);
@@ -12,4 +13,5 @@ export class DataService implements AbstractDataService {
   readonly channels: Observable<Channel[]> = this._channels.asObservable();
   readonly transformers: Observable<TransformerDef[]> = this._transformers.asObservable();
   readonly hierarchy: Observable<Config> = this._hierarchy.asObservable();
+  readonly selectedTransformer: BehaviorSubject<Transformer | undefined> = new BehaviorSubject(undefined);
 }

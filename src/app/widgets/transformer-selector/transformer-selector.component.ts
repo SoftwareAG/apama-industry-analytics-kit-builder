@@ -50,9 +50,7 @@ export class TransformerSelectorComponent implements OnInit {
         .attr('y', transformerHeight / 2)
         .attr('x', width / 2);
       transformersUpdate.select('text')
-        .text((d: TransformerDef) => {
-          return d.name;
-        })
+        .text((d: TransformerDef) =>  d.name.getValue())
     });
   }
 

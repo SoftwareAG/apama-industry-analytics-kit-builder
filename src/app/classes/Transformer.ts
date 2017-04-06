@@ -1,24 +1,34 @@
-import {NestedPropertyBuilder, ValidProperty} from "./Property";
+import {NestedPropertyBuilder, Property} from "./Property";
 import {TransformerDef, TransformerDefInterface} from "./TransformerDef";
 import {ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
 import {NestedTransformerChannelDefBuilder, TransformerChannelDef} from "app/classes/TransformerChannelDef";
+import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
+import {List} from "immutable";
+import {BehaviorSubject, Observable} from "rxjs";
 
 export interface TransformerInterface extends TransformerDefInterface {
-  properties: ValidProperty[];
+  properties: Property[];
 }
 
-export class Transformer extends TransformerDef implements TransformerInterface {
-  readonly properties: ValidProperty[];
+export class Transformer extends TransformerDef implements AsObservable, BehaviorSubjectify<TransformerInterface> {
+  readonly properties: BehaviorSubject<List<Property>>;
 
   constructor(obj: TransformerInterface) {
     super(obj);
-    this.properties = obj.properties;
+    this.properties = new BehaviorSubject(List(obj.properties));
+  }
+
+  asObservable(): Observable<this> {
+    return Observable.merge(
+      this.properties,
+      this.properties.switchMap(properties => Observable.merge(properties.toArray().map(property => (property as Property).asObservable())))
+    ).mapTo(this);
   }
 }
 
 export class TransformerBuilder extends ClassBuilder<Transformer> implements TransformerInterface {
   name: string;
-  properties: ValidProperty[] = [];
+  properties: Property[] = [];
   inputChannels: TransformerChannelDef[] = [];
   outputChannels: TransformerChannelDef[] = [];
 
@@ -26,11 +36,11 @@ export class TransformerBuilder extends ClassBuilder<Transformer> implements Tra
     this.name = name;
     return this;
   }
-  Properties(properties: ValidProperty[]): this {
+  Properties(properties: Property[]): this {
     this.properties = properties;
     return this;
   }
-  pushProperty(...property: ValidProperty[]): this {
+  pushProperty(...property: Property[]): this {
     this.properties.push(...property);
     return this;
   }

@@ -1,14 +1,22 @@
 import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
+import {BehaviorSubject, Observable} from "rxjs";
+import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
 
 export interface ChannelInterface {
   name: string;
 }
 
-export class Channel implements ChannelInterface {
-  name: string;
+export class Channel implements AsObservable, BehaviorSubjectify<ChannelInterface> {
+  readonly name: BehaviorSubject<string>;
 
   constructor(obj: ChannelInterface) {
-    this.name = obj.name;
+    this.name = new BehaviorSubject<string>(obj.name);
+  }
+
+  asObservable(): Observable<this> {
+    return Observable.merge(
+      this.name
+    ).mapTo(this);
   }
 }
 

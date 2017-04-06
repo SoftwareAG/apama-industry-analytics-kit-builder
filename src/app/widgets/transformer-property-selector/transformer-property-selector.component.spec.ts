@@ -1,19 +1,39 @@
 import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 import {TransformerPropertySelectorComponent} from "./transformer-property-selector.component";
 import {Transformer, TransformerBuilder} from "../../classes/Transformer";
+import {Injectable} from "@angular/core";
+import {AbstractDataService} from "../../services/AbstractDataService";
+import {BehaviorSubject, Observable} from "rxjs";
+import {Config} from "../../classes/Config";
+import {TransformerDef} from "../../classes/TransformerDef";
+import {Channel} from "../../classes/Channel";
+
+@Injectable()
+class DataServiceMock implements AbstractDataService {
+  readonly channels: Observable<Channel[]>;
+  readonly transformers: Observable<TransformerDef[]>;
+  readonly hierarchy: Observable<Config>;
+  readonly selectedTransformer: BehaviorSubject<Transformer | undefined> = new BehaviorSubject(undefined);
+}
 
 describe('TransformerPropertySelectorComponent', () => {
+  let dataService: AbstractDataService;
   let component: TransformerPropertySelectorComponent;
   let fixture: ComponentFixture<TransformerPropertySelectorComponent>;
   let el: HTMLElement;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TransformerPropertySelectorComponent ]
+      declarations: [ TransformerPropertySelectorComponent ],
+      providers: [
+        {provide: AbstractDataService, useClass: DataServiceMock}
+      ]
+
     }).compileComponents();
   }));
 
   beforeEach(() => {
+    dataService = TestBed.get(AbstractDataService) as DataServiceMock;
     fixture = TestBed.createComponent(TransformerPropertySelectorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -23,8 +43,7 @@ describe('TransformerPropertySelectorComponent', () => {
   it('should create transformer property elements', () => {
 
     const transformer = getTransformer();
-
-    component.transformer = transformer;
+    dataService.selectedTransformer.next(transformer);
     fixture.detectChanges();
 
     // Check that all of the transformer properties have rendered into the DOM
@@ -33,7 +52,7 @@ describe('TransformerPropertySelectorComponent', () => {
     // Get the data so we can compare it against the DOM elements
     Array.from(el.querySelectorAll('.transformer-property-name')).forEach((transformerPropertyEl, i) => {
       let text: string = transformerPropertyEl.textContent || "";
-      switch(transformer.properties[i].type) {
+      switch(transformer.properties.getValue().get(i).type.getValue()) {
         case "decimal":
         case "float":
         case "integer":
@@ -45,7 +64,7 @@ describe('TransformerPropertySelectorComponent', () => {
           text = text.substr(0, text.indexOf('\n'));
           break;
       }
-      expect(text).toEqual(transformer.properties[i].name);
+      expect(text).toEqual(transformer.properties.getValue().get(i).name.getValue());
     });
   });
 });

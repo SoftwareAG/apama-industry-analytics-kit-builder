@@ -7,6 +7,7 @@ import {Channel} from "../../classes/Channel";
 import {TransformerDef} from "../../classes/TransformerDef";
 import {Config, ConfigBuilder} from "app/classes/Config";
 import {LadderDiagramComponent} from "./ladder-diagram.component";
+import {Transformer} from "../../classes/Transformer";
 
 @Injectable()
 class DataServiceMock implements AbstractDataService {
@@ -15,6 +16,7 @@ class DataServiceMock implements AbstractDataService {
   readonly channels: Observable<Channel[]>;
   readonly transformers: Observable<TransformerDef[]>;
   readonly hierarchy: Observable<Config> = this._hierarchy.asObservable();
+  readonly selectedTransformer: BehaviorSubject<Transformer | undefined>;
 
   updateHierarchy(hierarchy: Config) {
     this._hierarchy.next(hierarchy);

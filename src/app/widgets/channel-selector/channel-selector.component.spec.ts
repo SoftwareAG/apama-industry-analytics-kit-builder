@@ -62,7 +62,7 @@ describe('ChannelSelectorComponent', () => {
     fixture.detectChanges();
     expect(el.querySelectorAll('.channel').length).toEqual(5);
     Array.from(el.querySelectorAll('.channel')).forEach((channelEl, i) => {
-      expect((channelEl.querySelector('text') as Element).textContent).toEqual(channels[i].name);
+      expect((channelEl.querySelector('text') as Element).textContent).toEqual(channels[i].name.getValue());
     });
   });
 });

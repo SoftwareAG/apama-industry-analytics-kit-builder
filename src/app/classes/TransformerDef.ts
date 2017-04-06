@@ -1,6 +1,9 @@
 import {NestedPropertyDefBuilder, PropertyDef} from "./PropertyDef";
 import {ClassBuilder, ClassArrayBuilder, NestedClassBuilder} from "./ClassBuilder";
 import {NestedTransformerChannelDefBuilder, TransformerChannelDef} from "./TransformerChannelDef";
+import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
+import {BehaviorSubject, Observable} from "rxjs";
+import {List} from "immutable";
 
 export interface TransformerDefInterface {
   name: string;
@@ -9,17 +12,29 @@ export interface TransformerDefInterface {
   outputChannels: TransformerChannelDef[];
 }
 
-export class TransformerDef implements TransformerDefInterface {
-  readonly name: string;
-  readonly properties: PropertyDef[];
-  readonly inputChannels: TransformerChannelDef[];
-  readonly outputChannels: TransformerChannelDef[];
+export class TransformerDef implements AsObservable, BehaviorSubjectify<TransformerDefInterface> {
+  readonly name: BehaviorSubject<string>;
+  readonly properties: BehaviorSubject<List<PropertyDef>>;
+  readonly inputChannels: BehaviorSubject<List<TransformerChannelDef>>;
+  readonly outputChannels: BehaviorSubject<List<TransformerChannelDef>>;
 
   constructor(obj: TransformerDefInterface) {
-    this.name = obj.name;
-    this.properties = obj.properties;
-    this.inputChannels = obj.inputChannels;
-    this.outputChannels = obj.outputChannels;
+    this.name = new BehaviorSubject(obj.name);
+    this.properties = new BehaviorSubject(List(obj.properties));
+    this.inputChannels = new BehaviorSubject(List(obj.inputChannels));
+    this.outputChannels = new BehaviorSubject(List(obj.outputChannels));
+  }
+
+  asObservable(): Observable<this> {
+    return Observable.merge(
+      this.name,
+      this.properties,
+      this.inputChannels,
+      this.outputChannels,
+      this.properties.switchMap(properties => Observable.merge(properties.map(property => (property as PropertyDef).asObservable()).toArray())),
+      this.inputChannels.switchMap(inChannels => Observable.merge(inChannels.toArray().map(inChan => inChan.asObservable()))),
+      this.outputChannels.switchMap(outChannels => Observable.merge(outChannels.toArray().map(outChan => outChan.asObservable())))
+    ).mapTo(this)
   }
 }
 

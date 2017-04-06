@@ -1,4 +1,6 @@
 import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
+import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
+import {BehaviorSubject, Observable} from "rxjs";
 export interface PropertyDefInterface {
   name: string;
   description: string;
@@ -6,17 +8,26 @@ export interface PropertyDefInterface {
   optional?: boolean;
 }
 
-export class PropertyDef implements PropertyDefInterface {
-  readonly name: string;
-  readonly description: string;
-  readonly type: "integer" | "string" | "float" | "decimal" | "boolean";
-  readonly optional?: boolean;
+export class PropertyDef implements AsObservable, BehaviorSubjectify<PropertyDefInterface> {
+  readonly name: BehaviorSubject<string>;
+  readonly description: BehaviorSubject<string>;
+  readonly type: BehaviorSubject<"integer" | "string" | "float" | "decimal" | "boolean">;
+  readonly optional: BehaviorSubject<boolean>;
 
   constructor(obj: PropertyDefInterface) {
-    this.name = obj.name;
-    this.description = obj.description;
-    this.type = obj.type;
-    this.optional = obj.optional;
+    this.name = new BehaviorSubject(obj.name);
+    this.description = new BehaviorSubject(obj.description);
+    this.type = new BehaviorSubject(obj.type);
+    this.optional = new BehaviorSubject(!!obj.optional);
+  }
+
+  asObservable(): Observable<this> {
+    return Observable.merge(
+      this.name,
+      this.description,
+      this.type,
+      this.optional
+    ).mapTo(this);
   }
 }
 

@@ -42,7 +42,7 @@ export class ChannelSelectorComponent implements OnInit {
         .attr("x", (d: Channel, i) => { return i + 100; });
 
       groupsUpdate.select('text')
-        .text((d: Channel) => { return d.name; });
+        .text((d: Channel) => { return d.name.getValue(); });
     })
   }
 

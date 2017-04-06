@@ -96,7 +96,7 @@ export class LadderDiagramComponent implements OnInit {
 
       rows.datum(data);
 
-      const row = rows.selectAll('.row').data((d: Config) => { return d.rows; });
+      const row = rows.selectAll('.row').data((d: Config) => { return d.rows.getValue().toArray(); });
       row.exit().remove();
       const rowEnter = row.enter().append('g')
         .classed('row', true);
@@ -106,9 +106,9 @@ export class LadderDiagramComponent implements OnInit {
         .classed('channels', true);
 
       const inChannel = channels.selectAll('.inChannel').data((d: Row) => {
-        const transWidth = transformerWidth(d.maxTransformerCount);
-        const lastTransformerX = d.transformers.length ? transformerX(transWidth, d.transformers.length - 1) : transformerX(transWidth, 0);
-        return d.getInChannels().map((channel) => { return { lastTransformerX: lastTransformerX, channel: channel } });
+        const transWidth = transformerWidth(d.maxTransformerCount.getValue());
+        const lastTransformerX = d.transformers.getValue().size ? transformerX(transWidth, d.transformers.getValue().size - 1) : transformerX(transWidth, 0);
+        return d.getInChannels().map((channel) => { return { lastTransformerX: lastTransformerX, channel: channel } }).toArray();
       });
       inChannel.exit().remove();
       const inChannelEnter = inChannel.enter().append('g')
@@ -135,9 +135,9 @@ export class LadderDiagramComponent implements OnInit {
         .attr('y2', 0);
 
       const outChannel = channels.selectAll('.outChannel').data((d: Row) => {
-        const transWidth = transformerWidth(d.maxTransformerCount);
+        const transWidth = transformerWidth(d.maxTransformerCount.getValue());
         const firstTransformerX = transformerX(transWidth, 0);
-        return d.getOutChannels().map((channel) => { return { firstTransformerX: firstTransformerX, channel: channel } });
+        return d.getOutChannels().map((channel) => { return { firstTransformerX: firstTransformerX, channel: channel } }).toArray();
       });
       outChannel.exit().remove();
       const outChannelEnter = outChannel.enter().append('g')
@@ -166,15 +166,13 @@ export class LadderDiagramComponent implements OnInit {
       rowEnter.append('g')
         .classed('transformers', true);
 
-      const rowTransformers = rowUpdate.select('.transformers').datum(d => { return { transformerWidth: transformerWidth(d.maxTransformerCount), row: d } });
+      const rowTransformers = rowUpdate.select('.transformers').datum(d => { return { transformerWidth: transformerWidth(d.maxTransformerCount.getValue()), row: d } });
 
-      const transformer = rowTransformers.selectAll('.transformer').data(d => { return d.row.transformers.map(transformer => {
-        return {
-          width: d.transformerWidth,
-          height: transformerHeight(transformer.inputChannels.length, transformer.outputChannels.length),
-          transformer: transformer
-        } });
-      });
+      const transformer = rowTransformers.selectAll('.transformer').data(d => d.row.transformers.getValue().toArray().map(transformer => { return {
+        width: d.transformerWidth,
+        height: transformerHeight(transformer.inputChannels.getValue().size, transformer.outputChannels.getValue().size),
+        transformer: transformer
+      }}));
       transformer.exit().remove();
 
       const transformerEnter = transformer.enter().append('g')
@@ -197,13 +195,13 @@ export class LadderDiagramComponent implements OnInit {
         .attr('height', d => { return d.height; })
         .attr('width', d => { return d.width });
       transformerUpdate.select('text')
-        .text(d => { return d.transformer.name });
+        .text(d => { return d.transformer.name.getValue() });
 
       transformerEnter.append('g')
         .classed('transformer-inchannels', true)
         .attr('transform', d => { return `translate(${-d.width/2},0)`});
       const transformerInChansUpdate = transformerUpdate.select('.transformer-inchannels');
-      const transformerInChan = transformerInChansUpdate.selectAll('.channel').data((d) => { return d.transformer.inputChannels.map((chanDef) => { return { channel: chanDef } }); });
+      const transformerInChan = transformerInChansUpdate.selectAll('.channel').data((d) => { return d.transformer.inputChannels.getValue().toArray().map((chanDef) => { return { channel: chanDef } }); });
       transformerInChan.exit().remove();
       const transformerInChanEnter = transformerInChan.enter().append('circle').call(styleChannel, 5);
       const transformerInChanUpdate = transformerInChan.merge(transformerInChanEnter)
@@ -214,7 +212,7 @@ export class LadderDiagramComponent implements OnInit {
         .classed('transformer-outchannels', true)
         .attr('transform', d => { return `translate(${d.width/2},0)`});
       const transformerOutChansUpdate = transformerUpdate.select('.transformer-outchannels');
-      const transformerOutChan = transformerOutChansUpdate.selectAll('.channel').data((d) => { return d.transformer.outputChannels.map((chanDef) => { return { channel: chanDef } }); });
+      const transformerOutChan = transformerOutChansUpdate.selectAll('.channel').data((d) => { return d.transformer.outputChannels.getValue().toArray().map((chanDef) => { return { channel: chanDef } }); });
       transformerOutChan.exit().remove();
       const transformerOutChanEnter = transformerOutChan.enter().append('circle').call(styleChannel, 5);
       const transformerOutChanUpdate = transformerOutChan.merge(transformerOutChanEnter)
@@ -237,10 +235,10 @@ export class LadderDiagramComponent implements OnInit {
 
       inChannelUpdate.selectAll('text')
         .attr('x', 0)
-        .text((d: {channel: TransformerChannelDef | Channel}) => { return d.channel.name });
+        .text((d: {channel: TransformerChannelDef | Channel}) => { return d.channel.name.getValue() });
       outChannelUpdate.selectAll('text')
         .attr('x', width)
-        .text((d: {channel: TransformerChannelDef | Channel}) => { return d.channel.name });
+        .text((d: {channel: TransformerChannelDef | Channel}) => { return d.channel.name.getValue() });
 
       // Stack the rows below each other
       rowUpdate

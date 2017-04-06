@@ -2,6 +2,9 @@ import {NestedTransformerBuilder, Transformer} from "./Transformer";
 import {Channel, NestedChannelBuilder} from "./Channel";
 import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
 import {TransformerChannelDef} from "./TransformerChannelDef";
+import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
+import {BehaviorSubject, Observable} from "rxjs";
+import {List} from "immutable";
 
 export interface RowInterface {
   maxTransformerCount: number;
@@ -10,31 +13,43 @@ export interface RowInterface {
   outputChannelOverrides: (Channel | undefined)[];
 }
 
-export class Row implements RowInterface {
-  readonly maxTransformerCount: number;
-  transformers : Transformer[];
-  inputChannelOverrides: (Channel | undefined)[];
-  outputChannelOverrides: (Channel | undefined)[];
+export class Row  implements AsObservable, BehaviorSubjectify<RowInterface>  {
+  readonly maxTransformerCount: BehaviorSubject<number>;
+  readonly transformers : BehaviorSubject<List<Transformer>>;
+  readonly inputChannelOverrides: BehaviorSubject<List<Channel | undefined>>;
+  readonly outputChannelOverrides: BehaviorSubject<List<Channel | undefined>>;
 
   constructor(obj: RowInterface) {
-    this.maxTransformerCount = obj.maxTransformerCount;
-    this.transformers = obj.transformers;
-    this.inputChannelOverrides = obj.inputChannelOverrides;
-    this.outputChannelOverrides = obj.outputChannelOverrides;
+    this.maxTransformerCount = new BehaviorSubject(obj.maxTransformerCount);
+    this.transformers = new BehaviorSubject(List(obj.transformers));
+    this.inputChannelOverrides = new BehaviorSubject(List(obj.inputChannelOverrides));
+    this.outputChannelOverrides = new BehaviorSubject(List(obj.outputChannelOverrides));
   }
 
-  getInChannels(): (Channel | TransformerChannelDef)[] {
+  asObservable(): Observable<this> {
+    return Observable.merge(
+      this.maxTransformerCount,
+      this.transformers,
+      this.inputChannelOverrides,
+      this.outputChannelOverrides,
+      this.transformers.switchMap(transformers => Observable.merge(transformers.toArray().map(transformer => transformer.asObservable()))),
+      this.inputChannelOverrides.switchMap(inChannels => Observable.merge(inChannels.toArray().map(inChan => inChan ? inChan.asObservable() : Observable.of(undefined)))),
+      this.outputChannelOverrides.switchMap(outChannels => Observable.merge(outChannels.toArray().map(outChan => outChan ? outChan.asObservable() : Observable.of(undefined)))),
+    ).mapTo(this);
+  }
+
+  getInChannels(): List<Channel | TransformerChannelDef> {
     // Must have the same number of input channels as the first transformer
-    const requiredChannels = this.transformers.length ? this.transformers[0].inputChannels : [];
+    const requiredChannels = this.transformers.getValue().size ? this.transformers.getValue().first().inputChannels.getValue() : List();
     // If the row contains an override then return that otherwise return the Default ChannelDef from the first transformer
-    return requiredChannels.map((channelDef, i) => { return this.inputChannelOverrides.length > i && this.inputChannelOverrides[i] || channelDef; });
+    return requiredChannels.map((channelDef: TransformerChannelDef, i: number) => this.inputChannelOverrides.getValue().size > i && this.inputChannelOverrides.getValue().get(i) || channelDef) as List<Channel | TransformerChannelDef>;
   }
 
-  getOutChannels(): (Channel | TransformerChannelDef)[] {
+  getOutChannels(): List<Channel | TransformerChannelDef> {
     // Must have the same number of output channels as the last transformer
-    const requiredChannels = this.transformers.length ? this.transformers[this.transformers.length - 1].outputChannels : [];
+    const requiredChannels = this.transformers.getValue().size ? this.transformers.getValue().last().outputChannels.getValue() : List();
     // If the row contains an override then return that otherwise return the Default ChannelDef from the last transformer
-    return requiredChannels.map((channelDef, i) => { return this.outputChannelOverrides.length > i && this.outputChannelOverrides[i] || channelDef; });
+    return requiredChannels.map((channelDef: TransformerChannelDef, i: number) => { return this.outputChannelOverrides.getValue().size > i && this.outputChannelOverrides.getValue().get(i) || channelDef; }) as List<Channel | TransformerChannelDef>;
   }
 }
 

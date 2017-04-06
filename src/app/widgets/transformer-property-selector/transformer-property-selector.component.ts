@@ -1,5 +1,8 @@
-import {Component, ElementRef, Input, OnInit} from '@angular/core';
-import {Transformer} from "../../classes/Transformer";
+import {Component, OnInit} from "@angular/core";
+import {Observable} from "rxjs";
+import {AbstractDataService} from "../../services/AbstractDataService";
+import {Property} from "app/classes/Property";
+import {List} from "immutable";
 
 @Component({
   selector: 'transformer-property-selector',
@@ -7,13 +10,12 @@ import {Transformer} from "../../classes/Transformer";
   styleUrls: ['./transformer-property-selector.component.css']
 })
 export class TransformerPropertySelectorComponent implements OnInit {
-  readonly nativeElement;
 
-  @Input()
-  transformer: Transformer;
+  readonly transformerProperties: Observable<List<Property>>;
 
-  constructor(myElement: ElementRef) {
-    this.nativeElement = myElement;
+  constructor(dataService: AbstractDataService) {
+    this.transformerProperties = dataService.selectedTransformer.asObservable()
+      .switchMap(transformer => transformer ? transformer.properties : Observable.of(List()));
   }
 
   ngOnInit() { }

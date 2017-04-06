@@ -1,5 +1,8 @@
 import {NestedRowBuilder, Row} from "./Row";
 import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
+import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
+import {BehaviorSubject, Observable} from "rxjs";
+import {List} from "immutable";
 
 export interface ConfigInterface {
   name: string;
@@ -7,44 +10,24 @@ export interface ConfigInterface {
   rows: Row[]
 }
 
-export class Config implements ConfigInterface {
-  name: string;
-  description: string;
-  rows : Row[];
+export class Config implements AsObservable, BehaviorSubjectify<ConfigInterface>  {
+  readonly name: BehaviorSubject<string>;
+  readonly description: BehaviorSubject<string>;
+  readonly rows : BehaviorSubject<List<Row>>;
 
   constructor(obj: ConfigInterface) {
-    this.name = obj.name;
-    this.description = obj.description;
-    this.rows = obj.rows;
+    this.name = new BehaviorSubject(obj.name);
+    this.description = new BehaviorSubject(obj.description);
+    this.rows = new BehaviorSubject(List(obj.rows));
   }
 
-  /**
-   * Removes a row if it is present
-   * @param row
-   * @returns {boolean} Whether the row was removed
-   */
-  removeRow(row: Row) : boolean {
-    const index = this.rows.indexOf(row);
-    if (~index) {
-      this.rows.splice(index,1);
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  /**
-   * Moves a row from and index to an index
-   * @param fromIndex
-   * @param toIndex
-   */
-  moveRow(fromIndex: number, toIndex : number) {
-    if (fromIndex < 0) { throw new Error("From index must be greater than zero"); }
-    if (toIndex < 0) { throw new Error("To index must be greater than zero"); }
-    if (fromIndex >= this.rows.length) { throw new Error("From index must be less than the size of the array"); }
-    if (toIndex >= this.rows.length) { throw new Error("To index must be less than the size of the array"); }
-
-    this.rows.splice(toIndex, 0, this.rows.splice(fromIndex, 1)[0]);
+  asObservable(): Observable<this> {
+    return Observable.merge(
+      this.name,
+      this.description,
+      this.rows,
+      this.rows.switchMap(rows => rows.toArray().map(row => row.asObservable()))
+    ).mapTo(this);
   }
 }
 
