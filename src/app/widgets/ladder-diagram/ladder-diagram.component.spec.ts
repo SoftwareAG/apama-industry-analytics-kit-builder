@@ -250,10 +250,10 @@ describe('LadderDiagramComponent', () => {
       .Description("This configuration demonstrates a single row with a single Analytic containing two input channels and two output channels")
       .withRow()
         .MaxTransformerCount(3)
-        .withInputChannel().Name("Input Channel 1").endWith()
-        .withOutputChannel().Name("Output Channel 1").endWith()
         .withTransformer()
           .Name("My First Analytic")
+          .withInputChannel().Name("Input Channel 1").endWith()
+          .withOutputChannel().Name("Output Channel 1").endWith()
         .endWith()
       .endWith()
       .build();
@@ -283,11 +283,15 @@ describe('LadderDiagramComponent', () => {
 
     const inChannels = Array.from(el.querySelectorAll('.channels > .inChannel'));
     expect(inChannels).toBeArrayOfSize(2);
+    expect(Array.from(inChannels[0].querySelectorAll('.placeholder-channel'))).toBeEmptyArray();
+    expect(Array.from(inChannels[1].querySelectorAll('.placeholder-channel'))).toBeArrayOfSize(1);
     expect(inChannels[0].querySelectorAll('text')[0].textContent).toEqual(`OverriddenInput`);
     expect(inChannels[1].querySelectorAll('text')[0].textContent).toEqual(`InChannel1`);
 
     const outChannels = Array.from(el.querySelectorAll('.channels > .outChannel'));
     expect(outChannels).toBeArrayOfSize(2);
+    expect(Array.from(outChannels[0].querySelectorAll('.placeholder-channel'))).toBeEmptyArray();
+    expect(Array.from(outChannels[1].querySelectorAll('.placeholder-channel'))).toBeArrayOfSize(1);
     expect(outChannels[0].querySelectorAll('text')[0].textContent).toEqual(`OverriddenOutput`);
     expect(outChannels[1].querySelectorAll('text')[0].textContent).toEqual(`OutChannel1`);
 
