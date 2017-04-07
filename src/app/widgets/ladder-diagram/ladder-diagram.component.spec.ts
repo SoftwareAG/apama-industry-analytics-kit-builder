@@ -241,5 +241,60 @@ describe('LadderDiagramComponent', () => {
     expect(Array.from(row1.querySelectorAll('.channels > .outChannel'))).toBeArrayOfSize(1);
     expect(Array.from(row1.querySelectorAll('.channels > .inChannel .placeholder-channel'))).toBeArrayOfSize(2);
     expect(Array.from(row1.querySelectorAll('.channels > .outChannel .placeholder-channel'))).toBeArrayOfSize(1);
-  })
+  });
+
+
+  it('ISSUE-127804: On a config reload the input and output channels and transformers should be redrawn correctly', () => {
+    const config = new ConfigBuilder()
+      .Name("Single row with a single Analytic containing two input channels and two output channels")
+      .Description("This configuration demonstrates a single row with a single Analytic containing two input channels and two output channels")
+      .withRow()
+        .MaxTransformerCount(3)
+        .withInputChannel().Name("Input Channel 1").endWith()
+        .withOutputChannel().Name("Output Channel 1").endWith()
+        .withTransformer()
+          .Name("My First Analytic")
+        .endWith()
+      .endWith()
+      .build();
+
+    dataService.updateHierarchy(config);
+    fixture.detectChanges();
+
+    const config2 = new ConfigBuilder()
+      .Name("Single row with a single Analytic containing two input channels and two output channels")
+      .Description("This configuration demonstrates a single row with a single Analytic containing two input channels and two output channels")
+      .withRow()
+        .MaxTransformerCount(3)
+        .withInputChannel().Name("OverriddenInput").endWith()
+        .withOutputChannel().Name("OverriddenOutput").endWith()
+        .withTransformer()
+          .Name("My Second Analytic")
+          .withInputChannel().Name("InChannel0").endWith()
+          .withOutputChannel().Name("OutChannel0").endWith()
+          .withInputChannel().Name("InChannel1").endWith()
+          .withOutputChannel().Name("OutChannel1").endWith()
+        .endWith()
+      .endWith()
+      .build();
+
+    dataService.updateHierarchy(config2);
+    fixture.detectChanges();
+
+    const inChannels = Array.from(el.querySelectorAll('.channels > .inChannel'));
+    expect(inChannels).toBeArrayOfSize(2);
+    expect(inChannels[0].querySelectorAll('text')[0].textContent).toEqual(`OverriddenInput`);
+    expect(inChannels[1].querySelectorAll('text')[0].textContent).toEqual(`InChannel1`);
+
+    const outChannels = Array.from(el.querySelectorAll('.channels > .outChannel'));
+    expect(outChannels).toBeArrayOfSize(2);
+    expect(outChannels[0].querySelectorAll('text')[0].textContent).toEqual(`OverriddenOutput`);
+    expect(outChannels[1].querySelectorAll('text')[0].textContent).toEqual(`OutChannel1`);
+
+    const transformerName = Array.from(el.querySelectorAll('.transformer > text'));
+    expect(transformerName).toBeArrayOfSize(1);
+    expect(transformerName[0].textContent).toEqual("My Second Analytic");
+
+  });
+
 });
