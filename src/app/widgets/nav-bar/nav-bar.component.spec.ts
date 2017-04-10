@@ -40,6 +40,12 @@ describe('NavBarComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should render Navbar title as "Analytics Builder"', () => {
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('#navbar-title').text).toContain('Analytics Builder');
+  });
+
   it('should correctly display example configurations in the dropdown', () => {
     dataService.loadConfigurations();
     fixture.detectChanges();

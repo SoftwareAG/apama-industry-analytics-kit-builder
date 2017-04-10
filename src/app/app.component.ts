@@ -8,7 +8,7 @@ import {DataService} from "./services/DataService";
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  // title = 'app works!';
+  title = 'Analytics Builder';
 
   constructor(dataService: AbstractDataService) {
     (dataService as DataService).loadConfigurations();
