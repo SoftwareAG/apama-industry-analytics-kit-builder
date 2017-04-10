@@ -4,6 +4,7 @@ import * as deepFreeze from "deep-freeze";
 import {TransformerDef} from "../../classes/TransformerDef";
 import {Observable} from "rxjs";
 import {AbstractDataService} from "../../services/AbstractDataService";
+import {List} from "immutable";
 
 @Component({
   selector: 'transformer-selector',
@@ -11,17 +12,17 @@ import {AbstractDataService} from "../../services/AbstractDataService";
 })
 export class TransformerSelectorComponent implements OnInit {
   readonly nativeElement;
-  readonly transformers: Observable<TransformerDef[]>;
+  readonly transformers: Observable<List<TransformerDef>>;
 
   constructor(myElement: ElementRef, dataService: AbstractDataService) {
     this.nativeElement = myElement.nativeElement;
-    this.transformers = dataService.transformers;
+    this.transformers = dataService.transformers.asObservable();
   }
 
   ngOnInit() {
     const padding = deepFreeze({top: 10, right: 10, bottom: 10, left: 10});
     const width = 200 - padding.left - padding.right;
-    const height = 500 - padding.top - padding.bottom;
+    const height = 1000 - padding.top - padding.bottom;
     const transformerHeight = 50;
 
     const svg = d3.select(this.nativeElement).append('svg')
@@ -29,7 +30,7 @@ export class TransformerSelectorComponent implements OnInit {
       .attr('height', height + padding.top + padding.bottom);
 
     this.transformers.subscribe(transformerDefs => {
-      const transformers = svg.selectAll('g').data(transformerDefs);
+      const transformers = svg.selectAll('g').data(transformerDefs.toArray());
       transformers.exit().remove();
       const transformersEnter = transformers.enter().append('g')
         .classed('transformer', true)

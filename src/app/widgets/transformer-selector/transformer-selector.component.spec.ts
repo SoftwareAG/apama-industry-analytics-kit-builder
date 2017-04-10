@@ -2,22 +2,21 @@ import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 import {TransformerSelectorComponent} from "./transformer-selector.component";
 import {Injectable} from "@angular/core";
 import {AbstractDataService} from "../../services/AbstractDataService";
-import {BehaviorSubject, Observable} from "rxjs";
+import {BehaviorSubject} from "rxjs";
 import {TransformerDef, TransformerDefArrayBuilder} from "../../classes/TransformerDef";
 import {Channel} from "../../classes/Channel";
 import {Config} from "../../classes/Config";
+import {List} from "immutable";
+import {Transformer} from "../../classes/Transformer";
 
 @Injectable()
 class DataServiceMock implements AbstractDataService {
-  private _transformers: BehaviorSubject<TransformerDef[]> = new BehaviorSubject([]);
+  readonly configurations: BehaviorSubject<List<Config>>;
 
-  readonly channels: Observable<Channel[]>;
-  readonly transformers: Observable<TransformerDef[]> = this._transformers.asObservable();
-  readonly hierarchy: Observable<Config>;
-
-  updateTransformers(transformers: TransformerDef[]) {
-    this._transformers.next(transformers);
-  }
+  readonly channels: BehaviorSubject<List<Channel>>;
+  readonly transformers: BehaviorSubject<List<TransformerDef>> = new BehaviorSubject(List<TransformerDef>());
+  readonly hierarchy: BehaviorSubject<Config>;
+  readonly selectedTransformer: BehaviorSubject<Transformer | undefined>;
 }
 
 describe('TransformerSelectorComponent', () => {
@@ -49,11 +48,11 @@ describe('TransformerSelectorComponent', () => {
   });
 
   it('should create transformer elements', () => {
-    const transformers = new TransformerDefArrayBuilder()
+    const transformers = List(new TransformerDefArrayBuilder()
       .with().Name("MyFirstAnalytic").endWith()
       .with().Name("MySecondAnalytic").endWith()
-      .build();
-    dataService.updateTransformers(transformers);
+      .build());
+    dataService.transformers.next(transformers);
     const textContents = Array.from(el.querySelectorAll('.transformer')).map((transformerEl) => {
       return (transformerEl.querySelector('text') as Element).textContent;
     });

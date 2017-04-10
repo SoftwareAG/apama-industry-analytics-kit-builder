@@ -9,6 +9,9 @@ import {TransformerSelectorComponent} from "./widgets/transformer-selector/trans
 import {LadderDiagramComponent} from "./widgets/ladder-diagram/ladder-diagram.component";
 import {AbstractDataService} from "./services/AbstractDataService";
 import {DataService} from "app/services/DataService";
+import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
+import {TransformerPropertySelectorComponent} from "./widgets/transformer-property-selector/transformer-property-selector.component";
+import {NavBarComponent} from "./widgets/nav-bar/nav-bar.component";
 
 @NgModule({
   declarations: [
@@ -16,12 +19,15 @@ import {DataService} from "app/services/DataService";
     ChannelSelectorComponent,
     TransformerSelectorComponent,
     LadderDiagramComponent,
-    TransformerSelectorComponent
+    TransformerSelectorComponent,
+    TransformerPropertySelectorComponent,
+    NavBarComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule
+    HttpModule,
+    NgbModule.forRoot()
   ],
   providers: [
     {provide: AbstractDataService, useClass: DataService}

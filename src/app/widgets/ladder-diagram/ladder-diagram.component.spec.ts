@@ -2,26 +2,22 @@ import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 import * as d3 from "d3";
 import {Injectable} from "@angular/core";
 import {AbstractDataService} from "../../services/AbstractDataService";
-import {BehaviorSubject, Observable} from "rxjs";
+import {BehaviorSubject} from "rxjs";
 import {Channel} from "../../classes/Channel";
 import {TransformerDef} from "../../classes/TransformerDef";
 import {Config, ConfigBuilder} from "app/classes/Config";
 import {LadderDiagramComponent} from "./ladder-diagram.component";
 import {Transformer} from "../../classes/Transformer";
+import {List} from "immutable";
 
 @Injectable()
 class DataServiceMock implements AbstractDataService {
-  private _hierarchy: BehaviorSubject<Config> = new BehaviorSubject(new ConfigBuilder().build());
+  readonly configurations: BehaviorSubject<List<Config>>;
 
-  readonly channels: Observable<Channel[]>;
-  readonly transformers: Observable<TransformerDef[]>;
-  readonly hierarchy: Observable<Config> = this._hierarchy.asObservable();
+  readonly channels: BehaviorSubject<List<Channel>>;
+  readonly transformers: BehaviorSubject<List<TransformerDef>>;
+  readonly hierarchy: BehaviorSubject<Config> = new BehaviorSubject(new ConfigBuilder().build());
   readonly selectedTransformer: BehaviorSubject<Transformer | undefined>;
-
-  updateHierarchy(hierarchy: Config) {
-    this._hierarchy.next(hierarchy);
-  }
-
 }
 
 describe('LadderDiagramComponent', () => {
@@ -42,7 +38,7 @@ describe('LadderDiagramComponent', () => {
 
   beforeEach(() => {
     dataService = TestBed.get(AbstractDataService) as DataServiceMock;
-    dataService.updateHierarchy(new ConfigBuilder().build());
+    dataService.hierarchy.next(new ConfigBuilder().build());
     fixture = TestBed.createComponent(LadderDiagramComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -61,7 +57,7 @@ describe('LadderDiagramComponent', () => {
       }
       const config: Config = configBuilder.build();
 
-      dataService.updateHierarchy(config);
+      dataService.hierarchy.next(config);
       fixture.detectChanges();
 
       expect(el.querySelectorAll('.rows > .row').length).toEqual(i);
@@ -77,7 +73,7 @@ describe('LadderDiagramComponent', () => {
       }
       const config: Config = rowBuilder.endWith().build();
 
-      dataService.updateHierarchy(config);
+      dataService.hierarchy.next(config);
       fixture.detectChanges();
 
       const transformers = Array.from(el.querySelectorAll('.rows')[0].querySelectorAll('.transformers > .transformer'));
@@ -99,7 +95,7 @@ describe('LadderDiagramComponent', () => {
         }
         const config: Config = transformerBuilder.endWith().endWith().build();
 
-        dataService.updateHierarchy(config);
+        dataService.hierarchy.next(config);
         fixture.detectChanges();
 
         const inChannels = Array.from(el.querySelectorAll('.channels > .inChannel'));
@@ -122,7 +118,7 @@ describe('LadderDiagramComponent', () => {
         }
         const config: Config = transformerBuilder.endWith().endWith().build();
 
-        dataService.updateHierarchy(config);
+        dataService.hierarchy.next(config);
         fixture.detectChanges();
 
         const outChannels = Array.from(el.querySelectorAll('.channels > .outChannel'));
@@ -162,7 +158,7 @@ describe('LadderDiagramComponent', () => {
         }
         const config: Config = rowBuilder.endWith().build();
 
-        dataService.updateHierarchy(config);
+        dataService.hierarchy.next(config);
         fixture.detectChanges();
 
         const inChannels = Array.from(el.querySelectorAll('.channels > .inChannel'));
@@ -214,7 +210,7 @@ describe('LadderDiagramComponent', () => {
       .endWith()
       .build();
 
-    dataService.updateHierarchy(config);
+    dataService.hierarchy.next(config);
     fixture.detectChanges();
 
     const rows = Array.from(el.querySelectorAll('.rows > .row'));
@@ -258,7 +254,7 @@ describe('LadderDiagramComponent', () => {
       .endWith()
       .build();
 
-    dataService.updateHierarchy(config);
+    dataService.hierarchy.next(config);
     fixture.detectChanges();
 
     const config2 = new ConfigBuilder()
@@ -278,7 +274,7 @@ describe('LadderDiagramComponent', () => {
       .endWith()
       .build();
 
-    dataService.updateHierarchy(config2);
+    dataService.hierarchy.next(config2);
     fixture.detectChanges();
 
     const inChannels = Array.from(el.querySelectorAll('.channels > .inChannel'));

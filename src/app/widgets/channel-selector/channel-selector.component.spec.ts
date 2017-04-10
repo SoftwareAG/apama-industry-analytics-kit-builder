@@ -1,24 +1,22 @@
 import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 import {Injectable} from "@angular/core";
-import {Channel} from "../../classes/Channel";
+import {Channel, ChannelArrayBuilder} from "../../classes/Channel";
 import {ChannelSelectorComponent} from "./channel-selector.component";
 import {AbstractDataService} from "../../services/AbstractDataService";
-import {BehaviorSubject, Observable} from "rxjs";
+import {BehaviorSubject} from "rxjs";
 import {TransformerDef} from "../../classes/TransformerDef";
 import {Config} from "../../classes/Config";
+import {List} from "immutable";
+import {Transformer} from "app/classes/Transformer";
 
 
 @Injectable()
 class DataServiceMock implements AbstractDataService {
-  private _channels: BehaviorSubject<Channel[]> = new BehaviorSubject([]);
-
-  readonly channels: Observable<Channel[]> = this._channels.asObservable();
-  readonly transformers: Observable<TransformerDef[]>;
-  readonly hierarchy: Observable<Config>;
-
-  updateChannels(channels: Channel[]) {
-    this._channels.next(channels);
-  }
+  readonly channels: BehaviorSubject<List<Channel>> = new BehaviorSubject(List<Channel>());
+  readonly transformers: BehaviorSubject<List<TransformerDef>>;
+  readonly hierarchy: BehaviorSubject<Config>;
+  readonly selectedTransformer: BehaviorSubject<Transformer | undefined>;
+  readonly configurations: BehaviorSubject<List<Config>>;
 }
 
 describe('ChannelSelectorComponent', () => {
@@ -39,7 +37,8 @@ describe('ChannelSelectorComponent', () => {
 
   beforeEach(() => {
     channelDataService = TestBed.get(AbstractDataService) as DataServiceMock;
-    channelDataService.updateChannels([]);
+
+    channelDataService.channels.next(List<Channel>());
     fixture = TestBed.createComponent(ChannelSelectorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -51,18 +50,19 @@ describe('ChannelSelectorComponent', () => {
   });
 
   it('should create transformer elements', () => {
-    const channels = [
-      new Channel({name: 'Default'}),
-      new Channel({name: 'Channel 1'}),
-      new Channel({name: 'Channel 2'}),
-      new Channel({name: 'Channel 3'}),
-      new Channel({name: 'Channel 4'})
-    ];
-    channelDataService.updateChannels(channels);
+    const channels = List(new ChannelArrayBuilder()
+        .with().Name('Default 1').endWith()
+        .with().Name('Default 2').endWith()
+        .with().Name('Default 3').endWith()
+        .with().Name('Default 4').endWith()
+        .with().Name('Default 5').endWith()
+      .build());
+
+    channelDataService.channels.next(channels);
     fixture.detectChanges();
-    expect(el.querySelectorAll('.channel').length).toEqual(5);
+    expect(Array.from(el.querySelectorAll('.channel'))).toBeArrayOfSize(5);
     Array.from(el.querySelectorAll('.channel')).forEach((channelEl, i) => {
-      expect((channelEl.querySelector('text') as Element).textContent).toEqual(channels[i].name.getValue());
+      expect((channelEl.querySelector('text') as Element).textContent).toEqual(channels.get(i).name.getValue());
     });
   });
 });
