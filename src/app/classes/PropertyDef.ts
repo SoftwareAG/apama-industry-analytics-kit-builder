@@ -1,12 +1,15 @@
 import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
 import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
 import {BehaviorSubject, Observable} from "rxjs";
+import {validate} from "validate.js";
+
 export interface PropertyDefInterface {
   name: string;
   description: string;
   type: "integer" | "string" | "float" | "decimal" | "boolean";
   optional?: boolean;
 }
+
 
 export class PropertyDef implements AsObservable, BehaviorSubjectify<PropertyDefInterface> {
   readonly name: BehaviorSubject<string>;
@@ -18,6 +21,7 @@ export class PropertyDef implements AsObservable, BehaviorSubjectify<PropertyDef
     this.name = new BehaviorSubject(obj.name);
     this.description = new BehaviorSubject(obj.description);
     this.type = new BehaviorSubject(obj.type);
+    //noinspection PointlessBooleanExpressionJS
     this.optional = new BehaviorSubject(!!obj.optional);
   }
 
@@ -55,6 +59,38 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
   }
   build(): PropertyDef {
     return new PropertyDef(this);
+  }
+
+  static buildFromJSON(jsonData: any) : PropertyDef {
+
+    // validate jsonData object
+    if (!validate.isObject(jsonData)) { throw new Error('jsonData is invalid'); }
+
+    // validate name
+    if (!validate.contains(jsonData, 'name')) { throw new Error('jsonData does not contain the "name" element'); }
+    if (!validate.isString(jsonData.name)) { throw new Error('name must contain string data'); }
+    if (validate.isEmpty(jsonData.name)) { throw new Error('name cannot be empty'); }
+
+    // validate description
+    if (!validate.contains(jsonData, 'description')) { throw new Error('jsonData does not contain the "description" element'); }
+    if (!validate.isString(jsonData.description)) { throw new Error('description must contain string data'); }
+    if (validate.isEmpty(jsonData.description)) { throw new Error('description cannot be empty'); }
+
+    // validate type
+    if (!validate.contains(jsonData, 'type')) { throw new Error('jsonData does not contain the "type" element'); }
+    if (!validate.isString(jsonData.type)) { throw new Error('type must contain string data'); }
+
+    // Confirm that the data in the type element is valid
+    if(!validate.contains(["integer", "string", "float", "decimal", "boolean"], jsonData.type)) {
+      throw new Error(`type cannot contain ${jsonData.type} data`);
+    }
+
+    // validate optional
+    // If the optional element has been provided, it must contain boolean data
+    if ( validate.contains(jsonData, 'optional') && !validate.isBoolean(jsonData.optional)) { throw new Error('optional must contain Boolean data'); }
+
+    const propertyDefBuilder = Object.assign(new PropertyDefBuilder(), jsonData);
+    return propertyDefBuilder.build();
   }
 }
 
