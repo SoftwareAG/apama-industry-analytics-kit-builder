@@ -12,6 +12,9 @@ import {DataService} from "app/services/DataService";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {TransformerPropertySelectorComponent} from "./widgets/transformer-property-selector/transformer-property-selector.component";
 import {NavBarComponent} from "./widgets/nav-bar/nav-bar.component";
+import {AbstractDragService} from "app/services/AbstractDragService";
+import {DragService} from "./services/DragService";
+import {DragOverlayComponent} from "./widgets/dragoverlay/drag-overlay.component";
 
 @NgModule({
   declarations: [
@@ -21,7 +24,8 @@ import {NavBarComponent} from "./widgets/nav-bar/nav-bar.component";
     LadderDiagramComponent,
     TransformerSelectorComponent,
     TransformerPropertySelectorComponent,
-    NavBarComponent
+    NavBarComponent,
+    DragOverlayComponent
   ],
   imports: [
     BrowserModule,
@@ -30,7 +34,8 @@ import {NavBarComponent} from "./widgets/nav-bar/nav-bar.component";
     NgbModule.forRoot()
   ],
   providers: [
-    {provide: AbstractDataService, useClass: DataService}
+    {provide: AbstractDataService, useClass: DataService},
+    {provide: AbstractDragService, useClass: DragService}
   ],
   bootstrap: [AppComponent]
 })

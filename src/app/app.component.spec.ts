@@ -8,6 +8,9 @@ import {LadderDiagramComponent} from "./widgets/ladder-diagram/ladder-diagram.co
 import {AbstractDataService} from "./services/AbstractDataService";
 import {DataService} from "./services/DataService";
 import {NavBarComponent} from "./widgets/nav-bar/nav-bar.component";
+import {AbstractDragService} from "./services/AbstractDragService";
+import {DragService} from "./services/DragService";
+import {DragOverlayComponent} from "./widgets/dragoverlay/drag-overlay.component";
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
@@ -19,10 +22,12 @@ describe('AppComponent', () => {
         LadderDiagramComponent,
         TransformerSelectorComponent,
         TransformerPropertySelectorComponent,
-        NavBarComponent
+        NavBarComponent,
+        DragOverlayComponent
       ],
       providers: [
-        {provide: AbstractDataService, useClass: DataService}
+        {provide: AbstractDataService, useClass: DataService},
+        {provide: AbstractDragService, useClass: DragService}
       ],
     }).compileComponents();
   }));

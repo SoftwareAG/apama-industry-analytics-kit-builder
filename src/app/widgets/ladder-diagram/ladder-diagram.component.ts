@@ -7,6 +7,7 @@ import {Row} from "../../classes/Row";
 import {TransformerChannelDef} from "../../classes/TransformerChannelDef";
 import {Channel} from "../../classes/Channel";
 import {Observable} from "rxjs";
+import {AbstractDragService} from "../../services/AbstractDragService";
 
 @Component({
   selector: 'ladder-diagram',
@@ -15,10 +16,12 @@ import {Observable} from "rxjs";
 export class LadderDiagramComponent implements OnInit {
   readonly nativeElement;
   readonly hierarchy: Observable<Config>;
+  readonly dragService: AbstractDragService;
 
-  constructor(myElement: ElementRef, dataService: AbstractDataService) {
+  constructor(myElement: ElementRef, dataService: AbstractDataService, dragService: AbstractDragService) {
     this.nativeElement = myElement.nativeElement;
     this.hierarchy = dataService.hierarchy;
+    this.dragService = dragService;
   }
 
   ngOnInit() {
@@ -92,7 +95,9 @@ export class LadderDiagramComponent implements OnInit {
     const rows = container.append('g')
       .classed('rows', true);
 
-    this.hierarchy.subscribe((data: Config) => {
+    this.hierarchy
+      .switchMap((hierarchy) => hierarchy.asObservable()) // subscribe to all of the sub-tree changes too
+      .subscribe((data: Config) => {
 
       rows.datum(data);
 
@@ -110,11 +115,19 @@ export class LadderDiagramComponent implements OnInit {
       const inChannel = channelsUpdate.selectAll('.inChannel').data((d: Row) => {
         const transWidth = transformerWidth(d.maxTransformerCount.getValue());
         const lastTransformerX = d.transformers.getValue().size ? transformerX(transWidth, d.transformers.getValue().size - 1) : transformerX(transWidth, 0);
-        return d.getInChannels().toArray().map((channel) => { return { lastTransformerX: lastTransformerX, channel: channel } });
+        return d.getInChannels().toArray().map((channel) => { return { lastTransformerX: lastTransformerX, channel: channel, row: d } });
       });
       inChannel.exit().remove();
       const inChannelEnter = inChannel.enter().append('g')
-        .classed('inChannel', true);
+        .classed('inChannel', true)
+        .on('mouseup', (d, i) => {
+          const dragged = this.dragService.dragging.getValue();
+          if (dragged && dragged.object instanceof Channel) {
+            this.dragService.stopDrag();
+            d3.event.preventDefault();
+            d.row.inputChannelOverrides.next(d.row.inputChannelOverrides.getValue().set(i, dragged.object))
+          }
+        });
       const inChannelUpdate = inChannel.merge(inChannelEnter)
         .attr('transform', (d,i) => `translate(0,${(i+1) * defaultTransformerHeight / 2})`);
 
@@ -139,11 +152,19 @@ export class LadderDiagramComponent implements OnInit {
       const outChannel = channelsUpdate.selectAll('.outChannel').data((d: Row) => {
         const transWidth = transformerWidth(d.maxTransformerCount.getValue());
         const firstTransformerX = transformerX(transWidth, 0);
-        return d.getOutChannels().toArray().map((channel) => { return { firstTransformerX: firstTransformerX, channel: channel } });
+        return d.getOutChannels().toArray().map((channel) => { return { firstTransformerX: firstTransformerX, channel: channel, row: d } });
       });
       outChannel.exit().remove();
       const outChannelEnter = outChannel.enter().append('g')
-        .classed('outChannel', true);
+        .classed('outChannel', true)
+        .on('mouseup', (d, i) => {
+          const dragged = this.dragService.dragging.getValue();
+          if (dragged && dragged.object instanceof Channel) {
+            this.dragService.stopDrag();
+            d3.event.preventDefault();
+            d.row.outputChannelOverrides.next(d.row.outputChannelOverrides.getValue().set(i, dragged.object))
+          }
+        });
       const outChannelUpdate = outChannel.merge(outChannelEnter)
         .attr('transform', (d,i) => `translate(0,${(i+1) * defaultTransformerHeight / 2})`);
 

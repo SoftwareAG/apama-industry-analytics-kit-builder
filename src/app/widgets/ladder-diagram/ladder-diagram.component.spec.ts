@@ -9,6 +9,7 @@ import {Config, ConfigBuilder} from "app/classes/Config";
 import {LadderDiagramComponent} from "./ladder-diagram.component";
 import {Transformer} from "../../classes/Transformer";
 import {List} from "immutable";
+import {AbstractDragService, Draggable, Dragged, Point} from "../../services/AbstractDragService";
 
 @Injectable()
 class DataServiceMock implements AbstractDataService {
@@ -18,6 +19,15 @@ class DataServiceMock implements AbstractDataService {
   readonly transformers: BehaviorSubject<List<TransformerDef>>;
   readonly hierarchy: BehaviorSubject<Config> = new BehaviorSubject(new ConfigBuilder().build());
   readonly selectedTransformer: BehaviorSubject<Transformer | undefined>;
+}
+
+@Injectable()
+class DragServiceMock implements AbstractDragService {
+  dragging: BehaviorSubject<Dragged | undefined>;
+
+  startDrag(draggable: Draggable) {}
+  stopDrag(): Dragged | undefined { return undefined; }
+  drag(newLocation: Point) {}
 }
 
 describe('LadderDiagramComponent', () => {
@@ -30,7 +40,8 @@ describe('LadderDiagramComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ LadderDiagramComponent ],
       providers: [
-        {provide: AbstractDataService, useClass: DataServiceMock}
+        {provide: AbstractDataService, useClass: DataServiceMock},
+        {provide: AbstractDragService, useClass: DragServiceMock}
       ]
     })
     .compileComponents();

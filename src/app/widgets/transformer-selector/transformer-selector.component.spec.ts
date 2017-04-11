@@ -8,6 +8,7 @@ import {Channel} from "../../classes/Channel";
 import {Config} from "../../classes/Config";
 import {List} from "immutable";
 import {Transformer} from "../../classes/Transformer";
+import {AbstractDragService, Draggable, Dragged, Point} from "../../services/AbstractDragService";
 
 @Injectable()
 class DataServiceMock implements AbstractDataService {
@@ -17,6 +18,15 @@ class DataServiceMock implements AbstractDataService {
   readonly transformers: BehaviorSubject<List<TransformerDef>> = new BehaviorSubject(List<TransformerDef>());
   readonly hierarchy: BehaviorSubject<Config>;
   readonly selectedTransformer: BehaviorSubject<Transformer | undefined>;
+}
+
+@Injectable()
+class DragServiceMock implements AbstractDragService {
+  dragging: BehaviorSubject<Dragged | undefined>;
+
+  startDrag(draggable: Draggable) {}
+  stopDrag(): Dragged | undefined { return undefined; }
+  drag(newLocation: Point) {}
 }
 
 describe('TransformerSelectorComponent', () => {
@@ -29,7 +39,8 @@ describe('TransformerSelectorComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ TransformerSelectorComponent ],
       providers: [
-        {provide: AbstractDataService, useClass: DataServiceMock}
+        {provide: AbstractDataService, useClass: DataServiceMock},
+        {provide: AbstractDragService, useClass: DragServiceMock}
       ]
     })
     .compileComponents();
