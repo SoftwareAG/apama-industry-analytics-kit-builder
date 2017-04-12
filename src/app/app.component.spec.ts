@@ -11,6 +11,8 @@ import {NavBarComponent} from "./widgets/nav-bar/nav-bar.component";
 import {AbstractDragService} from "./services/AbstractDragService";
 import {DragService} from "./services/DragService";
 import {DragOverlayComponent} from "./widgets/dragoverlay/drag-overlay.component";
+import {FormsModule} from "@angular/forms";
+import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
@@ -24,6 +26,10 @@ describe('AppComponent', () => {
         TransformerPropertySelectorComponent,
         NavBarComponent,
         DragOverlayComponent
+      ],
+      imports: [
+        FormsModule,
+        NgbModule.forRoot()
       ],
       providers: [
         {provide: AbstractDataService, useClass: DataService},

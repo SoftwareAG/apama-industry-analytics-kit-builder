@@ -7,6 +7,8 @@ import {BehaviorSubject, Observable} from "rxjs";
 import {Config} from "../../classes/Config";
 import {TransformerDef} from "../../classes/TransformerDef";
 import {Channel} from "../../classes/Channel";
+import {FormsModule} from "@angular/forms";
+import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 
 @Injectable()
 class DataServiceMock implements AbstractDataService {
@@ -27,6 +29,10 @@ describe('TransformerPropertySelectorComponent', () => {
       declarations: [ TransformerPropertySelectorComponent ],
       providers: [
         {provide: AbstractDataService, useClass: DataServiceMock}
+      ],
+      imports: [
+        FormsModule,
+        NgbModule.forRoot()
       ]
 
     }).compileComponents();
