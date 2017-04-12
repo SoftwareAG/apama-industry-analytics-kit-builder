@@ -1,52 +1,45 @@
+<div *ngFor="let transformerProperty of transformerProperties | async" class="transformer-property">
+  <div class="transformer-property-group">
 
-<form>
+    <div [ngSwitch]="transformerProperty.type | async">
 
-  <!--suppress HtmlUnknownAttribute -->
-  <div *ngFor="let transformerProperty of transformerProperties | async" class="transformer-property">
+      <ng-template [ngSwitchCase]="'string'">
+        <label class="transformer-property-name">{{transformerProperty.name | async}}
+          <input class="transformer-property-value form-control" type="text" [ngModel]="transformerProperty.value | async" (ngModelChange)="transformerProperty.value.next($event)"/>
+          <!--select class="transformer-property-value">
+            <option>
+              {{transformerProperty.value | async}}
+            </option>
+          </select-->
+        </label>
+      </ng-template>
 
-    <div class="transformer-property-group">
+      <ng-template [ngSwitchCase]="'decimal'">
+        <label class="transformer-property-name">{{transformerProperty.name | async}}
+          <input class="transformer-property-value form-control" type="number" [ngModel]="transformerProperty.value | async" (ngModelChange)="transformerProperty.value.next($event)"/>
+        </label>
+      </ng-template>
 
-      <div [ngSwitch]="transformerProperty.type | async">
+      <ng-template [ngSwitchCase]="'integer'">
+        <label class="transformer-property-name">{{transformerProperty.name | async}}
+          <input class="transformer-property-value form-control" type="number" [ngModel]="transformerProperty.value | async" (ngModelChange)="transformerProperty.value.next($event)"/>
+        </label>
+      </ng-template>
 
-        <ng-template [ngSwitchCase]="'string'">
-          <label class="transformer-property-name">{{transformerProperty.name | async}}
-            <input class="transformer-property-value form-control" type="text" value="{{transformerProperty.value | async}}"/>
-            <!--select class="transformer-property-value">
-              <option>
-                {{transformerProperty.value | async}}
-              </option>
-            </select-->
-          </label>
-        </ng-template>
+      <ng-template [ngSwitchCase]="'float'">
+        <label class="transformer-property-name">{{transformerProperty.name | async}}
+          <input class="transformer-property-value form-control" type="number" [ngModel]="transformerProperty.value | async" (ngModelChange)="transformerProperty.value.next($event)"/>
+        </label>
+      </ng-template>
 
-        <ng-template [ngSwitchCase]="'decimal'">
-          <label class="transformer-property-name">{{transformerProperty.name | async}}
-            <input class="transformer-property-value form-control" type="number" value="{{transformerProperty.value | async}}"/>
-          </label>
-        </ng-template>
-
-        <ng-template [ngSwitchCase]="'integer'">
-          <label class="transformer-property-name">{{transformerProperty.name | async}}
-            <input class="transformer-property-value form-control" type="number" value="{{transformerProperty.value | async}}"/>
-          </label>
-        </ng-template>
-
-        <ng-template [ngSwitchCase]="'float'">
-          <label class="transformer-property-name">{{transformerProperty.name | async}}
-            <input class="transformer-property-value form-control" type="number" value="{{transformerProperty.value | async}}"/>
-          </label>
-        </ng-template>
-
-        <ng-template [ngSwitchCase]="'boolean'">
-          <label class="transformer-property-name">{{transformerProperty.name | async}}
-            <input class="transformer-property-value form-control" type="checkbox" [checked]="transformerProperty.value | async">
-          </label>
-        </ng-template>
-
-      </div>
+      <ng-template [ngSwitchCase]="'boolean'">
+        <label class="transformer-property-name">{{transformerProperty.name | async}}
+          <input class="transformer-property-value form-control" type="checkbox" [ngModel]="transformerProperty.value | async" (ngModelChange)="transformerProperty.value.next($event)">
+        </label>
+      </ng-template>
 
     </div>
 
   </div>
 
-</form>
+</div>
