@@ -1,8 +1,15 @@
-import {NestedRowBuilder, Row} from "./Row";
+import {NestedRowBuilder, Row, RowBuilder, RowJsonInterface} from "./Row";
 import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
 import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
 import {BehaviorSubject, Observable} from "rxjs";
 import {List} from "immutable";
+import {AbstractModel} from "./AbstractModel";
+
+export interface ConfigJsonInterface {
+  name: string;
+  description: string;
+  rows: RowJsonInterface[]
+}
 
 export interface ConfigInterface {
   name: string;
@@ -10,12 +17,13 @@ export interface ConfigInterface {
   rows: Row[]
 }
 
-export class Config implements AsObservable, BehaviorSubjectify<ConfigInterface>  {
+export class Config extends AbstractModel<ConfigJsonInterface> implements AsObservable, BehaviorSubjectify<ConfigInterface>  {
   readonly name: BehaviorSubject<string>;
   readonly description: BehaviorSubject<string>;
   readonly rows : BehaviorSubject<List<Row>>;
 
   constructor(obj: ConfigInterface) {
+    super();
     this.name = new BehaviorSubject(obj.name);
     this.description = new BehaviorSubject(obj.description);
     this.rows = new BehaviorSubject(List(obj.rows));
@@ -60,6 +68,13 @@ export class ConfigBuilder extends ClassBuilder<Config> implements ConfigInterfa
 
   build(): Config {
     return new Config(this);
+  }
+
+  static fromJson(json: ConfigJsonInterface): ConfigBuilder {
+    return new ConfigBuilder()
+      .Name(json.name)
+      .Description(json.description)
+      .Rows(json.rows.map((row) => RowBuilder.fromJson(row).build()));
   }
 }
 

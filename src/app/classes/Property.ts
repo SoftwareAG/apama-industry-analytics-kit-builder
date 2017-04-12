@@ -1,13 +1,18 @@
-import {PropertyDef, PropertyDefBuilder, PropertyDefInterface} from "./PropertyDef";
+import {PropertyDef, PropertyDefBuilder, PropertyDefInterface, PropertyDefJsonInterface} from "./PropertyDef";
 import {NestedClassBuilder, ClassArrayBuilder} from "./ClassBuilder";
 import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
 import {BehaviorSubject, Observable} from "rxjs";
+import {AbstractModel} from "./AbstractModel";
+
+export interface PropertyJsonInterface extends PropertyDefJsonInterface {
+  value?: number | string | boolean;
+}
 
 export interface PropertyInterface extends PropertyDefInterface {
   value?: number | string | boolean;
 }
 
-export class Property extends PropertyDef implements AsObservable, BehaviorSubjectify<PropertyInterface> {
+export class Property extends PropertyDef implements AsObservable, BehaviorSubjectify<PropertyInterface>, AbstractModel<PropertyJsonInterface>  {
   readonly value: BehaviorSubject<number | string | boolean | undefined>;
 
   constructor(obj: PropertyInterface) {
@@ -26,13 +31,37 @@ export class Property extends PropertyDef implements AsObservable, BehaviorSubje
 export class PropertyBuilder extends PropertyDefBuilder implements PropertyInterface {
   value?: number | string | boolean;
 
-  Value(value:  number | string | boolean): this {
+  Value(value:  number | string | boolean | undefined): this {
     this.value = value;
     return this;
   }
 
   build(): Property {
+    if (typeof this.value === 'undefined' && !this.optional) {
+      switch(this.type) {
+        case 'string':
+          this.value = "";
+          break;
+        case 'float':
+        case 'decimal':
+        case 'integer':
+          this.value = 0;
+          break;
+        case 'boolean':
+          this.value = false;
+          break;
+      }
+    }
     return new Property(this);
+  }
+
+  static fromPropertyDefBuilder(propertyDefBuilder: PropertyDefBuilder): PropertyBuilder {
+    return Object.assign(new PropertyBuilder(), propertyDefBuilder);
+  }
+
+  static fromJson(json: PropertyJsonInterface): PropertyBuilder {
+    return this.fromPropertyDefBuilder(PropertyDefBuilder.fromJson(json))
+      .Value(json.value);
   }
 }
 

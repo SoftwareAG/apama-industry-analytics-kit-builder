@@ -1,17 +1,23 @@
 import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
-import {NestedTransformerDefBuilder, TransformerDef} from "./TransformerDef";
+import {NestedTransformerDefBuilder, TransformerDef, TransformerDefJsonInterface, TransformerDefBuilder} from "./TransformerDef";
 import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
 import {BehaviorSubject, Observable} from "rxjs";
 import {List} from "immutable";
+import {AbstractModel} from "./AbstractModel";
+
+export interface MetadataJsonInterface {
+  transformers: TransformerDefJsonInterface[]
+}
 
 export interface MetadataInterface {
   transformers: TransformerDef[]
 }
 
-export class Metadata implements AsObservable, BehaviorSubjectify<MetadataInterface> {
+export class Metadata extends AbstractModel<MetadataJsonInterface> implements AsObservable, BehaviorSubjectify<MetadataInterface> {
   readonly transformers: BehaviorSubject<List<TransformerDef>>;
 
   constructor(obj: MetadataInterface) {
+    super();
     this.transformers = new BehaviorSubject(List(obj.transformers));
   }
 
@@ -40,6 +46,11 @@ export class MetadataBuilder extends ClassBuilder<Metadata> implements MetadataI
 
   build(): Metadata {
     return new Metadata(this);
+  }
+
+  static fromJson(json: MetadataJsonInterface) {
+    return new MetadataBuilder()
+      .Transformers(json.transformers.map((transformer) => TransformerDefBuilder.fromJson(transformer).build()))
   }
 }
 

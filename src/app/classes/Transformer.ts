@@ -1,16 +1,27 @@
-import {NestedPropertyBuilder, Property} from "./Property";
-import {TransformerDef, TransformerDefInterface} from "./TransformerDef";
+import {NestedPropertyBuilder, Property, PropertyBuilder, PropertyJsonInterface} from "./Property";
+import {
+  TransformerDef,
+  TransformerDefBuilder,
+  TransformerDefInterface,
+  TransformerDefJsonInterface
+} from "./TransformerDef";
 import {ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
 import {NestedTransformerChannelDefBuilder, TransformerChannelDef} from "app/classes/TransformerChannelDef";
 import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
 import {List} from "immutable";
 import {BehaviorSubject, Observable} from "rxjs";
+import {AbstractModel} from "./AbstractModel";
 
-export interface TransformerInterface extends TransformerDefInterface {
+export interface TransformerJsonInterface extends TransformerDefJsonInterface {
+  name: string;
+  properties: PropertyJsonInterface[]
+}
+
+export interface TransformerInterface extends TransformerDefInterface  {
   properties: Property[];
 }
 
-export class Transformer extends TransformerDef implements AsObservable, BehaviorSubjectify<TransformerInterface> {
+export class Transformer extends TransformerDef implements AsObservable, BehaviorSubjectify<TransformerInterface>, AbstractModel<TransformerJsonInterface> {
   readonly properties: BehaviorSubject<List<Property>>;
 
   constructor(obj: TransformerInterface) {
@@ -24,6 +35,10 @@ export class Transformer extends TransformerDef implements AsObservable, Behavio
       this.properties,
       this.properties.switchMap(properties => Observable.merge(...properties.toArray().map(property => (property as Property).asObservable())))
     ).mapTo(this);
+  }
+
+  toJson(): TransformerJsonInterface {
+    return super.toJson() as TransformerJsonInterface;
   }
 }
 
@@ -72,6 +87,18 @@ export class TransformerBuilder extends ClassBuilder<Transformer> implements Tra
   }
   build(): Transformer {
     return new Transformer(this);
+  }
+
+  static fromTransformerDefBuilder(transformerDefBuilder: TransformerDefBuilder): TransformerBuilder {
+    return new TransformerBuilder()
+      .Name(transformerDefBuilder.name)
+      .Properties(transformerDefBuilder.properties.map((propDef) => PropertyBuilder.fromJson(propDef.toJson()).build()))
+      .InputChannels(transformerDefBuilder.inputChannels)
+      .OutputChannels(transformerDefBuilder.outputChannels);
+  }
+
+  static fromJson(json: TransformerJsonInterface): TransformerBuilder {
+    return this.fromTransformerDefBuilder(TransformerDefBuilder.fromJson(json));
   }
 }
 

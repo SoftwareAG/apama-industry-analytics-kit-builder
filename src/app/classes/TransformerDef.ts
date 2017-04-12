@@ -1,9 +1,20 @@
-import {NestedPropertyDefBuilder, PropertyDef} from "./PropertyDef";
+import {NestedPropertyDefBuilder, PropertyDef, PropertyDefJsonInterface, PropertyDefBuilder} from "./PropertyDef";
 import {ClassBuilder, ClassArrayBuilder, NestedClassBuilder} from "./ClassBuilder";
-import {NestedTransformerChannelDefBuilder, TransformerChannelDef} from "./TransformerChannelDef";
+import {
+  NestedTransformerChannelDefBuilder, TransformerChannelDef, TransformerChannelDefBuilder,
+  TransformerChannelDefJsonInterface
+} from "./TransformerChannelDef";
 import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
 import {BehaviorSubject, Observable} from "rxjs";
 import {List} from "immutable";
+import {AbstractModel} from "./AbstractModel";
+
+export interface TransformerDefJsonInterface {
+  name: string;
+  properties: PropertyDefJsonInterface[];
+  inputChannels: TransformerChannelDefJsonInterface[];
+  outputChannels: TransformerChannelDefJsonInterface[];
+}
 
 export interface TransformerDefInterface {
   name: string;
@@ -12,13 +23,14 @@ export interface TransformerDefInterface {
   outputChannels: TransformerChannelDef[];
 }
 
-export class TransformerDef implements AsObservable, BehaviorSubjectify<TransformerDefInterface> {
+export class TransformerDef extends AbstractModel<TransformerDefJsonInterface> implements AsObservable, BehaviorSubjectify<TransformerDefInterface> {
   readonly name: BehaviorSubject<string>;
   readonly properties: BehaviorSubject<List<PropertyDef>>;
   readonly inputChannels: BehaviorSubject<List<TransformerChannelDef>>;
   readonly outputChannels: BehaviorSubject<List<TransformerChannelDef>>;
 
   constructor(obj: TransformerDefInterface) {
+    super();
     this.name = new BehaviorSubject(obj.name);
     this.properties = new BehaviorSubject(List(obj.properties));
     this.inputChannels = new BehaviorSubject(List(obj.inputChannels));
@@ -83,6 +95,14 @@ export class TransformerDefBuilder extends ClassBuilder<TransformerDef> implemen
   }
   build(): TransformerDef {
     return new TransformerDef(this);
+  }
+
+  static fromJson(json: TransformerDefJsonInterface): TransformerDefBuilder {
+    return new TransformerDefBuilder()
+      .Name(json.name)
+      .Properties(json.properties.map((prop) => PropertyDefBuilder.fromJson(prop).build()))
+      .InputChannels(json.inputChannels.map((inChan) => TransformerChannelDefBuilder.fromJson(inChan).build()))
+      .OutputChannels(json.outputChannels.map((outChan) => TransformerChannelDefBuilder.fromJson(outChan).build()))
   }
 }
 

@@ -2,6 +2,14 @@ import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilde
 import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
 import {BehaviorSubject, Observable} from "rxjs";
 import {validate} from "validate.js";
+import {AbstractModel} from "app/classes/AbstractModel";
+
+export interface PropertyDefJsonInterface {
+  name: string;
+  description: string;
+  type: "integer" | "string" | "float" | "decimal" | "boolean";
+  optional?: boolean;
+}
 
 export interface PropertyDefInterface {
   name: string;
@@ -10,14 +18,14 @@ export interface PropertyDefInterface {
   optional?: boolean;
 }
 
-
-export class PropertyDef implements AsObservable, BehaviorSubjectify<PropertyDefInterface> {
+export class PropertyDef extends AbstractModel<PropertyDefJsonInterface> implements AsObservable, BehaviorSubjectify<PropertyDefInterface> {
   readonly name: BehaviorSubject<string>;
   readonly description: BehaviorSubject<string>;
   readonly type: BehaviorSubject<"integer" | "string" | "float" | "decimal" | "boolean">;
   readonly optional: BehaviorSubject<boolean>;
 
   constructor(obj: PropertyDefInterface) {
+    super();
     this.name = new BehaviorSubject(obj.name);
     this.description = new BehaviorSubject(obj.description);
     this.type = new BehaviorSubject(obj.type);
@@ -61,7 +69,7 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
     return new PropertyDef(this);
   }
 
-  static buildFromJSON(jsonData: any) : PropertyDef {
+  static fromJson(jsonData: PropertyDefJsonInterface) : PropertyDefBuilder {
 
     // validate jsonData object
     if (!validate.isObject(jsonData)) { throw new Error('jsonData is invalid'); }
@@ -89,8 +97,11 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
     // If the optional element has been provided, it must contain boolean data
     if ( validate.contains(jsonData, 'optional') && !validate.isBoolean(jsonData.optional)) { throw new Error('optional must contain Boolean data'); }
 
-    const propertyDefBuilder = Object.assign(new PropertyDefBuilder(), jsonData);
-    return propertyDefBuilder.build();
+    return new PropertyDefBuilder()
+      .Name(jsonData.name)
+      .Optional(jsonData.optional)
+      .Description(jsonData.description)
+      .Type(jsonData.type)
   }
 }
 

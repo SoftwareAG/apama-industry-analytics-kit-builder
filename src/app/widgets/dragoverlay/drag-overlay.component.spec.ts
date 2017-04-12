@@ -29,7 +29,7 @@ function withTempSvg() {
   return d3.select(document.createElementNS("http://www.w3.org/2000/svg", "svg"));
 }
 
-describe('LadderDiagramComponent', () => {
+describe('DragOverlayComponent', () => {
   let component: DragOverlayComponent;
   let fixture: ComponentFixture<DragOverlayComponent>;
   let el: HTMLElement;

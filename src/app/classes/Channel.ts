@@ -1,15 +1,21 @@
 import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
 import {BehaviorSubject, Observable} from "rxjs";
 import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
+import {AbstractModel} from "./AbstractModel";
+
+export interface ChannelJsonInterface {
+  name: string;
+}
 
 export interface ChannelInterface {
   name: string;
 }
 
-export class Channel implements AsObservable, BehaviorSubjectify<ChannelInterface> {
+export class Channel extends AbstractModel<ChannelJsonInterface> implements AsObservable, BehaviorSubjectify<ChannelInterface> {
   readonly name: BehaviorSubject<string>;
 
   constructor(obj: ChannelInterface) {
+    super();
     this.name = new BehaviorSubject<string>(obj.name);
   }
 
@@ -30,6 +36,11 @@ export class ChannelBuilder extends ClassBuilder<Channel> implements ChannelInte
 
   build(): Channel {
     return new Channel(this);
+  }
+
+  static fromJson(json: ChannelJsonInterface) {
+    return new ChannelBuilder()
+      .Name(json.name);
   }
 }
 

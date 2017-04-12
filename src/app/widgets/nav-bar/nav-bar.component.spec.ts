@@ -1,14 +1,47 @@
 import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 import {NavBarComponent} from "./nav-bar.component";
 import {AbstractDataService} from "../../services/AbstractDataService";
-import {Config} from "../../classes/Config";
-import {DataService} from "../../services/DataService";
+import {Config, ConfigArrayBuilder} from "../../classes/Config";
+import {BehaviorSubject} from "rxjs";
+import {Channel} from "../../classes/Channel";
+import {List} from "immutable";
+import {Injectable} from "@angular/core";
+import {TransformerDef} from "../../classes/TransformerDef";
+import {Transformer} from "../../classes/Transformer";
+
+@Injectable()
+class DataServiceMock implements AbstractDataService {
+  readonly configurations: BehaviorSubject<List<Config>> = new BehaviorSubject(List(new ConfigArrayBuilder()
+    .with()
+      .Name("Config1")
+      .Description("Config1Desc")
+    .endWith()
+    .with()
+      .Name("Config2")
+      .Description("Config2Desc")
+    .endWith()
+    .with()
+      .Name("Config3")
+      .Description("Config3Desc")
+    .endWith()
+    .with()
+      .Name("Config4")
+      .Description("Config4Desc")
+    .endWith()
+    .build()
+  ));
+
+  readonly channels: BehaviorSubject<List<Channel>>;
+  readonly transformers: BehaviorSubject<List<TransformerDef>>;
+  readonly hierarchy: BehaviorSubject<Config>;
+  readonly selectedTransformer: BehaviorSubject<Transformer | undefined>;
+}
 
 describe('NavBarComponent', () => {
   let component: NavBarComponent;
   let fixture: ComponentFixture<NavBarComponent>;
   let el: HTMLElement;
-  let dataService: DataService;
+  let dataService: DataServiceMock;
 
   let configurations: Config[];
 
@@ -16,7 +49,7 @@ describe('NavBarComponent', () => {
     TestBed.configureTestingModule({
       declarations: [NavBarComponent],
       providers: [
-        {provide: AbstractDataService, useClass: DataService}
+        {provide: AbstractDataService, useClass: DataServiceMock}
       ]
       })
   }));
@@ -29,7 +62,7 @@ describe('NavBarComponent', () => {
   }));
 
   beforeEach(() => {
-    dataService = TestBed.get(AbstractDataService) as DataService;
+    dataService = TestBed.get(AbstractDataService) as DataServiceMock;
     fixture = TestBed.createComponent(NavBarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -47,7 +80,6 @@ describe('NavBarComponent', () => {
   });
 
   it('should correctly display example configurations in the dropdown', () => {
-    dataService.loadConfigurations();
     fixture.detectChanges();
     const configurations = Array.from(el.querySelectorAll('.dropdown-menu > .dropdown-item'));
 

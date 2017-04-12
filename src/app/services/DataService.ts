@@ -1,6 +1,6 @@
 import {Config, ConfigBuilder} from "../classes/Config";
 import {Channel, ChannelBuilder} from "../classes/Channel";
-import {TransformerDef, TransformerDefBuilder} from "../classes/TransformerDef";
+import {TransformerDef, TransformerDefArrayBuilder, TransformerDefBuilder} from "../classes/TransformerDef";
 import {BehaviorSubject} from "rxjs";
 import {AbstractDataService} from "./AbstractDataService";
 import {Transformer} from "../classes/Transformer";
@@ -142,6 +142,16 @@ export class DataService implements AbstractDataService {
         .endWith()
         .build()
     ));
+
+    this.configurations.next(this.configurations.getValue().push(
+      new ConfigBuilder()
+        .Name("Blank row")
+        .Description("This configuration demonstrates a single row with a no Analytics")
+        .withRow()
+          .MaxTransformerCount(4)
+        .endWith()
+        .build()
+    ));
   }
 
   loadChannels()
@@ -161,64 +171,66 @@ export class DataService implements AbstractDataService {
 
   loadTransformers()
   {
-    this.transformers.next(this.transformers.getValue().push(
-      new TransformerDefBuilder()
+    this.transformers.next(List(new TransformerDefArrayBuilder()
+      .with()
         .Name("Sorter")
-        .build()
-    ));
-
-    this.transformers.next(this.transformers.getValue().push(
-      new TransformerDefBuilder()
+        .withInputChannel().Name("In1").Description("").endWith()
+        .withOutputChannel().Name("Out1").Description("").endWith()
+      .endWith()
+      .with()
+        .Name("NoInput")
+        .withOutputChannel().Name("Out1").Description("").endWith()
+      .endWith()
+      .with()
+        .Name("NoOutput")
+        .withInputChannel().Name("In1").Description("").endWith()
+      .endWith()
+      .with()
         .Name("Drift")
-        .build()
-    ));
-
-    this.transformers.next(this.transformers.getValue().push(
-      new TransformerDefBuilder()
+        .withInputChannel().Name("In1").Description("").endWith()
+        .withOutputChannel().Name("Out1").Description("").endWith()
+      .endWith()
+      .with()
         .Name("Spike")
-        .build()
-    ));
-
-    this.transformers.next(this.transformers.getValue().push(
-      new TransformerDefBuilder()
+        .withInputChannel().Name("In1").Description("").endWith()
+        .withOutputChannel().Name("Out1").Description("").endWith()
+      .endWith()
+      .with()
         .Name("Threshold")
-        .build()
-    ));
-
-    this.transformers.next(this.transformers.getValue().push(
-      new TransformerDefBuilder()
+        .withInputChannel().Name("In1").Description("").endWith()
+        .withOutputChannel().Name("Out1").Description("").endWith()
+      .endWith()
+      .with()
         .Name("Delta")
-        .build()
-    ));
-
-    this.transformers.next(this.transformers.getValue().push(
-      new TransformerDefBuilder()
+        .withInputChannel().Name("In1").Description("").endWith()
+        .withOutputChannel().Name("Out1").Description("").endWith()
+      .endWith()
+      .with()
         .Name("Gradient")
-        .build()
-    ));
-
-    this.transformers.next(this.transformers.getValue().push(
-      new TransformerDefBuilder()
+        .withInputChannel().Name("In1").Description("").endWith()
+        .withOutputChannel().Name("Out1").Description("").endWith()
+      .endWith()
+      .with()
         .Name("Average")
-        .build()
-    ));
-
-    this.transformers.next(this.transformers.getValue().push(
-      new TransformerDefBuilder()
+        .withInputChannel().Name("In1").Description("").endWith()
+        .withOutputChannel().Name("Out1").Description("").endWith()
+      .endWith()
+      .with()
         .Name("Sum")
-        .build()
-    ));
-    this.transformers.next(this.transformers.getValue().push(
-      new TransformerDefBuilder()
+        .withInputChannel().Name("In1").Description("").endWith()
+        .withOutputChannel().Name("Out1").Description("").endWith()
+      .endWith()
+      .with()
         .Name("Mode")
-        .build()
-    ));
-
-    this.transformers.next(this.transformers.getValue().push(
-      new TransformerDefBuilder()
+        .withInputChannel().Name("In1").Description("").endWith()
+        .withOutputChannel().Name("Out1").Description("").endWith()
+      .endWith()
+      .with()
         .Name("Spread")
-        .build()
-    ));
+        .withInputChannel().Name("In1").Description("").endWith()
+        .withOutputChannel().Name("Out1").Description("").endWith()
+      .endWith()
+    .build()))
 
   }
 }

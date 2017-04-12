@@ -1,16 +1,24 @@
 import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
 import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
 import {BehaviorSubject, Observable} from "rxjs";
+import {AbstractModel} from "./AbstractModel";
+
+export interface TransformerChannelDefJsonInterface {
+  name: string;
+  description: string;
+}
+
 export interface TransformerChannelDefInterface {
   name: string;
   description: string;
 }
 
-export class TransformerChannelDef implements AsObservable, BehaviorSubjectify<TransformerChannelDefInterface> {
+export class TransformerChannelDef extends AbstractModel<TransformerChannelDefJsonInterface> implements AsObservable, BehaviorSubjectify<TransformerChannelDefInterface> {
   readonly name: BehaviorSubject<string>;
   readonly description: BehaviorSubject<string>;
 
   constructor(obj: TransformerChannelDefInterface) {
+    super();
     this.name = new BehaviorSubject(obj.name);
     this.description = new BehaviorSubject(obj.description);
   }
@@ -37,6 +45,12 @@ export class TransformerChannelDefBuilder extends ClassBuilder<TransformerChanne
   }
   build(): TransformerChannelDef {
     return new TransformerChannelDef(this);
+  }
+
+  static fromJson(json: TransformerChannelDefJsonInterface) {
+    return new TransformerChannelDefBuilder()
+      .Name(json.name)
+      .Description(json.description);
   }
 }
 

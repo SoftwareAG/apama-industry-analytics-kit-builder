@@ -23,7 +23,7 @@ class DataServiceMock implements AbstractDataService {
 
 @Injectable()
 class DragServiceMock implements AbstractDragService {
-  dragging: BehaviorSubject<Dragged | undefined>;
+  readonly dragging: BehaviorSubject<Dragged | undefined> = new BehaviorSubject(undefined);
 
   startDrag(draggable: Draggable) {}
   stopDrag(): Dragged | undefined { return undefined; }
