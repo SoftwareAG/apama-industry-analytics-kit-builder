@@ -10,35 +10,36 @@
 
         <ng-template [ngSwitchCase]="'string'">
           <label class="transformer-property-name">{{transformerProperty.name | async}}
-            <select class="transformer-property-value">
+            <input class="transformer-property-value form-control" type="text" value="{{transformerProperty.value | async}}"/>
+            <!--select class="transformer-property-value">
               <option>
                 {{transformerProperty.value | async}}
               </option>
-            </select>
+            </select-->
           </label>
         </ng-template>
 
         <ng-template [ngSwitchCase]="'decimal'">
           <label class="transformer-property-name">{{transformerProperty.name | async}}
-            <input class="transformer-property-value" type="number" value="{{transformerProperty.value | async}}"/>
+            <input class="transformer-property-value form-control" type="number" value="{{transformerProperty.value | async}}"/>
           </label>
         </ng-template>
 
         <ng-template [ngSwitchCase]="'integer'">
           <label class="transformer-property-name">{{transformerProperty.name | async}}
-            <input class="transformer-property-value" type="number" value="{{transformerProperty.value | async}}"/>
+            <input class="transformer-property-value form-control" type="number" value="{{transformerProperty.value | async}}"/>
           </label>
         </ng-template>
 
         <ng-template [ngSwitchCase]="'float'">
           <label class="transformer-property-name">{{transformerProperty.name | async}}
-            <input class="transformer-property-value" type="number" value="{{transformerProperty.value | async}}"/>
+            <input class="transformer-property-value form-control" type="number" value="{{transformerProperty.value | async}}"/>
           </label>
         </ng-template>
 
         <ng-template [ngSwitchCase]="'boolean'">
           <label class="transformer-property-name">{{transformerProperty.name | async}}
-            <input class="transformer-property-value" type="checkbox" [checked]="transformerProperty.value | async">
+            <input class="transformer-property-value form-control" type="checkbox" [checked]="transformerProperty.value | async">
           </label>
         </ng-template>
 

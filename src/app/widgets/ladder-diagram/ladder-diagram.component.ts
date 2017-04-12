@@ -16,15 +16,15 @@ import {AbstractDragService} from "../../services/AbstractDragService";
 export class LadderDiagramComponent implements OnInit {
   readonly nativeElement;
   readonly hierarchy: Observable<Config>;
-  readonly dragService: AbstractDragService;
 
-  constructor(myElement: ElementRef, dataService: AbstractDataService, dragService: AbstractDragService) {
+  constructor(myElement: ElementRef, private readonly dataService: AbstractDataService, private readonly dragService: AbstractDragService) {
     this.nativeElement = myElement.nativeElement;
     this.hierarchy = dataService.hierarchy;
-    this.dragService = dragService;
   }
 
   ngOnInit() {
+    const component = this;
+
     const padding = deepFreeze({top: 20, right: 200, bottom: 20, left: 200});
     const width = 1100 - padding.left - padding.right;
     const defaultTransformerHeight = 50;
@@ -200,7 +200,10 @@ export class LadderDiagramComponent implements OnInit {
       transformer.exit().remove();
 
       const transformerEnter = transformer.enter().append('g')
-        .classed('transformer', true);
+        .classed('transformer', true)
+        .on('mouseup', (d, i) => {
+          component.dataService.selectedTransformer.next(d.transformer);
+        });
       const transformerUpdate = transformer.merge(transformerEnter)
         .attr('transform', (d, i) => `translate(${transformerX(d.width, i)},0)`);
 

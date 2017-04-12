@@ -14,8 +14,9 @@ export class TransformerPropertySelectorComponent implements OnInit {
   readonly transformerProperties: Observable<List<Property>>;
 
   constructor(dataService: AbstractDataService) {
-    this.transformerProperties = dataService.selectedTransformer.asObservable()
-      .switchMap(transformer => transformer ? transformer.properties : Observable.of(List()));
+    this.transformerProperties = dataService.selectedTransformer
+      .switchMap(transformer => transformer ? transformer.asObservable() : Observable.of(undefined))
+      .switchMap(transformer => transformer ? transformer.properties : Observable.of(List<Property>()));
   }
 
   ngOnInit() { }
