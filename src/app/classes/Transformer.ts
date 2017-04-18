@@ -1,4 +1,4 @@
-import {NestedPropertyBuilder, Property, PropertyBuilder, PropertyJsonInterface} from "./Property";
+import {NestedPropertyBuilder, Property, PropertyBuilder, PropertyJsonInterface, PropertySerializer} from "./Property";
 import {
   TransformerDef,
   TransformerDefBuilder,
@@ -11,6 +11,7 @@ import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
 import {List} from "immutable";
 import {BehaviorSubject, Observable} from "rxjs";
 import {AbstractModel} from "./AbstractModel";
+import {RowJsonInterface} from "./Row";
 
 export interface TransformerJsonInterface extends TransformerDefJsonInterface {
   name: string;
@@ -109,5 +110,55 @@ export class NestedTransformerBuilder<Parent> extends TransformerBuilder impleme
 
   endWith(): Parent {
     return this.callback(this.build());
+  }
+}
+
+export class TransformerSerializer {
+  static toApama(transformer: TransformerJsonInterface, transformerIndex: number, row: RowJsonInterface, rowIndex: number) {
+    const namespace  = 'com.industry.analytics';
+
+    return "" +
+      `${namespace}.Analytic("` +
+        `${transformer.name}",` +
+        "[" +
+          TransformerSerializer.getInChannels(transformer, transformerIndex, row, rowIndex) +
+        "]," +
+        "[" +
+          TransformerSerializer.getOutChannels(transformer, transformerIndex, row, rowIndex) +
+        "]" +
+        "{" +
+          transformer.properties.map(PropertySerializer.toApama) +
+        "}" +
+      ")";
+  }
+
+  private static getInChannels(transformer: TransformerJsonInterface, transformerIndex: number, row: RowJsonInterface, rowIndex: number) : string {
+    return "\"" + transformer.inputChannels.map((channel, channelIndex) => {
+      if (transformerIndex === 0) {
+        let channelOverride;
+        if (channelIndex < row.inputChannelOverrides.length && (channelOverride = row.inputChannelOverrides[channelIndex])) {
+          return channelOverride.name;
+        } else {
+          return `Row${rowIndex}:Input${channelIndex}`;
+        }
+      } else {
+        return `Row${rowIndex}:Channel${transformerIndex}`
+      }
+    }).join("\",\"") + "\""
+  }
+
+  private static getOutChannels(transformer: TransformerJsonInterface, transformerIndex: number, row: RowJsonInterface, rowIndex: number) : string {
+    return "\"" + transformer.inputChannels.map((channel, channelIndex) => {
+      if (transformerIndex === row.transformers.length-1) {
+        let channelOverride;
+        if (channelIndex < row.outputChannelOverrides.length && (channelOverride = row.outputChannelOverrides[channelIndex])) {
+          return channelOverride.name;
+        } else {
+          return `Row${rowIndex}:Output${channelIndex}`;
+        }
+      } else {
+        return `Row${rowIndex}:Channel${transformerIndex+1}`
+      }
+    }).join("\",\"") + "\""
   }
 }

@@ -80,3 +80,25 @@ export class PropertyArrayBuilder extends ClassArrayBuilder<Property, NestedProp
     super(NestedPropertyBuilder);
   }
 }
+
+export class PropertySerializer {
+  static toApama(property: PropertyJsonInterface) {
+    return "" +
+      property.value !== undefined ? `"${property.name}":"${PropertySerializer.valueFromType(property.value, property.type)}"` : "";
+  }
+
+  private static valueFromType(jsValue: number | string | boolean | undefined, apamaType: "integer" | "string" | "float" | "decimal" | "boolean") {
+    switch(apamaType) {
+      case 'string':
+        return `${jsValue}`;
+      case 'float':
+        return `${jsValue}f`;
+      case 'decimal':
+        return `${jsValue}d`;
+      case 'integer':
+        return `${jsValue}`;
+      case 'boolean':
+        return jsValue ? "true" : "false";
+    }
+  }
+}

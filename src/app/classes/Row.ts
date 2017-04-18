@@ -1,4 +1,7 @@
-import {NestedTransformerBuilder, Transformer, TransformerBuilder, TransformerJsonInterface} from "./Transformer";
+import {
+  NestedTransformerBuilder, Transformer, TransformerBuilder, TransformerJsonInterface,
+  TransformerSerializer
+} from "./Transformer";
 import {Channel, ChannelJsonInterface, NestedChannelBuilder, ChannelBuilder} from "./Channel";
 import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
 import {TransformerChannelDef} from "./TransformerChannelDef";
@@ -138,3 +141,11 @@ export class RowArrayBuilder extends ClassArrayBuilder<Row, NestedRowBuilder<Row
   }
 }
 
+export class RowSerializer {
+  static toApama(row: RowJsonInterface, rowIndex: number) {
+    return "" +
+      `\\\\ Row: ${rowIndex}\n` +
+      row.transformers.map((transformer, transformerIndex) => TransformerSerializer.toApama(transformer, transformerIndex, row, rowIndex))
+        .join('\n');
+  }
+}

@@ -1,4 +1,4 @@
-import {NestedRowBuilder, Row, RowBuilder, RowJsonInterface} from "./Row";
+import {NestedRowBuilder, Row, RowBuilder, RowJsonInterface, RowSerializer} from "./Row";
 import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
 import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
 import {BehaviorSubject, Observable} from "rxjs";
@@ -91,5 +91,15 @@ export class NestedConfigBuilder<Parent> extends ConfigBuilder implements Nested
 export class ConfigArrayBuilder extends ClassArrayBuilder<Config, NestedConfigBuilder<ConfigArrayBuilder>> {
   constructor() {
     super(NestedConfigBuilder);
+  }
+}
+
+export class ConfigSerializer {
+  static toApama(config: ConfigJsonInterface) {
+
+    return "" +
+      (config.name  ? `\\\\ Name: ${config.name}\n` : '') +
+      (config.description  ? `\\\\ Description: ${config.description}\n` : '') +
+      config.rows.map(RowSerializer.toApama).join('\n\n');
   }
 }
