@@ -16,6 +16,7 @@
       "es2016",
       "dom"
     ],
+    "skipLibCheck": true,
     "strictNullChecks": true
   }
 }

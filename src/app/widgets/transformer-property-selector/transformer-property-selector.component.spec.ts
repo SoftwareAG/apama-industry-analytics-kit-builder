@@ -3,23 +3,25 @@ import {TransformerPropertySelectorComponent} from "./transformer-property-selec
 import {Transformer, TransformerBuilder} from "../../classes/Transformer";
 import {Injectable} from "@angular/core";
 import {AbstractDataService} from "../../services/AbstractDataService";
-import {BehaviorSubject, Observable} from "rxjs";
+import {BehaviorSubject} from "rxjs";
 import {Config} from "../../classes/Config";
 import {TransformerDef} from "../../classes/TransformerDef";
 import {Channel} from "../../classes/Channel";
 import {FormsModule} from "@angular/forms";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
+import {List} from "immutable";
 
 @Injectable()
 class DataServiceMock implements AbstractDataService {
-  readonly channels: Observable<Channel[]>;
-  readonly transformers: Observable<TransformerDef[]>;
-  readonly hierarchy: Observable<Config>;
+  readonly configurations: BehaviorSubject<List<Config>>;
+  readonly channels: BehaviorSubject<List<Channel>>;
+  readonly transformers: BehaviorSubject<List<TransformerDef>>;
+  readonly hierarchy: BehaviorSubject<Config>;
   readonly selectedTransformer: BehaviorSubject<Transformer | undefined> = new BehaviorSubject(undefined);
 }
 
 describe('TransformerPropertySelectorComponent', () => {
-  let dataService: AbstractDataService;
+  let dataService: DataServiceMock;
   let component: TransformerPropertySelectorComponent;
   let fixture: ComponentFixture<TransformerPropertySelectorComponent>;
   let el: HTMLElement;
