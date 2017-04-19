@@ -15,6 +15,11 @@ import {NavBarComponent} from "./widgets/nav-bar/nav-bar.component";
 import {AbstractDragService} from "app/services/AbstractDragService";
 import {DragService} from "./services/DragService";
 import {DragOverlayComponent} from "./widgets/dragoverlay/drag-overlay.component";
+import {ConfigSerializer} from "./classes/Config";
+import {RowSerializer} from "./classes/Row";
+import {TransformerSerializer} from "./classes/Transformer";
+import {PropertySerializer} from "./classes/Property";
+import {FileService} from "./services/FileService";
 
 @NgModule({
   declarations: [
@@ -35,7 +40,12 @@ import {DragOverlayComponent} from "./widgets/dragoverlay/drag-overlay.component
   ],
   providers: [
     {provide: AbstractDataService, useClass: DataService},
-    {provide: AbstractDragService, useClass: DragService}
+    {provide: AbstractDragService, useClass: DragService},
+    FileService,
+    ConfigSerializer,
+    RowSerializer,
+    TransformerSerializer,
+    PropertySerializer
   ],
   bootstrap: [AppComponent]
 })

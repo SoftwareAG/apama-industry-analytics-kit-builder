@@ -44,8 +44,8 @@ describe('ConfigSerializer', () => {
 
     const analytics = findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
     expect(analytics).toEqual([
-      '"Analytic 1",["Input Channel 1"],["Row0:Channel1"]{"My first property":"Hello World"}',
-      '"Analytic 2",["Row0:Channel1"],["Output Channel 1"]{"My first property":"true"}'
+      '"Analytic 1",["Input Channel 1"],["Row0:Channel1"],{"My first property":"Hello World"}',
+      '"Analytic 2",["Row0:Channel1"],["Output Channel 1"],{"My first property":"true"}'
     ]);
 
   });

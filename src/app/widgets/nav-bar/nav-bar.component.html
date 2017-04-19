@@ -15,10 +15,11 @@
 
       <li class="nav-item">
         <label for="save-configuration" class="btn btn-outline-primary btn-file">
-          Save Configuration <input id="save-configuration" type="file"  style="display: none;"/>
+          Save Configuration <input id="save-configuration" type="button"  style="display: none;" (click)="saveConfiguration()"/>
+          <a #saveFile href="" style="display: none;"></a>
+
         </label>
       </li>
-
       <li class="nav-item">
         <div ngbDropdown class="d-inline-block">
           <button class="btn btn-outline-primary" id="dropdownMenu1" ngbDropdownToggle>Sample Configurations</button>

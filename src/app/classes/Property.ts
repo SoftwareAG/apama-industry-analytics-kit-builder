@@ -82,7 +82,7 @@ export class PropertyArrayBuilder extends ClassArrayBuilder<Property, NestedProp
 }
 
 export class PropertySerializer {
-  static toApama(property: PropertyJsonInterface) {
+  toApama(property: PropertyJsonInterface) {
     return "" +
       property.value !== undefined ? `"${property.name}":"${PropertySerializer.valueFromType(property.value, property.type)}"` : "";
   }

@@ -13,6 +13,10 @@ import {DragService} from "./services/DragService";
 import {DragOverlayComponent} from "./widgets/dragoverlay/drag-overlay.component";
 import {FormsModule} from "@angular/forms";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
+import {ConfigSerializer} from "./classes/Config";
+import {RowSerializer} from "./classes/Row";
+import {PropertySerializer} from "app/classes/Property";
+import {TransformerSerializer} from "./classes/Transformer";
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
@@ -33,7 +37,12 @@ describe('AppComponent', () => {
       ],
       providers: [
         {provide: AbstractDataService, useClass: DataService},
-        {provide: AbstractDragService, useClass: DragService}
+        {provide: AbstractDragService, useClass: DragService},
+        ConfigSerializer,
+        RowSerializer,
+        TransformerSerializer,
+        PropertySerializer
+
       ],
     }).compileComponents();
   }));

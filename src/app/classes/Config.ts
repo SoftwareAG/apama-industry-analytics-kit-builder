@@ -4,6 +4,7 @@ import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
 import {BehaviorSubject, Observable} from "rxjs";
 import {List} from "immutable";
 import {AbstractModel} from "./AbstractModel";
+import {Inject} from "@angular/core";
 
 export interface ConfigJsonInterface {
   name: string;
@@ -95,11 +96,14 @@ export class ConfigArrayBuilder extends ClassArrayBuilder<Config, NestedConfigBu
 }
 
 export class ConfigSerializer {
-  static toApama(config: ConfigJsonInterface) {
+
+  constructor(@Inject(RowSerializer) private rowSerializer: RowSerializer) {}
+
+  toApama(config: ConfigJsonInterface) {
 
     return "" +
       (config.name  ? `\\\\ Name: ${config.name}\n` : '') +
       (config.description  ? `\\\\ Description: ${config.description}\n` : '') +
-      config.rows.map(RowSerializer.toApama).join('\n\n');
+      config.rows.map((row, i) => this.rowSerializer.toApama(row, i)).join('\n\n');
   }
 }
