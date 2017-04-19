@@ -36,9 +36,8 @@ export class NavBarComponent implements OnInit {
     const config = this.dataService.hierarchy.getValue();
 
     const data = this.fileService.serialize(config);
-
     saveFile.href = "data:application/octet-stream," + encodeURI(data);
-    saveFile.download = "myfile.evt";
+    saveFile.download = config.name.getValue() + ".evt";
     saveFile.click();
   }
 }

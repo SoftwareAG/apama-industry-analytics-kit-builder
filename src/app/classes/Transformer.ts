@@ -120,19 +120,23 @@ export class TransformerSerializer {
   toApama(transformer: TransformerJsonInterface, transformerIndex: number, row: RowJsonInterface, rowIndex: number) {
     const namespace  = 'com.industry.analytics';
 
+    transformer.name = transformer.name || "";
+
     return "" +
-      `${namespace}.Analytic("` +
+      (transformer.name ?
+        `${namespace}.Analytic("` +
         `${transformer.name}",` +
-        "[" +
-          TransformerSerializer.getInChannels(transformer, transformerIndex, row, rowIndex) +
-        "]," +
-        "[" +
-          TransformerSerializer.getOutChannels(transformer, transformerIndex, row, rowIndex) +
-        "]," +
-        "{" +
-          transformer.properties.map(this.propertySerializer.toApama) +
-        "}" +
-      ")";
+          "[" +
+            TransformerSerializer.getInChannels(transformer, transformerIndex, row, rowIndex) +
+          "]," +
+          "[" +
+            TransformerSerializer.getOutChannels(transformer, transformerIndex, row, rowIndex) +
+          "]," +
+          "{" +
+            transformer.properties.map(this.propertySerializer.toApama) +
+          "}" +
+        ")"
+      : "");
   }
 
   private static getInChannels(transformer: TransformerJsonInterface, transformerIndex: number, row: RowJsonInterface, rowIndex: number) : string {
@@ -151,7 +155,7 @@ export class TransformerSerializer {
   }
 
   private static getOutChannels(transformer: TransformerJsonInterface, transformerIndex: number, row: RowJsonInterface, rowIndex: number) : string {
-    return "\"" + transformer.inputChannels.map((channel, channelIndex) => {
+    return "\"" + transformer.outputChannels.map((channel, channelIndex) => {
       if (transformerIndex === row.transformers.length-1) {
         let channelOverride;
         if (channelIndex < row.outputChannelOverrides.length && (channelOverride = row.outputChannelOverrides[channelIndex])) {

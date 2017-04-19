@@ -84,9 +84,13 @@ export class PropertyArrayBuilder extends ClassArrayBuilder<Property, NestedProp
 
 @Injectable()
 export class PropertySerializer {
+  //noinspection JSMethodCanBeStatic
   toApama(property: PropertyJsonInterface) {
     return "" +
-      property.value !== undefined ? `"${property.name}":"${PropertySerializer.valueFromType(property.value, property.type)}"` : "";
+        (property.name ?
+          property.value !== undefined ? `"${property.name}":"${PropertySerializer.valueFromType(property.value, property.type)}"` : ""
+         : ""
+        );
   }
 
   private static valueFromType(jsValue: number | string | boolean | undefined, apamaType: "integer" | "string" | "float" | "decimal" | "boolean") {
