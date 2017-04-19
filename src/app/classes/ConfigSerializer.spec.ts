@@ -4,6 +4,7 @@ import {TransformerSerializer} from "app/classes/Transformer";
 import {RowSerializer} from "./Row";
 import {PropertySerializer} from "./Property";
 import {TestBed} from "@angular/core/testing";
+import {findAll} from "../services/TestUtil.spec";
 
 describe('ConfigSerializer', () => {
 
@@ -72,12 +73,3 @@ describe('ConfigSerializer', () => {
   });
 });
 
-function findAll(pattern: RegExp, str: string) {
-  const result = new Array<RegExpExecArray>();
-  let match;
-  while(match = pattern.exec(str)) {
-    const [, ...thisMatch] = match;
-    result.push(thisMatch);
-  }
-  return result;
-}
