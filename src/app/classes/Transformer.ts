@@ -12,7 +12,7 @@ import {List} from "immutable";
 import {BehaviorSubject, Observable} from "rxjs";
 import {AbstractModel} from "./AbstractModel";
 import {RowJsonInterface} from "./Row";
-import {Inject, Injectable} from "@angular/core";
+import {Injectable} from "@angular/core";
 
 export interface TransformerJsonInterface extends TransformerDefJsonInterface {
   name: string;
@@ -128,7 +128,7 @@ export class TransformerSerializer {
         "]," +
         "[" +
           TransformerSerializer.getOutChannels(transformer, transformerIndex, row, rowIndex) +
-        "]" +
+        "]," +
         "{" +
           transformer.properties.map(this.propertySerializer.toApama) +
         "}" +
