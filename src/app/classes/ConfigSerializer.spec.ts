@@ -1,14 +1,36 @@
-
 import {ConfigBuilder, ConfigSerializer} from "./Config";
+import {FileService} from "../services/FileService";
+import {TransformerSerializer} from "app/classes/Transformer";
+import {RowSerializer} from "./Row";
+import {PropertySerializer} from "./Property";
+import {TestBed} from "@angular/core/testing";
+
 describe('ConfigSerializer', () => {
 
+  let fileService: FileService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        FileService,
+        ConfigSerializer,
+        RowSerializer,
+        TransformerSerializer,
+        PropertySerializer
+      ]
+     });
+    fileService = TestBed.get(FileService) as FileService;
+  });
+
   it('should handle an empty Config', () => {
-    const result = ConfigSerializer.toApama(new ConfigBuilder().build().toJson());
+
+    const result = fileService.serialize(new ConfigBuilder().build());
     expect(result).toBe('')
   });
 
   it('should serialise a valid config with two Analytics', () => {
-    const result = ConfigSerializer.toApama(new ConfigBuilder()
+
+    const result = fileService.serialize(new ConfigBuilder()
       .Name("Single row with two Analytics each containing one input and output channel")
         .Description("This configuration demonstrates a single row with two Analytics each containing one input and output channel")
         .withRow()
@@ -28,8 +50,7 @@ describe('ConfigSerializer', () => {
             .withProperty().Name("My first property").Description("A property").Type("boolean").Optional(false).Value(true).endWith()
           .endWith()
         .endWith()
-      .build()
-      .toJson());
+      .build());
     console.log(result);
 
     const names = findAll(/(\\\\ Name:\s)(.*)/g, result).map(match => match[1]);

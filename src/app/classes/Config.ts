@@ -4,7 +4,7 @@ import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
 import {BehaviorSubject, Observable} from "rxjs";
 import {List} from "immutable";
 import {AbstractModel} from "./AbstractModel";
-import {Inject} from "@angular/core";
+import {Inject, Injectable} from "@angular/core";
 
 export interface ConfigJsonInterface {
   name: string;
@@ -95,9 +95,10 @@ export class ConfigArrayBuilder extends ClassArrayBuilder<Config, NestedConfigBu
   }
 }
 
+@Injectable()
 export class ConfigSerializer {
 
-  constructor(@Inject(RowSerializer) private rowSerializer: RowSerializer) {}
+  constructor(private rowSerializer: RowSerializer) {}
 
   toApama(config: ConfigJsonInterface) {
 

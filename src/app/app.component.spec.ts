@@ -17,6 +17,7 @@ import {ConfigSerializer} from "./classes/Config";
 import {RowSerializer} from "./classes/Row";
 import {PropertySerializer} from "app/classes/Property";
 import {TransformerSerializer} from "./classes/Transformer";
+import {FileService} from "./services/FileService";
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
@@ -38,6 +39,11 @@ describe('AppComponent', () => {
       providers: [
         {provide: AbstractDataService, useClass: DataService},
         {provide: AbstractDragService, useClass: DragService},
+        ConfigSerializer,
+        RowSerializer,
+        TransformerSerializer,
+        PropertySerializer,
+        FileService,
         ConfigSerializer,
         RowSerializer,
         TransformerSerializer,

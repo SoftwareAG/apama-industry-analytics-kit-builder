@@ -3,6 +3,7 @@ import {NestedClassBuilder, ClassArrayBuilder} from "./ClassBuilder";
 import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
 import {BehaviorSubject, Observable} from "rxjs";
 import {AbstractModel} from "./AbstractModel";
+import {Injectable} from "@angular/core";
 
 export interface PropertyJsonInterface extends PropertyDefJsonInterface {
   value?: number | string | boolean;
@@ -81,6 +82,7 @@ export class PropertyArrayBuilder extends ClassArrayBuilder<Property, NestedProp
   }
 }
 
+@Injectable()
 export class PropertySerializer {
   toApama(property: PropertyJsonInterface) {
     return "" +

@@ -1,9 +1,10 @@
 import {Config, ConfigSerializer} from "../classes/Config";
-import {Inject} from "@angular/core";
+import {Inject, Injectable} from "@angular/core";
 
+@Injectable()
 export class FileService {
 
-  constructor(@Inject(ConfigSerializer) private configSerializer: ConfigSerializer) {}
+  constructor(private configSerializer: ConfigSerializer) {}
 
   serialize(config: Config) {
     return this.configSerializer.toApama(config.toJson());

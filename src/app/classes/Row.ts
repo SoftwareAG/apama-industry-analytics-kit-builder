@@ -9,7 +9,7 @@ import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
 import {BehaviorSubject, Observable} from "rxjs";
 import {List} from "immutable";
 import {AbstractModel} from "./AbstractModel";
-import {Inject} from "@angular/core";
+import {Inject, Injectable} from "@angular/core";
 
 export interface RowJsonInterface {
   maxTransformerCount: number;
@@ -141,10 +141,10 @@ export class RowArrayBuilder extends ClassArrayBuilder<Row, NestedRowBuilder<Row
     super(NestedRowBuilder);
   }
 }
-
+@Injectable()
 export class RowSerializer {
 
-  constructor(@Inject(TransformerSerializer) private transformerSerializer: TransformerSerializer) {}
+  constructor(private transformerSerializer: TransformerSerializer) {}
 
   toApama(row: RowJsonInterface, rowIndex: number) {
     return "" +
