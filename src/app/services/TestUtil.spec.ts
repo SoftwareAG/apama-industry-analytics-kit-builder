@@ -1,3 +1,4 @@
+import * as d3 from "d3";
 
 export abstract class TestUtils {
   static findAll(pattern: RegExp, str: string) {
@@ -8,5 +9,9 @@ export abstract class TestUtils {
       result.push(thisMatch);
     }
     return result;
+  }
+
+  static withTempSvg() {
+    return d3.select(document.createElementNS("http://www.w3.org/2000/svg", "svg"));
   }
 }

@@ -4,6 +4,7 @@ import {BehaviorSubject} from "rxjs";
 import {AbstractDragService, Draggable, Dragged, Point} from "../../services/AbstractDragService";
 import {DragOverlayComponent} from "./drag-overlay.component";
 import * as d3 from "d3";
+import {TestUtils} from "../../services/TestUtil.spec";
 
 @Injectable()
 class DragServiceMock implements AbstractDragService {
@@ -23,10 +24,6 @@ class DragServiceMock implements AbstractDragService {
     const dragging = this.dragging.getValue();
     dragging && dragging.currentLocation.next(newLocation);
   }
-}
-
-function withTempSvg() {
-  return d3.select(document.createElementNS("http://www.w3.org/2000/svg", "svg"));
 }
 
 describe('DragOverlayComponent', () => {
@@ -60,7 +57,7 @@ describe('DragOverlayComponent', () => {
   it('should append a clone of the sourceElement when drag is started', () => {
     const svg = el.children[0];
 
-    const testElement = withTempSvg().append('text')
+    const testElement = TestUtils.withTempSvg().append('text')
       .classed('testElement', true)
       .text("HelloWorld")
       .node() as SVGTextElement;
@@ -76,7 +73,7 @@ describe('DragOverlayComponent', () => {
   it('should move the sourceElement clone when dragging', () => {
     const svg = el.children[0];
 
-    const testElement = withTempSvg().append('circle')
+    const testElement = TestUtils.withTempSvg().append('circle')
       .classed('testElement', true)
       .attr('r', 10)
       .node() as SVGCircleElement;
@@ -94,7 +91,7 @@ describe('DragOverlayComponent', () => {
   it('should move the sourceElement clone when mouse is moved', () => {
     const svg = el.children[0];
 
-    const testElement = withTempSvg().append('circle')
+    const testElement = TestUtils.withTempSvg().append('circle')
       .classed('testElement', true)
       .attr('r', 10)
       .node() as SVGCircleElement;
@@ -124,7 +121,7 @@ describe('DragOverlayComponent', () => {
   it('should remove sourceElement clone on dragStop', (done) => {
     const svg = el.children[0];
 
-    const testElement = withTempSvg().append('circle')
+    const testElement = TestUtils.withTempSvg().append('circle')
       .classed('testElement', true)
       .attr('r', 10)
       .node() as SVGCircleElement;
@@ -148,7 +145,7 @@ describe('DragOverlayComponent', () => {
   it('should drop the sourceElement clone when mouse is released', (done) => {
     const svg = el.children[0];
 
-    const testElement = withTempSvg().append('circle')
+    const testElement = TestUtils.withTempSvg().append('circle')
       .classed('testElement', true)
       .attr('r', 10)
       .node() as SVGCircleElement;

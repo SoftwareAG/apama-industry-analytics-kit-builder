@@ -86,9 +86,50 @@ export class LadderDiagramComponent implements OnInit {
       return [];
     }
 
+    function createRowChannel(selection, type: 'input' | 'output') {
+      selection
+        .on('mouseup', (d, i) => {
+          const dragged = component.dragService.dragging.getValue();
+          if (dragged && dragged.object instanceof Channel) {
+            component.dragService.stopDrag();
+            d3.event.stopPropagation();
+            if (type === 'input') {
+              d.row.inputChannelOverrides.next(d.row.inputChannelOverrides.getValue().set(i, dragged.object));
+            } else {
+              d.row.outputChannelOverrides.next(d.row.outputChannelOverrides.getValue().set(i, dragged.object));
+            }
+          }
+        })
+        .on('mouseleave', function(d, i) {
+          const dragging = component.dragService.dragging.getValue();
+          if (dragging && d.channel === dragging.object) {
+            if (type === 'input') {
+              d.row.inputChannelOverrides.next(d.row.inputChannelOverrides.getValue().set(i, undefined));
+            } else {
+              d.row.outputChannelOverrides.next(d.row.outputChannelOverrides.getValue().set(i, undefined));
+            }
+          }
+        })
+        .on('mousedown', function(d) {
+          if (d.channel instanceof Channel) {
+            component.dragService.startDrag({sourceElement: this as SVGGraphicsElement, object: d.channel});
+            d3.event.preventDefault();
+          }
+        });
+
+      selection.append('circle')
+        .call(styleChannel, 10)
+        .attr('cx', 0)
+        .attr('cy', 0);
+
+      selection.append('text')
+        .attr('text-anchor', type === 'input' ? 'end' : 'start')
+        .attr('dx', type === 'input' ? -20 : 20)
+        .attr('dy', '.3em')
+    }
+
     function styleChannel(selection, size: number) {
       selection
-        .classed('channel', true)
         .attr('stroke', 'black')
         .attr('stroke-width', '2')
         .attr('fill', 'steelblue')
@@ -147,35 +188,25 @@ export class LadderDiagramComponent implements OnInit {
         });
         inChannel.exit().remove();
         const inChannelEnter = inChannel.enter().append('g')
-          .classed('inChannel', true)
-          .on('mouseup', (d, i) => {
-            const dragged = this.dragService.dragging.getValue();
-            if (dragged && dragged.object instanceof Channel) {
-              this.dragService.stopDrag();
-              d3.event.preventDefault();
-              d.row.inputChannelOverrides.next(d.row.inputChannelOverrides.getValue().set(i, dragged.object))
-            }
-          });
+          .classed('inChannel', true);
         const inChannelUpdate = inChannel.merge(inChannelEnter)
           .attr('transform', (d,i) => `translate(0,${(i+1) * defaultTransformerHeight / 2})`);
 
         inChannelEnter.append('line')
           .attr('stroke', 'black')
           .attr('stroke-width', 2);
-        inChannelEnter.append('circle')
-          .call(styleChannel, 10)
-          .attr('cx', 0)
-          .attr('cy', 0);
-        inChannelEnter.append('text')
-          .attr('text-anchor', 'end')
-          .attr('dx', '-20')
-          .attr('dy', '.3em');
+
+        inChannelEnter.append('g')
+          .classed('channel', true)
+          .call(createRowChannel, 'input');
 
         inChannelUpdate.selectAll('line')
           .attr('x1', 0)
           .attr('y1', 0)
           .attr('x2', (d: {lastTransformerX: number}) => d.lastTransformerX)
           .attr('y2', 0);
+
+        inChannelUpdate.select('.channel').call(rowChannelUpdate);
 
         const outChannel = channelsUpdate.selectAll('.outChannel').data((d: Row) => {
           const transWidth = transformerWidth(d.maxTransformerCount.getValue());
@@ -184,35 +215,26 @@ export class LadderDiagramComponent implements OnInit {
         });
         outChannel.exit().remove();
         const outChannelEnter = outChannel.enter().append('g')
-          .classed('outChannel', true)
-          .on('mouseup', (d, i) => {
-            const dragged = this.dragService.dragging.getValue();
-            if (dragged && dragged.object instanceof Channel) {
-              this.dragService.stopDrag();
-              d3.event.preventDefault();
-              d.row.outputChannelOverrides.next(d.row.outputChannelOverrides.getValue().set(i, dragged.object))
-            }
-          });
+          .classed('outChannel', true);
         const outChannelUpdate = outChannel.merge(outChannelEnter)
           .attr('transform', (d,i) => `translate(0,${(i+1) * defaultTransformerHeight / 2})`);
 
         outChannelEnter.append('line')
           .attr('stroke', 'black')
           .attr('stroke-width', 2);
-        outChannelEnter.append('circle')
-          .call(styleChannel, 10)
-          .attr('cx', width)
-          .attr('cy', 0);
-        outChannelEnter.append('text')
-          .attr('text-anchor', 'start')
-          .attr('dx', '20')
-          .attr('dy', '.3em');
+
+        outChannelEnter.append('g')
+          .attr('transform', `translate(${width},0)`)
+          .classed('channel', true)
+          .call(createRowChannel, 'output');
 
         outChannelUpdate.selectAll('line')
           .attr('x1', (d: {firstTransformerX: number}) => d.firstTransformerX)
           .attr('y1', 0)
           .attr('x2', width)
           .attr('y2', 0);
+
+        outChannelUpdate.select('.channel').call(rowChannelUpdate);
 
         rowEnter.append('g')
           .classed('transformers', true);
@@ -269,7 +291,9 @@ export class LadderDiagramComponent implements OnInit {
           .attr('transform', d => `translate(${-d.width/2},0)`);
         const transformerInChan = transformerInChansUpdate.selectAll('.channel').data((d) => d.transformer.inputChannels.getValue().toArray().map((chanDef) => { return { channel: chanDef } }));
         transformerInChan.exit().remove();
-        const transformerInChanEnter = transformerInChan.enter().append('circle').call(styleChannel, 5);
+        const transformerInChanEnter = transformerInChan.enter().append('circle')
+          .classed('channel', true)
+          .call(styleChannel, 5);
         const transformerInChanUpdate = transformerInChan.merge(transformerInChanEnter)
           .attr('cx', 0)
           .attr('cy', (d,i) => (i+1) * defaultTransformerHeight/2);
@@ -280,31 +304,30 @@ export class LadderDiagramComponent implements OnInit {
           .attr('transform', d => `translate(${d.width/2},0)`);
         const transformerOutChan = transformerOutChansUpdate.selectAll('.channel').data((d) => d.transformer.outputChannels.getValue().toArray().map((chanDef) => { return { channel: chanDef } }));
         transformerOutChan.exit().remove();
-        const transformerOutChanEnter = transformerOutChan.enter().append('circle').call(styleChannel, 5);
+        const transformerOutChanEnter = transformerOutChan.enter().append('circle')
+          .classed('channel', true)
+          .call(styleChannel, 5);
         const transformerOutChanUpdate = transformerOutChan.merge(transformerOutChanEnter)
           .attr('cx', 0)
           .attr('cy', (d,i) => (i+1) * defaultTransformerHeight/2);
 
         function rowChannelUpdate(selection) {
+          selection.select('text')
+            .attr('x', 0)
+            .text((d) => d.channel.name.getValue());
+
           selection
-            .attr('fill', 'white')
             .classed('placeholder-channel', true)
-            .attr('stroke-dasharray', '2,2')
-            .filter((d: {channel: TransformerChannelDef | Channel}) => d.channel instanceof Channel)
+            .select('circle')
+              .attr('fill', 'white')
+              .attr('stroke-dasharray', '2,2');
+
+          selection.filter((d: {channel: TransformerChannelDef | Channel}) => d.channel instanceof Channel)
               .classed('placeholder-channel', false)
-              .attr('fill', 'steelblue')
-              .attr('stroke-dasharray', null);
+              .select('circle')
+                .attr('fill', 'steelblue')
+                .attr('stroke-dasharray', null);
         }
-
-        inChannelUpdate.select('.channel').call(rowChannelUpdate);
-        outChannelUpdate.select('.channel').call(rowChannelUpdate);
-
-        inChannelUpdate.select('text')
-          .attr('x', 0)
-          .text((d) => d.channel.name.getValue());
-        outChannelUpdate.select('text')
-          .attr('x', width)
-          .text((d) => d.channel.name.getValue());
 
         rowEnter.append('g')
           .classed('drop-targets', true);
@@ -329,7 +352,7 @@ export class LadderDiagramComponent implements OnInit {
                 d.row.transformers.next(d.row.transformers.getValue().insert(i, TransformerBuilder.fromTransformerDefBuilder(TransformerDefBuilder.fromJson(dragging.object.toJson())).build()));
               }
               this.dragService.stopDrag();
-              d3.event.preventDefault();
+              d3.event.stopPropagation();
             }
           });
 

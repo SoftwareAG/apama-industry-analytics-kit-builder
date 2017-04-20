@@ -3,13 +3,17 @@ import * as d3 from "d3";
 import {Injectable} from "@angular/core";
 import {AbstractDataService} from "../../services/AbstractDataService";
 import {BehaviorSubject} from "rxjs";
-import {Channel} from "../../classes/Channel";
+import {Channel, ChannelBuilder} from "../../classes/Channel";
 import {TransformerDef} from "../../classes/TransformerDef";
 import {Config, ConfigBuilder} from "app/classes/Config";
 import {LadderDiagramComponent} from "./ladder-diagram.component";
-import {Transformer} from "../../classes/Transformer";
+import {Transformer, TransformerBuilder} from "../../classes/Transformer";
 import {List} from "immutable";
-import {AbstractDragService, Draggable, Dragged, Point} from "../../services/AbstractDragService";
+import {AbstractDragService, Dragged} from "../../services/AbstractDragService";
+import {NestedRowBuilder, RowBuilder} from "app/classes/Row";
+import {DragService} from "app/services/DragService";
+import {TransformerChannelDef} from "../../classes/TransformerChannelDef";
+import {TestUtils} from "../../services/TestUtil.spec";
 
 @Injectable()
 class DataServiceMock implements AbstractDataService {
@@ -21,27 +25,19 @@ class DataServiceMock implements AbstractDataService {
   readonly selectedTransformer: BehaviorSubject<Transformer | undefined>;
 }
 
-@Injectable()
-class DragServiceMock implements AbstractDragService {
-  readonly dragging: BehaviorSubject<Dragged | undefined> = new BehaviorSubject(undefined);
-
-  startDrag(draggable: Draggable) {}
-  stopDrag(): Dragged | undefined { return undefined; }
-  drag(newLocation: Point) {}
-}
-
 describe('LadderDiagramComponent', () => {
   let component: LadderDiagramComponent;
   let fixture: ComponentFixture<LadderDiagramComponent>;
   let el: HTMLElement;
   let dataService: DataServiceMock;
+  let dragService: DragService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ LadderDiagramComponent ],
       providers: [
         {provide: AbstractDataService, useClass: DataServiceMock},
-        {provide: AbstractDragService, useClass: DragServiceMock}
+        {provide: AbstractDragService, useClass: DragService}
       ]
     })
     .compileComponents();
@@ -49,7 +45,7 @@ describe('LadderDiagramComponent', () => {
 
   beforeEach(() => {
     dataService = TestBed.get(AbstractDataService) as DataServiceMock;
-    dataService.hierarchy.next(new ConfigBuilder().build());
+    dragService = TestBed.get(AbstractDragService) as DragService;
     fixture = TestBed.createComponent(LadderDiagramComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -306,6 +302,300 @@ describe('LadderDiagramComponent', () => {
     expect(transformerName).toBeArrayOfSize(1);
     expect(transformerName[0].textContent).toEqual("My Second Analytic");
 
+  });
+
+  describe('should draw appropriate drop targets when dragging a Transformer', () => {
+    [
+      { description: "RowSize: 1, Transformers: 0", setup: (row: RowBuilder): RowBuilder => row.MaxTransformerCount(1), dropTargetCount: 1 }, {
+        description: "RowSize: 1, Transformers: 1",
+        setup: (row: RowBuilder): RowBuilder => {
+          return row.MaxTransformerCount(1)
+            .withTransformer()
+              .withInputChannel().endWith()
+              .withOutputChannel().endWith()
+            .endWith()
+        },
+        dropTargetCount: 0,
+      },{
+        description: "RowSize: 2, Transformers: 1",
+        setup: (row: RowBuilder): RowBuilder => {
+          return row.MaxTransformerCount(2)
+            .withTransformer()
+              .withInputChannel().endWith()
+              .withOutputChannel().endWith()
+            .endWith()
+        },
+        dropTargetCount: 2
+      },{
+        description: "RowSize: 2, Transformers: 1 (Multiple Inputs)",
+        setup: (row: RowBuilder): RowBuilder => {
+          return row.MaxTransformerCount(2)
+            .withTransformer()
+              .withInputChannel().endWith()
+              .withInputChannel().endWith()
+              .withOutputChannel().endWith()
+            .endWith()
+        },
+        dropTargetCount: 0
+      },{
+        description: "RowSize: 2, Transformers: 1 (Multiple Outputs)",
+        setup: (row: RowBuilder): RowBuilder => {
+          return row.MaxTransformerCount(2)
+            .withTransformer()
+              .withInputChannel().endWith()
+              .withOutputChannel().endWith()
+              .withOutputChannel().endWith()
+            .endWith()
+        },
+        dropTargetCount: 0
+      }
+    ].forEach((testCase) => {
+      it(testCase.description + ', DropTargets: ' + testCase.dropTargetCount, () => {
+        const config = (testCase.setup(new ConfigBuilder().withRow()) as NestedRowBuilder<ConfigBuilder>).endWith().build();
+
+        dataService.hierarchy.next(config);
+        fixture.detectChanges();
+
+        // Create a temporary dom element and transformer to simulate that one has been dragged
+        const dragEl = TestUtils.withTempSvg().append('rect').attr('width', 100).attr('height', 100).node() as SVGRectElement;
+        dragService.startDrag({ sourceElement: dragEl, object: new TransformerBuilder().withInputChannel().endWith().withOutputChannel().endWith().build() });
+
+        fixture.detectChanges();
+
+        const dropTargets = Array.from(el.querySelectorAll('.drop-target'));
+        expect(dropTargets).toBeArrayOfSize(testCase.dropTargetCount);
+      })
+    })
+  });
+
+  describe('should insert a transformer at the appropriate position when dropping on a drop target', () => {
+    for(let i = 0; i < 3; i++) {
+      it('Drop Target: ' + i, () => {
+        const config = new ConfigBuilder()
+          .withRow()
+            .MaxTransformerCount(3)
+            .withTransformer().withInputChannel().endWith().withOutputChannel().endWith().endWith()
+            .withTransformer().withInputChannel().endWith().withOutputChannel().endWith().endWith()
+          .endWith()
+          .build();
+
+        dataService.hierarchy.next(config);
+        fixture.detectChanges();
+
+        // Create a temporary dom element and transformer to simulate that one has been dragged
+        const dragEl = TestUtils.withTempSvg().append('rect').attr('width', 100).attr('height', 100).node() as SVGRectElement;
+        const dragTransformer = new TransformerBuilder().withInputChannel().endWith().withOutputChannel().endWith().build();
+        dragService.startDrag({ sourceElement: dragEl, object: dragTransformer });
+
+        fixture.detectChanges();
+
+        const dropTargets = Array.from(el.querySelectorAll('.drop-target'));
+        expect(dropTargets).toBeArrayOfSize(3);
+        expect(dragService.dragging.getValue()).toBeDefined();
+
+        dropTargets[i].dispatchEvent(new MouseEvent("mouseup", {
+          bubbles: true,
+          cancelable: true,
+          view: window,
+          clientX: 200,
+          clientY: 200
+        }));
+
+        expect(dragService.dragging.getValue()).toBeUndefined();
+
+        const transformers = Array.from(el.querySelectorAll('.transformer'));
+        expect(transformers).toBeArrayOfSize(3);
+
+        expect((d3.select(transformers[i]).datum() as any).transformer).toBe(dragTransformer);
+      })
+    }
+  });
+
+  // Drag the first transformer and drop in the last position
+  it('should allow dragging/dropping of existing transformer', () => {
+    const config = new ConfigBuilder()
+      .withRow()
+        .MaxTransformerCount(3)
+        .withTransformer().withInputChannel().endWith().withOutputChannel().endWith().endWith()
+        .withTransformer().withInputChannel().endWith().withOutputChannel().endWith().endWith()
+        .withTransformer().withInputChannel().endWith().withOutputChannel().endWith().endWith()
+      .endWith()
+      .build();
+
+    dataService.hierarchy.next(config);
+    fixture.detectChanges();
+
+    const transformerEls = Array.from(el.querySelectorAll('.transformer'));
+    const transformers = transformerEls.map((transEl) => (d3.select(transEl).datum() as any).transformer);
+
+    const transEl = transformerEls[0];
+
+    transEl.dispatchEvent(new MouseEvent("mousedown", {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+      clientX: 200,
+      clientY: 200
+    }));
+    fixture.detectChanges();
+
+    expect((dragService.dragging.getValue() as Dragged).object).toBe(transformers[0]);
+    expect(Array.from(el.querySelectorAll('.transformer'))).toBeArrayOfSize(3); // Still present until mouse leaves
+    expect(Array.from(el.querySelectorAll('.drop-target'))).toBeArrayOfSize(0); // No spaces until this transformer has been removed from the sequence (on mouseleave)
+
+    transEl.dispatchEvent(new MouseEvent("mouseleave", {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+      clientX: 0,
+      clientY: 0
+    }));
+    fixture.detectChanges();
+
+    expect((dragService.dragging.getValue() as Dragged).object).toBe(transformers[0]);
+    expect(Array.from(el.querySelectorAll('.transformer'))).toBeArrayOfSize(2);
+    const dropTargets = Array.from(el.querySelectorAll('.drop-target'));
+    expect(dropTargets).toBeArrayOfSize(3);
+
+    dropTargets[2].dispatchEvent(new MouseEvent("mouseup", {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+      clientX: 200,
+      clientY: 200
+    }));
+    fixture.detectChanges();
+
+    expect(dragService.dragging.getValue()).toBeUndefined();
+    expect(Array.from(el.querySelectorAll('.drop-target'))).toBeArrayOfSize(0);
+    const newTransformerEls = Array.from(el.querySelectorAll('.transformer'));
+    expect(newTransformerEls).toBeArrayOfSize(3);
+    const newTransformers = newTransformerEls.map((transEl) => (d3.select(transEl).datum() as any).transformer);
+    expect(newTransformers).toEqual([transformers[1], transformers[2], transformers[0]]);
+  });
+
+  it('should not allow dragging of placeholder channels', () => {
+    const config = new ConfigBuilder()
+      .withRow()
+        .MaxTransformerCount(1)
+        .withTransformer().withInputChannel().endWith().withOutputChannel().endWith().endWith()
+      .endWith()
+      .build();
+
+    dataService.hierarchy.next(config);
+    fixture.detectChanges();
+
+    const inChannel = Array.from(el.querySelectorAll('.inChannel .channel'))[0];
+    const outChannel = Array.from(el.querySelectorAll('.outChannel .channel'))[0];
+
+    [inChannel, outChannel].forEach((channelEl) => {
+      channelEl.dispatchEvent(new MouseEvent("mousedown", {
+        bubbles: true,
+        cancelable: true,
+        view: window,
+        clientX: 200,
+        clientY: 200
+      }));
+      fixture.detectChanges();
+
+      expect(dragService.dragging.getValue()).toBeUndefined();
+    })
+  });
+
+  describe('should allow dragging/dropping of existing channels', () => {
+    [
+      {
+        description: 'inputChannel dropped on output placeholder',
+        inputChannel: new ChannelBuilder().build(),
+        outputChannel: undefined,
+        fromSelector: '.inChannel .channel',
+        toSelector: '.outChannel .channel'
+      },{
+        description: 'outputChannel dropped on input placeholder',
+        inputChannel: undefined,
+        outputChannel: new ChannelBuilder().build(),
+        fromSelector: '.outChannel .channel',
+        toSelector: '.inChannel .channel'
+      },{
+        description: 'inputChannel dropped on outputChannel',
+        inputChannel: new ChannelBuilder().build(),
+        outputChannel: new ChannelBuilder().build(),
+        fromSelector: '.inChannel .channel',
+        toSelector: '.outChannel .channel'
+      },{
+        description: 'outputChannel dropped on inputChannel',
+        inputChannel: new ChannelBuilder().build(),
+        outputChannel: new ChannelBuilder().build(),
+        fromSelector: '.outChannel .channel',
+        toSelector: '.inChannel .channel'
+      },{
+        description: 'inputChannel dropped on inputChannel',
+        inputChannel: new ChannelBuilder().build(),
+        outputChannel: undefined,
+        fromSelector: '.inChannel .channel',
+        toSelector: '.inChannel .channel'
+      },{
+        description: 'outputChannel dropped on outputChannel',
+        inputChannel: undefined,
+        outputChannel: new ChannelBuilder().build(),
+        fromSelector: '.outChannel .channel',
+        toSelector: '.outChannel .channel'
+      },
+    ].forEach((testCase) => {
+      it(testCase.description, () => {
+        const config = new ConfigBuilder()
+          .withRow()
+            .MaxTransformerCount(1)
+            .pushInputChannel(testCase.inputChannel)
+            .pushOutputChannel(testCase.outputChannel)
+            .withTransformer().withInputChannel().endWith().withOutputChannel().endWith().endWith()
+          .endWith()
+          .build();
+
+        dataService.hierarchy.next(config);
+        fixture.detectChanges();
+
+        const fromChanEl = el.querySelectorAll(testCase.fromSelector)[0];
+        const toChanEl = el.querySelectorAll(testCase.toSelector)[0];
+        const dragChan = (d3.select(fromChanEl).datum() as any).channel;
+
+        fromChanEl.dispatchEvent(new MouseEvent("mousedown", {
+          bubbles: true,
+          cancelable: true,
+          view: window,
+          clientX: 200,
+          clientY: 200
+        }));
+        fixture.detectChanges();
+
+        expect((dragService.dragging.getValue() as Dragged).object).toBe(dragChan);
+        expect((d3.select(el.querySelectorAll(testCase.fromSelector)[0]).datum() as any).channel).toBe(dragChan); // Not removed until mouse leave
+
+        fromChanEl.dispatchEvent(new MouseEvent("mouseleave", {
+          bubbles: true,
+          cancelable: true,
+          view: window,
+          clientX: 200,
+          clientY: 200
+        }));
+        fixture.detectChanges();
+
+        expect((dragService.dragging.getValue() as Dragged).object).toBe(dragChan);
+        expect((d3.select(el.querySelectorAll(testCase.fromSelector)[0]).datum() as any).channel).toEqual(jasmine.any(TransformerChannelDef)); // Replaced with placeholder
+
+        toChanEl.dispatchEvent(new MouseEvent("mouseup", {
+          bubbles: true,
+          cancelable: true,
+          view: window,
+          clientX: 200,
+          clientY: 200
+        }));
+        fixture.detectChanges();
+
+        expect(dragService.dragging.getValue()).toBeUndefined();
+        expect((d3.select(el.querySelectorAll(testCase.toSelector)[0]).datum() as any).channel).toBe(dragChan);
+      })
+    })
   });
 
 });
