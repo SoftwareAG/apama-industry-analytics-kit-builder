@@ -36,8 +36,6 @@ describe('RowSerializer', () => {
       .endWith()
       .build().toJson()), 0);
 
-    console.info(result);
-
     const rows = TestUtils.findAll(/(\\\\ Row:\s)(.*)/g, result).map(match => match[1]);
     expect(rows).toEqual(["0"]);
 
