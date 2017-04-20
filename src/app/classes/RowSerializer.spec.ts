@@ -2,7 +2,7 @@ import {TransformerSerializer} from "app/classes/Transformer";
 import {RowBuilder, RowSerializer} from "./Row";
 import {PropertySerializer} from "./Property";
 import {TestBed} from "@angular/core/testing";
-import {findAll} from "../services/TestUtil.spec";
+import {TestUtils} from "../services/TestUtil.spec";
 
 describe('RowSerializer', () => {
 
@@ -38,10 +38,10 @@ describe('RowSerializer', () => {
 
     console.info(result);
 
-    const rows = findAll(/(\\\\ Row:\s)(.*)/g, result).map(match => match[1]);
+    const rows = TestUtils.findAll(/(\\\\ Row:\s)(.*)/g, result).map(match => match[1]);
     expect(rows).toEqual(["0"]);
 
-    const analytics = findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
+    const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
     expect(analytics).toEqual([
         '"Analytic 1",["Row0:Input0","Row0:Input1"],["Output Channel 1"],{}'
     ]);

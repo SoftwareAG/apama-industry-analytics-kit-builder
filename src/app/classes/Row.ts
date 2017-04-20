@@ -148,8 +148,11 @@ export class RowSerializer {
   constructor(private transformerSerializer: TransformerSerializer) {}
 
   toApama(row: RowJsonInterface, rowIndex: number) {
-    return "" +
-      (row.transformers.length > 0 ? `\\\\ Row: ${rowIndex}\n` : "") +
+    if (!row.transformers.length) {
+      return "";
+    }
+
+    return `\\\\ Row: ${rowIndex}\n` +
       row.transformers.map((transformer, transformerIndex) => this.transformerSerializer.toApama(transformer, transformerIndex, row, rowIndex))
         .join('\n');
   }

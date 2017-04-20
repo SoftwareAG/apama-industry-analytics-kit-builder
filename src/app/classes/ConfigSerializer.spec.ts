@@ -4,7 +4,7 @@ import {TransformerSerializer} from "app/classes/Transformer";
 import {RowSerializer} from "./Row";
 import {PropertySerializer} from "./Property";
 import {TestBed} from "@angular/core/testing";
-import {findAll} from "../services/TestUtil.spec";
+import {TestUtils} from "../services/TestUtil.spec";
 
 describe('ConfigSerializer', () => {
 
@@ -54,17 +54,17 @@ describe('ConfigSerializer', () => {
       .build());
     console.log(result);
 
-    const names = findAll(/(\\\\ Name:\s)(.*)/g, result).map(match => match[1]);
-    const descriptions = findAll(/(\\\\ Description:\s)(.*)/g, result).map(match => match[1]);
+    const names = TestUtils.findAll(/(\\\\ Name:\s)(.*)/g, result).map(match => match[1]);
+    const descriptions = TestUtils.findAll(/(\\\\ Description:\s)(.*)/g, result).map(match => match[1]);
     expect(names).toBeArrayOfSize(1);
     expect(names[0]).toEqual("Single row with two Analytics each containing one input and output channel");
     expect(descriptions).toBeArrayOfSize(1);
     expect(descriptions[0]).toEqual("This configuration demonstrates a single row with two Analytics each containing one input and output channel");
 
-    const rows = findAll(/(\\\\ Row:\s)(.*)/g, result).map(match => match[1]);
+    const rows = TestUtils.findAll(/(\\\\ Row:\s)(.*)/g, result).map(match => match[1]);
     expect(rows).toEqual(["0"]);
 
-    const analytics = findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
+    const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
     expect(analytics).toEqual([
       '"Analytic 1",["Input Channel 1"],["Row0:Channel1"],{"My first property":"Hello World"}',
       '"Analytic 2",["Row0:Channel1"],["Output Channel 1"],{"My first property":"true"}'

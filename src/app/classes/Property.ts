@@ -86,11 +86,12 @@ export class PropertyArrayBuilder extends ClassArrayBuilder<Property, NestedProp
 export class PropertySerializer {
   //noinspection JSMethodCanBeStatic
   toApama(property: PropertyJsonInterface) {
-    return "" +
-        (property.name ?
-          property.value !== undefined ? `"${property.name}":"${PropertySerializer.valueFromType(property.value, property.type)}"` : ""
-         : ""
-        );
+    if (!property.name) {
+      console.error("SerializationError: Property should have a name");
+      return "";
+    }
+
+    return property.value !== undefined ? `"${property.name}":"${PropertySerializer.valueFromType(property.value, property.type)}"` : "";
   }
 
   private static valueFromType(jsValue: number | string | boolean | undefined, apamaType: "integer" | "string" | "float" | "decimal" | "boolean") {
