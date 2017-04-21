@@ -29,7 +29,7 @@ describe('ConfigSerializer', () => {
     expect(result).toBe('\\\\ Version: 0.0.0.0\n')
   });
 
-  it('should serialise a valid config with two Analytics', () => {
+  it('should serialize a valid config with two Analytics', () => {
 
     const result = fileService.serialize(new ConfigBuilder()
       .Name("Single row with two Analytics each containing one input and output channel")

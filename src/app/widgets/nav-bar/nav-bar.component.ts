@@ -25,9 +25,6 @@ export class NavBarComponent implements OnInit {
 
   onConfigurationClick(config: Config) {
     this.dataService.hierarchy.next(config);
-
-
-
   }
 
   saveConfiguration() {
