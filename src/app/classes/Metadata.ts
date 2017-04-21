@@ -25,7 +25,7 @@ export class Metadata extends AbstractModel<MetadataJsonInterface> {
 }
 
 export class MetadataBuilder extends ClassBuilder<Metadata> implements MetadataInterface {
-  version: string;
+  version: string = "0.0.0.0";
   transformers: TransformerDef[] = [];
 
   Version(version: string): this {

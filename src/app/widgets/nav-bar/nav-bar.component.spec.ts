@@ -11,6 +11,8 @@ import {Transformer, TransformerSerializer} from "../../classes/Transformer";
 import {FileService} from "../../services/FileService";
 import {RowSerializer} from "../../classes/Row";
 import {PropertySerializer} from "../../classes/Property";
+import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
+import {AbstractMetadataService, MetadataService} from "../../services/MetadataService";
 
 @Injectable()
 class DataServiceMock extends AbstractDataService {
@@ -48,11 +50,15 @@ describe('NavBarComponent', () => {
       declarations: [NavBarComponent],
       providers: [
         {provide: AbstractDataService, useClass: DataServiceMock},
+        {provide: AbstractMetadataService, useClass: MetadataService},
         FileService,
         ConfigSerializer,
         RowSerializer,
         TransformerSerializer,
         PropertySerializer
+      ],
+      imports: [
+        NgbModule.forRoot()
       ]
       })
   }));
@@ -84,7 +90,7 @@ describe('NavBarComponent', () => {
 
   it('should correctly display example configurations in the dropdown', () => {
     fixture.detectChanges();
-    const configurations = Array.from(el.querySelectorAll('.dropdown-menu > .dropdown-item'));
+    const configurations = Array.from(el.querySelectorAll('.examples .dropdown-menu > .dropdown-item'));
 
     expect(configurations).toBeArrayOfSize(4);
     expect (configurations.length).toEqual(dataService.configurations.getValue().size);

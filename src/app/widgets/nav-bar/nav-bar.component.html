@@ -1,34 +1,40 @@
-<nav class="navbar navbar-toggleable-md navbar-light">
-  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+<nav class="navbar navbar-light navbar-toggleable-md">
+  <button class="navbar-toggler navbar-toggler-right" type="button" (click)="isNavbarCollapsed = !isNavbarCollapsed">
     <span class="navbar-toggler-icon"></span>
   </button>
-  <a class="navbar-brand" id="navbar-title" href="#">Analytics Builder</a>
+  <a class="navbar-brand" id="navbar-title">Analytics Builder</a>
 
-  <div class="collapse navbar-collapse" id="navbarNavDropdown">
-    <ul class="navbar-nav">
+  <div [ngbCollapse]="isNavbarCollapsed" class="collapse navbar-collapse" id="navbarNavDropdown">
+    <ul class="navbar-nav mr-auto">
 
       <li class="nav-item">
-        <label for="load-configuration" class="btn btn-outline-primary btn-file">
-          Load Configuration <input id="load-configuration" type="file" accept="text/*.evt" style="display: none;"/>
-        </label>
+        <a class="nav-link" href="javascript:void(0)" (click)="loadConfig()">Load Configuration</a>
       </li>
 
       <li class="nav-item">
-        <label for="save-configuration" class="btn btn-outline-primary btn-file">
-          Save Configuration <input id="save-configuration" type="button"  style="display: none;" (click)="saveConfiguration()"/>
-          <a #saveFile href="" style="display: none;"></a>
-
-        </label>
+        <a class="nav-link" href="javascript:void(0)" (click)="saveConfig()">Save Configuration</a>
       </li>
-      <li class="nav-item">
-        <div ngbDropdown class="d-inline-block">
-          <button class="btn btn-outline-primary" id="dropdownMenu1" ngbDropdownToggle>Sample Configurations</button>
-          <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
-            <!--suppress HtmlUnknownAttribute -->
-            <button *ngFor="let configuration of configurations | async" id="{{configuration.name | async}}" class="dropdown-item" (click)="onConfigurationClick(configuration)">{{configuration.name | async}}</button>
-          </div>
+      <li class="nav-item examples" ngbDropdown>
+        <a class="nav-link" href="javascript:void(0)" ngbDropdownToggle>Sample Configurations</a>
+        <div class="dropdown-menu">
+          <a *ngFor="let configuration of configurations | async" class="dropdown-item ellipsis" href="javascript:void(0)" (click)="onConfigurationClick(configuration)">{{configuration.name | async}}</a>
         </div>
       </li>
     </ul>
+    <div>
+      <div class="input-group">
+        <label class="input-group-addon">Version</label>
+        <div ngbDropdown class="d-inline-block input-group-btn">
+          <button class="btn btn-outline-primary" ngbDropdownToggle>{{currentMetaVersion | async}}</button>
+          <div class="dropdown-menu dropdown-menu-right">
+            <h6 class="dropdown-header">Default</h6>
+            <button class="dropdown-item" *ngFor="let version of metadataVersions | async" [ngClass]="{'selected': isSelectedVersion(version)}" (click)="metadataVersionChange(version)">{{version}}</button>
+            <div class="dropdown-divider"></div>
+            <h6 class="dropdown-header">Custom</h6>
+            <div class="px-2 w-100"><button class="btn btn-secondary w-100" (click)="loadCustomMetadata()">Upload...</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </nav>

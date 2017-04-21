@@ -1,4 +1,11 @@
-li {
-  padding-top:6px;
-  padding-right: 8px;
+.dropdown-item.selected {
+  background-color: #e7e7e9;
+}
+
+.dropdown-item.selected:hover {
+  background-color: #dcdcde;
+}
+
+.ellipsis {
+  text-overflow: ellipsis; overflow: hidden;
 }

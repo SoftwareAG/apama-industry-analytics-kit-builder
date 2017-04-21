@@ -17,6 +17,7 @@ export class AppComponent {
     (dataService as DataService).loadChannels();
 
     metadataService.metadata.next(new MetadataBuilder()
+      .Version("1.0.0")
       .withTransformer()
         .Name("Sorter")
         .withInputChannel().Name("In1").Description("").endWith()
