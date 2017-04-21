@@ -1,9 +1,8 @@
-import {BehaviorSubject} from "rxjs";
 import {AbstractDragService, Draggable, Dragged, Point} from "./AbstractDragService";
+import {Injectable} from "@angular/core";
 
+@Injectable()
 export class DragService extends AbstractDragService {
-  readonly dragging: BehaviorSubject<Dragged|undefined> = new BehaviorSubject(undefined);
-
   startDrag(draggable: Draggable) {
     this.dragging.next(new Dragged(draggable));
   }

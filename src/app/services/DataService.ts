@@ -1,21 +1,10 @@
-import {Config, ConfigBuilder} from "../classes/Config";
-import {Channel, ChannelBuilder} from "../classes/Channel";
-import {TransformerDef, TransformerDefArrayBuilder, TransformerDefBuilder} from "../classes/TransformerDef";
-import {BehaviorSubject} from "rxjs";
+import {ConfigBuilder} from "../classes/Config";
+import {ChannelBuilder} from "../classes/Channel";
 import {AbstractDataService} from "./AbstractDataService";
-import {Transformer} from "../classes/Transformer";
-import {List} from "immutable";
+import {Injectable} from "@angular/core";
 
-export class DataService implements AbstractDataService {
-  readonly channels: BehaviorSubject<List<Channel>> = new BehaviorSubject((List<Channel>()));
-  readonly transformers: BehaviorSubject<List<TransformerDef>> = new BehaviorSubject((List<TransformerDef>()));
-  readonly hierarchy: BehaviorSubject<Config> = new BehaviorSubject(new ConfigBuilder().build());
-  readonly selectedTransformer: BehaviorSubject<Transformer | undefined> = new BehaviorSubject(undefined);
-  readonly configurations: BehaviorSubject<List<Config>> = new BehaviorSubject(List<Config>());
-
-   constructor() {
-  }
-
+@Injectable()
+export class DataService extends AbstractDataService {
   loadConfigurations() {
 
     this.configurations.next(this.configurations.getValue().push(
@@ -167,70 +156,5 @@ export class DataService implements AbstractDataService {
         .Name("Channel 2")
         .build()
     ));
-  }
-
-  loadTransformers()
-  {
-    this.transformers.next(List(new TransformerDefArrayBuilder()
-      .with()
-        .Name("Sorter")
-        .withInputChannel().Name("In1").Description("").endWith()
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith()
-      .with()
-        .Name("NoInput")
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith()
-      .with()
-        .Name("NoOutput")
-        .withInputChannel().Name("In1").Description("").endWith()
-      .endWith()
-      .with()
-        .Name("Drift")
-        .withInputChannel().Name("In1").Description("").endWith()
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith()
-      .with()
-        .Name("Spike")
-        .withInputChannel().Name("In1").Description("").endWith()
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith()
-      .with()
-        .Name("Threshold")
-        .withInputChannel().Name("In1").Description("").endWith()
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith()
-      .with()
-        .Name("Delta")
-        .withInputChannel().Name("In1").Description("").endWith()
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith()
-      .with()
-        .Name("Gradient")
-        .withInputChannel().Name("In1").Description("").endWith()
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith()
-      .with()
-        .Name("Average")
-        .withInputChannel().Name("In1").Description("").endWith()
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith()
-      .with()
-        .Name("Sum")
-        .withInputChannel().Name("In1").Description("").endWith()
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith()
-      .with()
-        .Name("Mode")
-        .withInputChannel().Name("In1").Description("").endWith()
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith()
-      .with()
-        .Name("Spread")
-        .withInputChannel().Name("In1").Description("").endWith()
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith()
-    .build()))
-
   }
 }

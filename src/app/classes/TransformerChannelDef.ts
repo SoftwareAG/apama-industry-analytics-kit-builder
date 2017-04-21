@@ -1,6 +1,4 @@
 import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
-import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
-import {BehaviorSubject, Observable} from "rxjs";
 import {AbstractModel} from "./AbstractModel";
 
 export interface TransformerChannelDefJsonInterface {
@@ -13,21 +11,14 @@ export interface TransformerChannelDefInterface {
   description: string;
 }
 
-export class TransformerChannelDef extends AbstractModel<TransformerChannelDefJsonInterface> implements AsObservable, BehaviorSubjectify<TransformerChannelDefInterface> {
-  readonly name: BehaviorSubject<string>;
-  readonly description: BehaviorSubject<string>;
+export class TransformerChannelDef extends AbstractModel<TransformerChannelDefJsonInterface> {
+  readonly name: string;
+  readonly description: string;
 
   constructor(obj: TransformerChannelDefInterface) {
     super();
-    this.name = new BehaviorSubject(obj.name);
-    this.description = new BehaviorSubject(obj.description);
-  }
-
-  asObservable(): Observable<this> {
-    return Observable.merge(
-      this.name,
-      this.description
-    ).mapTo(this);
+    this.name = obj.name;
+    this.description = obj.description;
   }
 }
 

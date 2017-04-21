@@ -18,6 +18,7 @@ import {RowSerializer} from "./classes/Row";
 import {PropertySerializer} from "app/classes/Property";
 import {TransformerSerializer} from "./classes/Transformer";
 import {FileService} from "./services/FileService";
+import {AbstractMetadataService, MetadataService} from "./services/MetadataService";
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
@@ -39,6 +40,7 @@ describe('AppComponent', () => {
       providers: [
         {provide: AbstractDataService, useClass: DataService},
         {provide: AbstractDragService, useClass: DragService},
+        {provide: AbstractMetadataService, useClass: MetadataService},
         ConfigSerializer,
         RowSerializer,
         TransformerSerializer,

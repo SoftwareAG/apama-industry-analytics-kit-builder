@@ -17,11 +17,9 @@ import {Transformer, TransformerBuilder} from "../../classes/Transformer";
 })
 export class LadderDiagramComponent implements OnInit {
   readonly nativeElement;
-  readonly hierarchy: Observable<Config>;
 
   constructor(myElement: ElementRef, private readonly dataService: AbstractDataService, private readonly dragService: AbstractDragService) {
     this.nativeElement = myElement.nativeElement;
-    this.hierarchy = dataService.hierarchy;
   }
 
   ngOnInit() {
@@ -74,7 +72,10 @@ export class LadderDiagramComponent implements OnInit {
       if (
         transformerCount < maxTransformerCount &&
         rowInChannelCount <= 1 && rowOutChannelCount <= 1 &&
-        dragging.inputChannels.getValue().size === 1 && dragging.outputChannels.getValue().size === 1
+        (
+          (dragging instanceof Transformer && dragging.inputChannels.getValue().size === 1 && dragging.outputChannels.getValue().size === 1) ||
+          (dragging instanceof TransformerDef && dragging.inputChannels.size === 1 && dragging.outputChannels.size === 1)
+        )
       ) {
         return new Array(transformerCount + 1).fill(undefined).map((ignored, i) => {
           return {
@@ -160,8 +161,8 @@ export class LadderDiagramComponent implements OnInit {
     const rows = container.append('g')
       .classed('rows', true);
 
-    this.hierarchy
-      .switchMap((hierarchy) => hierarchy.asObservable()) // subscribe to all of the sub-tree changes too
+    this.dataService.hierarchy
+      .switchMap(hierarchy => hierarchy.asObservable()) // subscribe to all of the sub-tree changes too
       .combineLatest(
         this.dragService.dragging,
         (hierarchy, dragging) => hierarchy
@@ -312,21 +313,24 @@ export class LadderDiagramComponent implements OnInit {
           .attr('cy', (d,i) => (i+1) * defaultTransformerHeight/2);
 
         function rowChannelUpdate(selection) {
-          selection.select('text')
-            .attr('x', 0)
-            .text((d) => d.channel.name.getValue());
+          const channelSelection = selection.filter((d: {channel: TransformerChannelDef | Channel}) => d.channel instanceof Channel);
+          const channelDefSelection = selection.filter((d: {channel: TransformerChannelDef | Channel}) => d.channel instanceof TransformerChannelDef);
+          channelSelection.select('text')
+            .text(d => d.channel.name.getValue());
+          channelDefSelection.select('text')
+            .text(d => d.channel.name);
 
-          selection
+          channelSelection
+            .classed('placeholder-channel', false)
+              .select('circle')
+              .attr('fill', 'steelblue')
+              .attr('stroke-dasharray', null);
+
+          channelDefSelection
             .classed('placeholder-channel', true)
             .select('circle')
               .attr('fill', 'white')
               .attr('stroke-dasharray', '2,2');
-
-          selection.filter((d: {channel: TransformerChannelDef | Channel}) => d.channel instanceof Channel)
-              .classed('placeholder-channel', false)
-              .select('circle')
-                .attr('fill', 'steelblue')
-                .attr('stroke-dasharray', null);
         }
 
         rowEnter.append('g')
@@ -334,7 +338,7 @@ export class LadderDiagramComponent implements OnInit {
 
         const dropTarget = rowUpdate.select('.drop-targets').selectAll('.drop-target').data((d: Row) => {
           const dragging = component.dragService.dragging.getValue();
-          return dragging && dragging.object instanceof TransformerDef ? getDropTargetsForRow(d, dragging.object as TransformerDef) : []
+          return dragging && (dragging.object instanceof TransformerDef || dragging.object instanceof Transformer) ? getDropTargetsForRow(d, dragging.object) : []
         });
         dropTarget.exit().remove();
         const dropTargetEnter = dropTarget.enter().append('rect')

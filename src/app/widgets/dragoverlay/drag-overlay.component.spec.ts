@@ -1,15 +1,12 @@
 import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 import {Injectable} from "@angular/core";
-import {BehaviorSubject} from "rxjs";
 import {AbstractDragService, Draggable, Dragged, Point} from "../../services/AbstractDragService";
 import {DragOverlayComponent} from "./drag-overlay.component";
 import * as d3 from "d3";
 import {TestUtils} from "../../services/TestUtil.spec";
 
 @Injectable()
-class DragServiceMock implements AbstractDragService {
-  dragging: BehaviorSubject<Dragged | undefined> = new BehaviorSubject(undefined);
-
+class DragServiceMock extends AbstractDragService {
   startDrag(draggable: Draggable) {
     this.dragging.next(new Dragged(draggable));
   }

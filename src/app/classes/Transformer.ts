@@ -16,31 +16,40 @@ import {Injectable} from "@angular/core";
 
 export interface TransformerJsonInterface extends TransformerDefJsonInterface {
   name: string;
-  properties: PropertyJsonInterface[]
+  properties?: PropertyJsonInterface[]
 }
 
-export interface TransformerInterface extends TransformerDefInterface  {
+export interface TransformerInterface {
+  name: string;
   properties: Property[];
+  inputChannels: TransformerChannelDef[];
+  outputChannels: TransformerChannelDef[];
 }
 
-export class Transformer extends TransformerDef implements AsObservable, BehaviorSubjectify<TransformerInterface>, AbstractModel<TransformerJsonInterface> {
+export class Transformer extends AbstractModel<TransformerJsonInterface> implements AsObservable, BehaviorSubjectify<TransformerInterface>, AbstractModel<TransformerJsonInterface> {
+  readonly name: BehaviorSubject<string>;
   readonly properties: BehaviorSubject<List<Property>>;
+  readonly inputChannels: BehaviorSubject<List<TransformerChannelDef>>;
+  readonly outputChannels: BehaviorSubject<List<TransformerChannelDef>>;
 
   constructor(obj: TransformerInterface) {
-    super(obj);
+    super();
+    this.name = new BehaviorSubject(obj.name);
     this.properties = new BehaviorSubject(List(obj.properties));
+    this.inputChannels = new BehaviorSubject(List(obj.inputChannels));
+    this.outputChannels = new BehaviorSubject(List(obj.outputChannels));
   }
 
   asObservable(): Observable<this> {
     return Observable.merge(
-      super.asObservable(),
+      this.name,
       this.properties,
-      this.properties.switchMap(properties => Observable.merge(...properties.toArray().map(property => (property as Property).asObservable())))
+      this.inputChannels,
+      this.outputChannels,
+      this.properties.switchMap(properties => Observable.merge(...properties.map(property => (property as Property).asObservable()).toArray())),
+      this.inputChannels.switchMap(inChannels => Observable.merge(...inChannels.toArray().map((inChan: any) => inChan.asObservable ? inChan.asObservable() : new BehaviorSubject(inChan)))),
+      this.outputChannels.switchMap(outChannels => Observable.merge(...outChannels.toArray().map((outChan: any) => outChan.asObservable ? outChan.asObservable() : new BehaviorSubject(outChan))))
     ).mapTo(this);
-  }
-
-  toJson(): TransformerJsonInterface {
-    return super.toJson() as TransformerJsonInterface;
   }
 }
 
@@ -133,14 +142,14 @@ export class TransformerSerializer {
             TransformerSerializer.getOutChannels(transformer, transformerIndex, row, rowIndex) +
           "]," +
           "{" +
-            transformer.properties.map(this.propertySerializer.toApama) +
+            (transformer.properties || []).map(this.propertySerializer.toApama) +
           "}" +
         ")"
       : "");
   }
 
   private static getInChannels(transformer: TransformerJsonInterface, transformerIndex: number, row: RowJsonInterface, rowIndex: number) : string {
-    return "\"" + transformer.inputChannels.map((channel, channelIndex) => {
+    return "\"" + (transformer.inputChannels || []).map((channel, channelIndex) => {
       if (transformerIndex === 0) {
         let channelOverride;
         if (channelIndex < row.inputChannelOverrides.length && (channelOverride = row.inputChannelOverrides[channelIndex])) {
@@ -155,7 +164,7 @@ export class TransformerSerializer {
   }
 
   private static getOutChannels(transformer: TransformerJsonInterface, transformerIndex: number, row: RowJsonInterface, rowIndex: number) : string {
-    return "\"" + transformer.outputChannels.map((channel, channelIndex) => {
+    return "\"" + (transformer.outputChannels || []).map((channel, channelIndex) => {
       if (transformerIndex === row.transformers.length-1) {
         let channelOverride;
         if (channelIndex < row.outputChannelOverrides.length && (channelOverride = row.outputChannelOverrides[channelIndex])) {

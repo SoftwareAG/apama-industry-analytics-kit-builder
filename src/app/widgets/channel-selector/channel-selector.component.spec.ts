@@ -11,18 +11,10 @@ import {Transformer} from "app/classes/Transformer";
 import {AbstractDragService, Draggable, Dragged, Point} from "../../services/AbstractDragService";
 
 @Injectable()
-class DataServiceMock implements AbstractDataService {
-  readonly channels: BehaviorSubject<List<Channel>> = new BehaviorSubject(List<Channel>());
-  readonly transformers: BehaviorSubject<List<TransformerDef>>;
-  readonly hierarchy: BehaviorSubject<Config>;
-  readonly selectedTransformer: BehaviorSubject<Transformer | undefined>;
-  readonly configurations: BehaviorSubject<List<Config>>;
-}
+class DataServiceMock extends AbstractDataService {}
 
 @Injectable()
-class DragServiceMock implements AbstractDragService {
-  dragging: BehaviorSubject<Dragged | undefined>;
-
+class DragServiceMock extends AbstractDragService {
   startDrag(draggable: Draggable) {}
   stopDrag(): Dragged | undefined { return undefined; }
   drag(newLocation: Point) {}

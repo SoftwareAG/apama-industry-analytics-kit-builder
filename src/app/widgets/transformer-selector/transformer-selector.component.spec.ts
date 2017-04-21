@@ -9,21 +9,18 @@ import {Config} from "../../classes/Config";
 import {List} from "immutable";
 import {Transformer} from "../../classes/Transformer";
 import {AbstractDragService, Draggable, Dragged, Point} from "../../services/AbstractDragService";
+import {AbstractMetadataService} from "../../services/MetadataService";
+import {Metadata, MetadataBuilder, MetadataJsonInterface} from "../../classes/Metadata";
 
 @Injectable()
-class DataServiceMock implements AbstractDataService {
-  readonly configurations: BehaviorSubject<List<Config>>;
-
-  readonly channels: BehaviorSubject<List<Channel>>;
-  readonly transformers: BehaviorSubject<List<TransformerDef>> = new BehaviorSubject(List<TransformerDef>());
-  readonly hierarchy: BehaviorSubject<Config>;
-  readonly selectedTransformer: BehaviorSubject<Transformer | undefined>;
+class MetadataServiceMock extends AbstractMetadataService {
+  loadMetadata(json: MetadataJsonInterface) {
+    throw new Error('Method not implemented.');
+  }
 }
 
 @Injectable()
-class DragServiceMock implements AbstractDragService {
-  dragging: BehaviorSubject<Dragged | undefined>;
-
+class DragServiceMock extends AbstractDragService {
   startDrag(draggable: Draggable) {}
   stopDrag(): Dragged | undefined { return undefined; }
   drag(newLocation: Point) {}
@@ -33,13 +30,13 @@ describe('TransformerSelectorComponent', () => {
   let component: TransformerSelectorComponent;
   let fixture: ComponentFixture<TransformerSelectorComponent>;
   let el: HTMLElement;
-  let dataService: DataServiceMock;
+  let metadataService: MetadataServiceMock;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ TransformerSelectorComponent ],
       providers: [
-        {provide: AbstractDataService, useClass: DataServiceMock},
+        {provide: AbstractMetadataService, useClass: MetadataServiceMock},
         {provide: AbstractDragService, useClass: DragServiceMock}
       ]
     })
@@ -47,7 +44,7 @@ describe('TransformerSelectorComponent', () => {
   }));
 
   beforeEach(() => {
-    dataService = TestBed.get(AbstractDataService) as DataServiceMock;
+    metadataService = TestBed.get(AbstractMetadataService) as MetadataServiceMock;
     fixture = TestBed.createComponent(TransformerSelectorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -59,11 +56,11 @@ describe('TransformerSelectorComponent', () => {
   });
 
   it('should create transformer elements', () => {
-    const transformers = List(new TransformerDefArrayBuilder()
-      .with().Name("MyFirstAnalytic").endWith()
-      .with().Name("MySecondAnalytic").endWith()
-      .build());
-    dataService.transformers.next(transformers);
+    const metadata = new MetadataBuilder()
+      .withTransformer().Name("MyFirstAnalytic").endWith()
+      .withTransformer().Name("MySecondAnalytic").endWith()
+      .build();
+    metadataService.metadata.next(metadata);
     const textContents = Array.from(el.querySelectorAll('.transformer')).map((transformerEl) => {
       return (transformerEl.querySelector('text') as Element).textContent;
     });

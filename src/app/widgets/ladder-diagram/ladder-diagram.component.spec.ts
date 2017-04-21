@@ -2,13 +2,10 @@ import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 import * as d3 from "d3";
 import {Injectable} from "@angular/core";
 import {AbstractDataService} from "../../services/AbstractDataService";
-import {BehaviorSubject} from "rxjs";
-import {Channel, ChannelBuilder} from "../../classes/Channel";
-import {TransformerDef} from "../../classes/TransformerDef";
+import {ChannelBuilder} from "../../classes/Channel";
 import {Config, ConfigBuilder} from "app/classes/Config";
 import {LadderDiagramComponent} from "./ladder-diagram.component";
-import {Transformer, TransformerBuilder} from "../../classes/Transformer";
-import {List} from "immutable";
+import {TransformerBuilder} from "../../classes/Transformer";
 import {AbstractDragService, Dragged} from "../../services/AbstractDragService";
 import {NestedRowBuilder, RowBuilder} from "app/classes/Row";
 import {DragService} from "app/services/DragService";
@@ -16,14 +13,7 @@ import {TransformerChannelDef} from "../../classes/TransformerChannelDef";
 import {TestUtils} from "../../services/TestUtil.spec";
 
 @Injectable()
-class DataServiceMock implements AbstractDataService {
-  readonly configurations: BehaviorSubject<List<Config>>;
-
-  readonly channels: BehaviorSubject<List<Channel>>;
-  readonly transformers: BehaviorSubject<List<TransformerDef>>;
-  readonly hierarchy: BehaviorSubject<Config> = new BehaviorSubject(new ConfigBuilder().build());
-  readonly selectedTransformer: BehaviorSubject<Transformer | undefined>;
-}
+class DataServiceMock extends AbstractDataService {}
 
 describe('LadderDiagramComponent', () => {
   let component: LadderDiagramComponent;

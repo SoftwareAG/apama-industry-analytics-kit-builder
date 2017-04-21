@@ -32,7 +32,7 @@ export interface Draggable {
 }
 
 export abstract class AbstractDragService {
-  readonly dragging: BehaviorSubject<Dragged|undefined>;
+  readonly dragging: BehaviorSubject<Dragged|undefined> = new BehaviorSubject(undefined);
 
   abstract startDrag(draggable: Draggable)
   abstract stopDrag(): Dragged | undefined

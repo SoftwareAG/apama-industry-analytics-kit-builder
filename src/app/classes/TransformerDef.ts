@@ -1,19 +1,19 @@
-import {NestedPropertyDefBuilder, PropertyDef, PropertyDefJsonInterface, PropertyDefBuilder} from "./PropertyDef";
-import {ClassBuilder, ClassArrayBuilder, NestedClassBuilder} from "./ClassBuilder";
+import {NestedPropertyDefBuilder, PropertyDef, PropertyDefBuilder, PropertyDefJsonInterface} from "./PropertyDef";
+import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
 import {
-  NestedTransformerChannelDefBuilder, TransformerChannelDef, TransformerChannelDefBuilder,
+  NestedTransformerChannelDefBuilder,
+  TransformerChannelDef,
+  TransformerChannelDefBuilder,
   TransformerChannelDefJsonInterface
 } from "./TransformerChannelDef";
-import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
-import {BehaviorSubject, Observable} from "rxjs";
 import {List} from "immutable";
 import {AbstractModel} from "./AbstractModel";
 
 export interface TransformerDefJsonInterface {
   name: string;
-  properties: PropertyDefJsonInterface[];
-  inputChannels: TransformerChannelDefJsonInterface[];
-  outputChannels: TransformerChannelDefJsonInterface[];
+  properties?: PropertyDefJsonInterface[];
+  inputChannels?: TransformerChannelDefJsonInterface[];
+  outputChannels?: TransformerChannelDefJsonInterface[];
 }
 
 export interface TransformerDefInterface {
@@ -23,30 +23,18 @@ export interface TransformerDefInterface {
   outputChannels: TransformerChannelDef[];
 }
 
-export class TransformerDef extends AbstractModel<TransformerDefJsonInterface> implements AsObservable, BehaviorSubjectify<TransformerDefInterface> {
-  readonly name: BehaviorSubject<string>;
-  readonly properties: BehaviorSubject<List<PropertyDef>>;
-  readonly inputChannels: BehaviorSubject<List<TransformerChannelDef>>;
-  readonly outputChannels: BehaviorSubject<List<TransformerChannelDef>>;
+export class TransformerDef extends AbstractModel<TransformerDefJsonInterface> {
+  readonly name: string;
+  readonly properties: List<PropertyDef>;
+  readonly inputChannels: List<TransformerChannelDef>;
+  readonly outputChannels: List<TransformerChannelDef>;
 
   constructor(obj: TransformerDefInterface) {
     super();
-    this.name = new BehaviorSubject(obj.name);
-    this.properties = new BehaviorSubject(List(obj.properties));
-    this.inputChannels = new BehaviorSubject(List(obj.inputChannels));
-    this.outputChannels = new BehaviorSubject(List(obj.outputChannels));
-  }
-
-  asObservable(): Observable<this> {
-    return Observable.merge(
-      this.name,
-      this.properties,
-      this.inputChannels,
-      this.outputChannels,
-      this.properties.switchMap(properties => Observable.merge(...properties.map(property => (property as PropertyDef).asObservable()).toArray())),
-      this.inputChannels.switchMap(inChannels => Observable.merge(...inChannels.toArray().map(inChan => inChan.asObservable()))),
-      this.outputChannels.switchMap(outChannels => Observable.merge(...outChannels.toArray().map(outChan => outChan.asObservable())))
-    ).mapTo(this)
+    this.name = obj.name;
+    this.properties = List(obj.properties);
+    this.inputChannels = List(obj.inputChannels);
+    this.outputChannels = List(obj.outputChannels);
   }
 }
 
@@ -100,9 +88,9 @@ export class TransformerDefBuilder extends ClassBuilder<TransformerDef> implemen
   static fromJson(json: TransformerDefJsonInterface): TransformerDefBuilder {
     return new TransformerDefBuilder()
       .Name(json.name)
-      .Properties(json.properties.map((prop) => PropertyDefBuilder.fromJson(prop).build()))
-      .InputChannels(json.inputChannels.map((inChan) => TransformerChannelDefBuilder.fromJson(inChan).build()))
-      .OutputChannels(json.outputChannels.map((outChan) => TransformerChannelDefBuilder.fromJson(outChan).build()))
+      .Properties((json.properties || []).map((prop) => PropertyDefBuilder.fromJson(prop).build()))
+      .InputChannels((json.inputChannels || []).map((inChan) => TransformerChannelDefBuilder.fromJson(inChan).build()))
+      .OutputChannels((json.outputChannels || []).map((outChan) => TransformerChannelDefBuilder.fromJson(outChan).build()))
   }
 }
 

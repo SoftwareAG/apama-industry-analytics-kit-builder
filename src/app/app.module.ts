@@ -20,6 +20,7 @@ import {RowSerializer} from "./classes/Row";
 import {TransformerSerializer} from "./classes/Transformer";
 import {PropertySerializer} from "./classes/Property";
 import {FileService} from "./services/FileService";
+import {AbstractMetadataService, MetadataService} from "./services/MetadataService";
 
 @NgModule({
   declarations: [
@@ -41,6 +42,7 @@ import {FileService} from "./services/FileService";
   providers: [
     {provide: AbstractDataService, useClass: DataService},
     {provide: AbstractDragService, useClass: DragService},
+    {provide: AbstractMetadataService, useClass: MetadataService},
     FileService,
     ConfigSerializer,
     RowSerializer,

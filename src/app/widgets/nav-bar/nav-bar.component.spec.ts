@@ -13,7 +13,7 @@ import {RowSerializer} from "../../classes/Row";
 import {PropertySerializer} from "../../classes/Property";
 
 @Injectable()
-class DataServiceMock implements AbstractDataService {
+class DataServiceMock extends AbstractDataService {
   readonly configurations: BehaviorSubject<List<Config>> = new BehaviorSubject(List(new ConfigArrayBuilder()
     .with()
       .Name("Config1")
@@ -33,11 +33,6 @@ class DataServiceMock implements AbstractDataService {
     .endWith()
     .build()
   ));
-
-  readonly channels: BehaviorSubject<List<Channel>>;
-  readonly transformers: BehaviorSubject<List<TransformerDef>>;
-  readonly hierarchy: BehaviorSubject<Config>;
-  readonly selectedTransformer: BehaviorSubject<Transformer | undefined>;
 }
 
 describe('NavBarComponent', () => {

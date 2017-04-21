@@ -3,9 +3,9 @@ import * as d3 from "d3";
 import * as deepFreeze from "deep-freeze";
 import {TransformerDef} from "../../classes/TransformerDef";
 import {Observable} from "rxjs";
-import {AbstractDataService} from "../../services/AbstractDataService";
 import {List} from "immutable";
 import {AbstractDragService} from "../../services/AbstractDragService";
+import {AbstractMetadataService} from "../../services/MetadataService";
 
 @Component({
   selector: 'transformer-selector',
@@ -17,9 +17,9 @@ export class TransformerSelectorComponent implements OnInit {
   readonly transformers: Observable<List<TransformerDef>>;
   readonly dragService: AbstractDragService;
 
-  constructor(myElement: ElementRef, dataService: AbstractDataService, dragService: AbstractDragService) {
+  constructor(myElement: ElementRef, metadataService: AbstractMetadataService, dragService: AbstractDragService) {
     this.nativeElement = myElement.nativeElement;
-    this.transformers = dataService.transformers.asObservable();
+    this.transformers = metadataService.metadata.map((metadata) => metadata.transformers);
     this.dragService = dragService;
   }
 
@@ -61,7 +61,7 @@ export class TransformerSelectorComponent implements OnInit {
         .attr('y', transformerHeight / 2)
         .attr('x', width / 2);
       transformersUpdate.select('text')
-        .text((d: TransformerDef) =>  d.name.getValue())
+        .text((d: TransformerDef) =>  d.name)
     });
   }
 

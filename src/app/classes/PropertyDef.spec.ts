@@ -1,4 +1,3 @@
-import {AsObservableTest} from "../interfaces/AsObservable.spec";
 import {PropertyDef, PropertyDefBuilder} from "./PropertyDef";
 describe('PropertyDef', () => {
 
@@ -9,16 +8,12 @@ describe('PropertyDef', () => {
     optional: true
   };
 
-  it('should trigger asObservable.next() when any BehaviorSubject property is updated', (done) => {
-    new AsObservableTest().test(new PropertyDefBuilder().build(), done).then(done);
-  });
-
   it('should convert valid JSON PropertyDef data into a PropertyDef', () => {
     const propertyDef = PropertyDefBuilder.fromJson(jsonData).build();
-    expect(propertyDef.name.getValue()).toEqual(jsonData.name);
-    expect(propertyDef.description.getValue()).toEqual(jsonData.description);
-    expect(propertyDef.type.getValue()).toEqual(jsonData.type);
-    expect(propertyDef.optional.getValue()).toEqual(jsonData.optional);
+    expect(propertyDef.name).toEqual(jsonData.name);
+    expect(propertyDef.description).toEqual(jsonData.description);
+    expect(propertyDef.type).toEqual(jsonData.type);
+    expect(propertyDef.optional).toEqual(jsonData.optional);
   });
 
   describe("Should throw an error if passed invalid JSON 'name' Data", () => {

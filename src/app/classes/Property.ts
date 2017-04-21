@@ -13,25 +13,57 @@ export interface PropertyInterface extends PropertyDefInterface {
   value?: number | string | boolean;
 }
 
-export class Property extends PropertyDef implements AsObservable, BehaviorSubjectify<PropertyInterface>, AbstractModel<PropertyJsonInterface>  {
+export class Property extends AbstractModel<PropertyDefJsonInterface> implements AsObservable, BehaviorSubjectify<PropertyInterface>  {
+  readonly name: BehaviorSubject<string>;
+  readonly description: BehaviorSubject<string>;
+  readonly type: BehaviorSubject<"integer" | "string" | "float" | "decimal" | "boolean">;
+  readonly optional: BehaviorSubject<boolean>;
   readonly value: BehaviorSubject<number | string | boolean | undefined>;
 
   constructor(obj: PropertyInterface) {
-    super(obj);
+    super();
+    this.name = new BehaviorSubject(obj.name);
+    this.description = new BehaviorSubject(obj.description);
+    this.type = new BehaviorSubject(obj.type);
+    //noinspection PointlessBooleanExpressionJS
+    this.optional = new BehaviorSubject(!!obj.optional);
     this.value = new BehaviorSubject(obj.value);
   }
 
   asObservable(): Observable<this> {
     return Observable.merge(
-      super.asObservable(),
+      this.name,
+      this.description,
+      this.type,
+      this.optional,
       this.value
     ).mapTo(this);
   }
 }
 
-export class PropertyBuilder extends PropertyDefBuilder implements PropertyInterface {
+export class PropertyBuilder implements PropertyInterface {
+  name: string;
+  description: string;
+  type: "integer" | "string" | "float" | "decimal" | "boolean";
+  optional?: boolean;
   value?: number | string | boolean;
 
+  Name(name: string): this {
+    this.name = name;
+    return this;
+  }
+  Description(description: string): this {
+    this.description = description;
+    return this;
+  }
+  Type(type: "integer" | "string" | "float" | "decimal" | "boolean"): this {
+    this.type = type;
+    return this;
+  }
+  Optional(optional?: boolean): this {
+    this.optional = optional;
+    return this;
+  }
   Value(value:  number | string | boolean | undefined): this {
     this.value = value;
     return this;
