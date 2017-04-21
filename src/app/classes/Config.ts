@@ -9,24 +9,33 @@ import {Inject, Injectable} from "@angular/core";
 export interface ConfigJsonInterface {
   name: string;
   description: string;
+  metadataVersion: string;
   rows: RowJsonInterface[]
 }
 
-export interface ConfigInterface {
+interface ModifiableConfigInterface {
   name: string;
   description: string;
   rows: Row[]
 }
 
-export class Config extends AbstractModel<ConfigJsonInterface> implements AsObservable, BehaviorSubjectify<ConfigInterface>  {
+interface UnmodifiableConfigInterface {
+  metadataVersion: string;
+}
+
+export interface ConfigInterface extends ModifiableConfigInterface, UnmodifiableConfigInterface {}
+
+export class Config extends AbstractModel<ConfigJsonInterface> implements AsObservable, BehaviorSubjectify<ModifiableConfigInterface>, UnmodifiableConfigInterface {
   readonly name: BehaviorSubject<string>;
   readonly description: BehaviorSubject<string>;
+  readonly metadataVersion: string;
   readonly rows : BehaviorSubject<List<Row>>;
 
   constructor(obj: ConfigInterface) {
     super();
-    this.name = new BehaviorSubject(obj.name);
-    this.description = new BehaviorSubject(obj.description);
+    this.name = new BehaviorSubject(obj.name || "");
+    this.description = new BehaviorSubject(obj.description || "");
+    this.metadataVersion = obj.metadataVersion;
     this.rows = new BehaviorSubject(List(obj.rows));
   }
 
@@ -41,8 +50,9 @@ export class Config extends AbstractModel<ConfigJsonInterface> implements AsObse
 }
 
 export class ConfigBuilder extends ClassBuilder<Config> implements ConfigInterface {
-  name: string;
-  description: string;
+  name: string = "";
+  description: string = "";
+  metadataVersion: string = "0.0.0.0";
   rows: Row[] = [];
 
   Name(name: string): this {
@@ -52,6 +62,11 @@ export class ConfigBuilder extends ClassBuilder<Config> implements ConfigInterfa
 
   Description(description: string): this {
     this.description = description;
+    return this;
+  }
+
+  MetadataVersion(metadataVersion: string): this {
+    this.metadataVersion = metadataVersion;
     return this;
   }
 
@@ -105,6 +120,7 @@ export class ConfigSerializer {
     return "" +
       (config.name  ? `\\\\ Name: ${config.name}\n` : '') +
       (config.description  ? `\\\\ Description: ${config.description}\n` : '') +
+      `\\\\ Version: ${config.metadataVersion}\n` +
       config.rows.map((row, i) => this.rowSerializer.toApama(row, i)).join('\n\n');
   }
 }

@@ -9,33 +9,31 @@ export interface PropertyJsonInterface extends PropertyDefJsonInterface {
   value?: number | string | boolean;
 }
 
-export interface PropertyInterface extends PropertyDefInterface {
+interface ModifiablePropertyInterface {
   value?: number | string | boolean;
 }
 
-export class Property extends AbstractModel<PropertyDefJsonInterface> implements AsObservable, BehaviorSubjectify<PropertyInterface>  {
-  readonly name: BehaviorSubject<string>;
-  readonly description: BehaviorSubject<string>;
-  readonly type: BehaviorSubject<"integer" | "string" | "float" | "decimal" | "boolean">;
-  readonly optional: BehaviorSubject<boolean>;
+export interface PropertyInterface extends PropertyDefInterface, ModifiablePropertyInterface {}
+
+export class Property extends AbstractModel<PropertyDefJsonInterface> implements AsObservable, BehaviorSubjectify<ModifiablePropertyInterface>, PropertyDefInterface {
+  readonly name: string;
+  readonly description: string;
+  readonly type: "integer" | "string" | "float" | "decimal" | "boolean";
+  readonly optional: boolean;
   readonly value: BehaviorSubject<number | string | boolean | undefined>;
 
   constructor(obj: PropertyInterface) {
     super();
-    this.name = new BehaviorSubject(obj.name);
-    this.description = new BehaviorSubject(obj.description);
-    this.type = new BehaviorSubject(obj.type);
+    this.name = obj.name;
+    this.description = obj.description;
+    this.type = obj.type;
     //noinspection PointlessBooleanExpressionJS
-    this.optional = new BehaviorSubject(!!obj.optional);
+    this.optional = !!obj.optional;
     this.value = new BehaviorSubject(obj.value);
   }
 
   asObservable(): Observable<this> {
     return Observable.merge(
-      this.name,
-      this.description,
-      this.type,
-      this.optional,
       this.value
     ).mapTo(this);
   }

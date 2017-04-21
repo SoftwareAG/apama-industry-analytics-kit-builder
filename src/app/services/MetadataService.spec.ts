@@ -16,6 +16,7 @@ describe('MetadataService', () => {
 
   it('should correctly parse a valid metadata json object', () => {
     metadataService.loadMetadata({
+      version: "0.0.0.0",
       transformers: [{
         name: "TestTransformer"
       }]

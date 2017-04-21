@@ -72,10 +72,7 @@ export class LadderDiagramComponent implements OnInit {
       if (
         transformerCount < maxTransformerCount &&
         rowInChannelCount <= 1 && rowOutChannelCount <= 1 &&
-        (
-          (dragging instanceof Transformer && dragging.inputChannels.getValue().size === 1 && dragging.outputChannels.getValue().size === 1) ||
-          (dragging instanceof TransformerDef && dragging.inputChannels.size === 1 && dragging.outputChannels.size === 1)
-        )
+        dragging.inputChannels.size === 1 && dragging.outputChannels.size === 1
       ) {
         return new Array(transformerCount + 1).fill(undefined).map((ignored, i) => {
           return {
@@ -245,7 +242,7 @@ export class LadderDiagramComponent implements OnInit {
 
         const transformer = rowTransformersUpdate.selectAll('.transformer').data(d => d.row.transformers.getValue().toArray().map(transformer => { return {
           width: d.transformerWidth,
-          height: transformerHeight(transformer.inputChannels.getValue().size, transformer.outputChannels.getValue().size),
+          height: transformerHeight(transformer.inputChannels.size, transformer.outputChannels.size),
           transformer: transformer,
           row: d.row
         }}));
@@ -284,13 +281,13 @@ export class LadderDiagramComponent implements OnInit {
         transformerUpdate.select('text')
           .attr('x', 0)
           .attr('y', d => d.height/2)
-          .text(d => d.transformer.name.getValue());
+          .text(d => d.transformer.name);
 
         transformerEnter.append('g')
           .classed('transformer-inchannels', true);
         const transformerInChansUpdate = transformerUpdate.select('.transformer-inchannels')
           .attr('transform', d => `translate(${-d.width/2},0)`);
-        const transformerInChan = transformerInChansUpdate.selectAll('.channel').data((d) => d.transformer.inputChannels.getValue().toArray().map((chanDef) => { return { channel: chanDef } }));
+        const transformerInChan = transformerInChansUpdate.selectAll('.channel').data((d) => d.transformer.inputChannels.toArray().map((chanDef) => { return { channel: chanDef } }));
         transformerInChan.exit().remove();
         const transformerInChanEnter = transformerInChan.enter().append('circle')
           .classed('channel', true)
@@ -303,7 +300,7 @@ export class LadderDiagramComponent implements OnInit {
           .classed('transformer-outchannels', true);
         const transformerOutChansUpdate = transformerUpdate.select('.transformer-outchannels')
           .attr('transform', d => `translate(${d.width/2},0)`);
-        const transformerOutChan = transformerOutChansUpdate.selectAll('.channel').data((d) => d.transformer.outputChannels.getValue().toArray().map((chanDef) => { return { channel: chanDef } }));
+        const transformerOutChan = transformerOutChansUpdate.selectAll('.channel').data((d) => d.transformer.outputChannels.toArray().map((chanDef) => { return { channel: chanDef } }));
         transformerOutChan.exit().remove();
         const transformerOutChanEnter = transformerOutChan.enter().append('circle')
           .classed('channel', true)

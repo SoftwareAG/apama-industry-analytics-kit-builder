@@ -53,7 +53,7 @@ describe('TransformerPropertySelectorComponent', () => {
     // Get the data so we can compare it against the DOM elements
     Array.from(el.querySelectorAll('.transformer-property-name')).forEach((transformerPropertyEl, i) => {
       let text: string = transformerPropertyEl.textContent || "";
-      switch(transformer.properties.getValue().get(i).type.getValue()) {
+      switch(transformer.properties.getValue().get(i).type) {
         case "decimal":
         case "float":
         case "integer":
@@ -65,7 +65,7 @@ describe('TransformerPropertySelectorComponent', () => {
           text = text.substr(0, text.indexOf('\n'));
           break;
       }
-      expect(text).toEqual(transformer.properties.getValue().get(i).name.getValue());
+      expect(text).toEqual(transformer.properties.getValue().get(i).name);
     });
   });
 });

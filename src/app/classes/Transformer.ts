@@ -19,36 +19,36 @@ export interface TransformerJsonInterface extends TransformerDefJsonInterface {
   properties?: PropertyJsonInterface[]
 }
 
-export interface TransformerInterface {
-  name: string;
+interface ModifiableTransformerInterface {
   properties: Property[];
+}
+
+interface UnmodifiableTransformerInterface {
+  name: string;
   inputChannels: TransformerChannelDef[];
   outputChannels: TransformerChannelDef[];
 }
 
-export class Transformer extends AbstractModel<TransformerJsonInterface> implements AsObservable, BehaviorSubjectify<TransformerInterface>, AbstractModel<TransformerJsonInterface> {
-  readonly name: BehaviorSubject<string>;
+export interface TransformerInterface extends ModifiableTransformerInterface, UnmodifiableTransformerInterface {}
+
+export class Transformer extends AbstractModel<TransformerJsonInterface> implements AsObservable, BehaviorSubjectify<ModifiableTransformerInterface> {
+  readonly name: string;
   readonly properties: BehaviorSubject<List<Property>>;
-  readonly inputChannels: BehaviorSubject<List<TransformerChannelDef>>;
-  readonly outputChannels: BehaviorSubject<List<TransformerChannelDef>>;
+  readonly inputChannels: List<TransformerChannelDef>;
+  readonly outputChannels: List<TransformerChannelDef>;
 
   constructor(obj: TransformerInterface) {
     super();
-    this.name = new BehaviorSubject(obj.name);
+    this.name = obj.name;
     this.properties = new BehaviorSubject(List(obj.properties));
-    this.inputChannels = new BehaviorSubject(List(obj.inputChannels));
-    this.outputChannels = new BehaviorSubject(List(obj.outputChannels));
+    this.inputChannels = List(obj.inputChannels);
+    this.outputChannels = List(obj.outputChannels);
   }
 
   asObservable(): Observable<this> {
     return Observable.merge(
-      this.name,
       this.properties,
-      this.inputChannels,
-      this.outputChannels,
-      this.properties.switchMap(properties => Observable.merge(...properties.map(property => (property as Property).asObservable()).toArray())),
-      this.inputChannels.switchMap(inChannels => Observable.merge(...inChannels.toArray().map((inChan: any) => inChan.asObservable ? inChan.asObservable() : new BehaviorSubject(inChan)))),
-      this.outputChannels.switchMap(outChannels => Observable.merge(...outChannels.toArray().map((outChan: any) => outChan.asObservable ? outChan.asObservable() : new BehaviorSubject(outChan))))
+      this.properties.switchMap(properties => Observable.merge(...properties.map(property => (property as Property).asObservable()).toArray()))
     ).mapTo(this);
   }
 }
@@ -129,23 +129,22 @@ export class TransformerSerializer {
   toApama(transformer: TransformerJsonInterface, transformerIndex: number, row: RowJsonInterface, rowIndex: number) {
     const namespace  = 'com.industry.analytics';
 
-    transformer.name = transformer.name || "";
+    if (!transformer.name) {
+      throw Error(`Serialization Error (Row:${rowIndex}, Transformer:${transformerIndex}): Transformer must have a name`);
+    }
 
-    return "" +
-      (transformer.name ?
-        `${namespace}.Analytic("` +
-        `${transformer.name}",` +
-          "[" +
-            TransformerSerializer.getInChannels(transformer, transformerIndex, row, rowIndex) +
-          "]," +
-          "[" +
-            TransformerSerializer.getOutChannels(transformer, transformerIndex, row, rowIndex) +
-          "]," +
-          "{" +
-            (transformer.properties || []).map(this.propertySerializer.toApama) +
-          "}" +
-        ")"
-      : "");
+    return `${namespace}.Analytic(` +
+      `"${transformer.name}",` +
+      "[" +
+        TransformerSerializer.getInChannels(transformer, transformerIndex, row, rowIndex) +
+      "]," +
+      "[" +
+        TransformerSerializer.getOutChannels(transformer, transformerIndex, row, rowIndex) +
+      "]," +
+      "{" +
+        (transformer.properties || []).map(property => this.propertySerializer.toApama(property)) +
+      "}" +
+    ")";
   }
 
   private static getInChannels(transformer: TransformerJsonInterface, transformerIndex: number, row: RowJsonInterface, rowIndex: number) : string {

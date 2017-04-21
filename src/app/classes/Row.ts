@@ -53,14 +53,14 @@ export class Row extends AbstractModel<RowJsonInterface> implements AsObservable
 
   getInChannels(): List<Channel | TransformerChannelDef> {
     // Must have the same number of input channels as the first transformer
-    const requiredChannels = this.transformers.getValue().size ? this.transformers.getValue().first().inputChannels.getValue() : List();
+    const requiredChannels = this.transformers.getValue().size ? this.transformers.getValue().first().inputChannels : List();
     // If the row contains an override then return that otherwise return the Default ChannelDef from the first transformer
     return requiredChannels.map((channelDef: TransformerChannelDef, i: number) => this.inputChannelOverrides.getValue().size > i && this.inputChannelOverrides.getValue().get(i) || channelDef) as List<Channel | TransformerChannelDef>;
   }
 
   getOutChannels(): List<Channel | TransformerChannelDef> {
     // Must have the same number of output channels as the last transformer
-    const requiredChannels = this.transformers.getValue().size ? this.transformers.getValue().last().outputChannels.getValue() : List();
+    const requiredChannels = this.transformers.getValue().size ? this.transformers.getValue().last().outputChannels : List();
     // If the row contains an override then return that otherwise return the Default ChannelDef from the last transformer
     return requiredChannels.map((channelDef: TransformerChannelDef, i: number) => { return this.outputChannelOverrides.getValue().size > i && this.outputChannelOverrides.getValue().get(i) || channelDef; }) as List<Channel | TransformerChannelDef>;
   }

@@ -18,14 +18,13 @@ describe('TransformerSerializer', () => {
     transformerSerializer = TestBed.get(TransformerSerializer) as TransformerSerializer;
   });
 
-  it('should handle an empty Transformer', () => {
+  it("should throw an error if the transformer doesn't have a name", () => {
     const row = new RowBuilder()
-      .withTransformer()
-      .endWith()
-      .build();
+      .withTransformer().endWith()
+      .build()
+      .toJson();
 
-    const result = transformerSerializer.toApama(row.transformers.getValue().toArray()[0].toJson(), 0, row.toJson(), 0);
-    expect(result).toBe('')
+      expect(() => transformerSerializer.toApama(row.transformers[0], 0, row, 0)).toThrowError(/Transformer must have a name/);
   });
 
   describe("Should process Transformers with 0 or more input and output channels", () => {
