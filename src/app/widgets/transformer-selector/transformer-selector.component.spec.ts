@@ -57,8 +57,8 @@ describe('TransformerSelectorComponent', () => {
 
   it('should create transformer elements', () => {
     const metadata = new MetadataBuilder()
-      .withTransformer().Name("MyFirstAnalytic").endWith()
-      .withTransformer().Name("MySecondAnalytic").endWith()
+      .withAnalytic().Name("MyFirstAnalytic").endWith()
+      .withAnalytic().Name("MySecondAnalytic").endWith()
       .build();
     metadataService.metadata.next(metadata);
     const textContents = Array.from(el.querySelectorAll('.transformer')).map((transformerEl) => {

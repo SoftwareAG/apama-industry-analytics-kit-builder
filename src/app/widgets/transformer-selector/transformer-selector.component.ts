@@ -19,7 +19,7 @@ export class TransformerSelectorComponent implements OnInit {
 
   constructor(myElement: ElementRef, metadataService: AbstractMetadataService, dragService: AbstractDragService) {
     this.nativeElement = myElement.nativeElement;
-    this.transformers = metadataService.metadata.map((metadata) => metadata.transformers);
+    this.transformers = metadataService.metadata.map((metadata) => metadata.analytics);
     this.dragService = dragService;
   }
 

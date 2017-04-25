@@ -17,11 +17,11 @@ describe('MetadataService', () => {
   it('should correctly parse a valid metadata json object', () => {
     metadataService.loadMetadata({
       version: "0.0.0.0",
-      transformers: [{
+      analytics: [{
         name: "TestTransformer"
       }]
     });
 
-    expect(metadataService.metadata.getValue().transformers.toArray()).toBeArrayOfSize(1);
+    expect(metadataService.metadata.getValue().analytics.toArray()).toBeArrayOfSize(1);
   })
 });
