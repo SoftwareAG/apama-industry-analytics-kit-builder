@@ -11,6 +11,9 @@ import {AbstractModel} from "./AbstractModel";
 
 export interface TransformerDefJsonInterface {
   name: string;
+  description?: string;
+  group?: string;
+  documentation?: string;
   properties?: PropertyDefJsonInterface[];
   inputChannels?: TransformerChannelDefJsonInterface[];
   outputChannels?: TransformerChannelDefJsonInterface[];
@@ -18,6 +21,9 @@ export interface TransformerDefJsonInterface {
 
 export interface TransformerDefInterface {
   name: string;
+  description: string;
+  group: string;
+  documentation: string;
   properties: PropertyDef[];
   inputChannels: TransformerChannelDef[];
   outputChannels: TransformerChannelDef[];
@@ -25,6 +31,9 @@ export interface TransformerDefInterface {
 
 export class TransformerDef extends AbstractModel<TransformerDefJsonInterface> {
   readonly name: string;
+  readonly description: string;
+  readonly group: string;
+  readonly documentation: string;
   readonly properties: List<PropertyDef>;
   readonly inputChannels: List<TransformerChannelDef>;
   readonly outputChannels: List<TransformerChannelDef>;
@@ -32,6 +41,9 @@ export class TransformerDef extends AbstractModel<TransformerDefJsonInterface> {
   constructor(obj: TransformerDefInterface) {
     super();
     this.name = obj.name;
+    this.description = obj.description;
+    this.group = obj.group;
+    this.documentation = obj.documentation;
     this.properties = List(obj.properties);
     this.inputChannels = List(obj.inputChannels);
     this.outputChannels = List(obj.outputChannels);
@@ -40,12 +52,27 @@ export class TransformerDef extends AbstractModel<TransformerDefJsonInterface> {
 
 export class TransformerDefBuilder extends ClassBuilder<TransformerDef> implements TransformerDefInterface {
   name: string;
+  description: string = "";
+  group: string = "";
+  documentation: string = "";
   properties: PropertyDef[] = [];
   inputChannels: TransformerChannelDef[] = [];
   outputChannels: TransformerChannelDef[] = [];
 
   Name(name): this {
     this.name = name;
+    return this;
+  }
+  Description(description: string): this {
+    this.description = description;
+    return this;
+  }
+  Group(group: string): this {
+    this.group = group;
+    return this;
+  }
+  Documentation(documentation: string): this {
+    this.documentation = documentation;
     return this;
   }
   Properties(properties: PropertyDef[]): this {
@@ -88,6 +115,9 @@ export class TransformerDefBuilder extends ClassBuilder<TransformerDef> implemen
   static fromJson(json: TransformerDefJsonInterface): TransformerDefBuilder {
     return new TransformerDefBuilder()
       .Name(json.name)
+      .Description(json.description || "")
+      .Group(json.group || "")
+      .Documentation(json.documentation || "")
       .Properties((json.properties || []).map((prop) => PropertyDefBuilder.fromJson(prop).build()))
       .InputChannels((json.inputChannels || []).map((inChan) => TransformerChannelDefBuilder.fromJson(inChan).build()))
       .OutputChannels((json.outputChannels || []).map((outChan) => TransformerChannelDefBuilder.fromJson(outChan).build()))

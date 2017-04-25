@@ -5,7 +5,9 @@ describe('PropertyDef', () => {
     name: 'validName',
     description: 'validDescription',
     type: "string" as "string",
-    optional: true
+    optional: true,
+    validValues: [],
+    validator: ""
   };
 
   it('should convert valid JSON PropertyDef data into a PropertyDef', () => {
@@ -74,6 +76,31 @@ describe('PropertyDef', () => {
     });
   });
 
+  it('should be valid if "defaultValue" element is not provided', () => {
+    let validJsonData = Object.assign({}, jsonData);
+    expect(() => { PropertyDefBuilder.fromJson( validJsonData).build(); }).toBeDefined();
+  });
+
+  describe('should be valid if "defaultValue" element is provided with valid data', () => {
+    [true, false, "stringdata", 0, 1, -1, 0.1 ].forEach((validDefaultValue) => {
+      it(`valid Default Value: ${validDefaultValue}`, () => {
+        expect(() => {
+          PropertyDefBuilder.fromJson(Object.assign({}, jsonData, {defaultValue: validDefaultValue})).build();
+        }).toBeDefined();
+      })
+    });
+  });
+
+  describe('should be invalid if "defaultValue" element is provided with invalid data', () => {
+    [[], {}, null, undefined].forEach((invalidDefaultValue) => {
+      it(`invalid Default Value: ${invalidDefaultValue}`, () => {
+       expect( () => {
+         PropertyDefBuilder.fromJson(Object.assign({}, jsonData, {defaultValue: invalidDefaultValue})).build();
+       }).toThrowError();
+      })
+    });
+  });
+
   describe("should throw an error if optional is provided and type is not boolean", () => {
     [null, {}, '', 1, -1, 0].forEach((optionalValue) => {
       it(`invalid optional value: ${optionalValue}`, () => {
@@ -91,4 +118,45 @@ describe('PropertyDef', () => {
         });
     });
   });
+
+  it('should be undefined if "validValues" is not provided', () => {
+    let validJsonData = Object.assign({}, jsonData);
+    delete validJsonData['validValues'];
+    expect(PropertyDefBuilder.fromJson( validJsonData).build().validValues).toBeUndefined();
+  });
+
+  it('should be valid if "validValues" is provided with an empty array', () => {
+    let validJsonData = Object.assign({}, jsonData, {validValues: []});
+    expect(PropertyDefBuilder.fromJson( validJsonData).build().validValues).toEqual([]);
+  });
+
+  describe('should error if "validValue" is provided with invalid data', () => {
+    [null, {}, "a", 1, 1.0].forEach((invalidData) => {
+      it(`Invalid ValidValue data :  ${JSON.stringify(invalidData)}`, () => {
+        expect(() => { PropertyDefBuilder.fromJson(Object.assign({}, jsonData, {validValues: invalidData})); }).toThrowError();
+      });
+    });
+  });
+
+  it('should be valid if "validValues" is provided with data', () => {
+    let validJsonData = Object.assign({}, jsonData, {validValues: ["a", "b", "c"]});
+    const result = PropertyDefBuilder.fromJson( validJsonData).build().validValues;
+    expect(result).toEqual(["a", "b", "c"]);
+  });
+
+  it('should be undefined if "validator" is not provided', () => {
+    let validJsonData = Object.assign({}, jsonData);
+    delete validJsonData['validator'];
+    expect(PropertyDefBuilder.fromJson( validJsonData).build().validator).toBeUndefined();
+  });
+
+  describe('should error if "validator" is provided with invalid data', () => {
+    [null, {}, 1, 1.0, true, false].forEach((invalidData) => {
+      it(`Invalid Validator data :  ${JSON.stringify(invalidData)}`, () => {
+        expect(() => { PropertyDefBuilder.fromJson(Object.assign({}, jsonData, {validator: invalidData})); }).toThrowError();
+      });
+    });
+  });
+
+
 });

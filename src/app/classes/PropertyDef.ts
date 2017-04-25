@@ -7,6 +7,9 @@ export interface PropertyDefJsonInterface {
   description: string;
   type: "integer" | "string" | "float" | "decimal" | "boolean";
   optional?: boolean;
+  defaultValue?: string | number | boolean;
+  validValues?: any[];
+  validator?: string;
 }
 
 export interface PropertyDefInterface {
@@ -14,6 +17,9 @@ export interface PropertyDefInterface {
   description: string;
   type: "integer" | "string" | "float" | "decimal" | "boolean";
   optional?: boolean;
+  defaultValue?: string | number | boolean;
+  validValues?: string[] | number[] | boolean[];
+  validator?: string;
 }
 
 export class PropertyDef extends AbstractModel<PropertyDefJsonInterface> {
@@ -21,6 +27,9 @@ export class PropertyDef extends AbstractModel<PropertyDefJsonInterface> {
   readonly description: string;
   readonly type: "integer" | "string" | "float" | "decimal" | "boolean";
   readonly optional: boolean;
+  readonly defaultValue?: string | number | boolean;
+  readonly validValues?: string[] | number[] | boolean[];
+  readonly validator?: string;
 
   constructor(obj: PropertyDefInterface) {
     super();
@@ -29,6 +38,9 @@ export class PropertyDef extends AbstractModel<PropertyDefJsonInterface> {
     this.type = obj.type;
     //noinspection PointlessBooleanExpressionJS
     this.optional = !!obj.optional;
+    this.defaultValue = obj.defaultValue;
+    this.validValues = obj.validValues;
+    this.validator = obj.validator;
   }
 }
 
@@ -37,6 +49,9 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
   description: string;
   type: "integer" | "string" | "float" | "decimal" | "boolean";
   optional?: boolean;
+  defaultValue?: string | number | boolean;
+  validValues?: string[] | number[] | boolean[];
+  validator?: string;
 
   Name(name: string): this {
     this.name = name;
@@ -52,6 +67,18 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
   }
   Optional(optional?: boolean): this {
     this.optional = optional;
+    return this;
+  }
+  DefaultValue(defaultValue: string | number | boolean | undefined): this {
+    this.defaultValue = defaultValue;
+    return this;
+  }
+  ValidValues(validValues: string[] | number[] | boolean[] | undefined) : this {
+    this.validValues = validValues;
+    return this;
+  }
+  Validator(validator: string | undefined) : this {
+    this.validator = validator;
     return this;
   }
   build(): PropertyDef {
@@ -86,11 +113,34 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
     // If the optional element has been provided, it must contain boolean data
     if ( validate.contains(jsonData, 'optional') && !validate.isBoolean(jsonData.optional)) { throw new Error('optional must contain Boolean data'); }
 
+    // validate defaultValue
+    // If the optional element has been provided, it must contain string | number | boolean data
+    if ( validate.contains(jsonData, 'defaultValue')) {
+      if (!validate.isBoolean(jsonData.defaultValue)
+          && !validate.isNumber(jsonData.defaultValue)
+          && !validate.isString(jsonData.defaultValue as any)) {
+        throw new Error('defaultValue must contain String | Number | Boolean data');
+      }
+    }
+
+    // If the validValues element has been provided, it must be an array
+    if ( validate.contains(jsonData, 'validValues') && !validate.isArray(jsonData.validValues)) {
+      throw new Error('validValues must be an array');
+    }
+
+    // If a validator element has been provided, it must contain string data
+    if ( validate.contains(jsonData, 'validator') && !validate.isString(jsonData.validator as string)) {
+      throw new Error('validator must be a string');
+    }
+
     return new PropertyDefBuilder()
       .Name(jsonData.name)
-      .Optional(jsonData.optional)
       .Description(jsonData.description)
       .Type(jsonData.type)
+      .Optional(jsonData.optional)
+      .DefaultValue(jsonData.defaultValue)
+      .ValidValues(jsonData.validValues)
+      .Validator(jsonData.validator);
   }
 }
 
