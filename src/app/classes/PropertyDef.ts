@@ -28,7 +28,7 @@ export class PropertyDef extends AbstractModel<PropertyDefJsonInterface> {
   readonly type: "integer" | "string" | "float" | "decimal" | "boolean";
   readonly optional: boolean;
   readonly defaultValue?: string | number | boolean;
-  readonly validValues?: string[] | number[] | boolean[];
+  readonly validValues?: string[] | number[] | boolean[] | undefined;
   readonly validator?: string;
 
   constructor(obj: PropertyDefInterface) {
@@ -48,10 +48,10 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
   name: string;
   description: string;
   type: "integer" | "string" | "float" | "decimal" | "boolean";
-  optional?: boolean;
-  defaultValue?: string | number | boolean;
-  validValues?: string[] | number[] | boolean[];
-  validator?: string;
+  optional?: boolean = false;
+  defaultValue?: string | number | boolean | undefined;
+  validValues?: string[] | number[] | boolean[] | undefined;
+  validator?: string | undefined;
 
   Name(name: string): this {
     this.name = name;
@@ -91,6 +91,8 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
     if (!validate.isObject(jsonData)) { throw new Error('jsonData is invalid'); }
 
     // validate name
+    jsonData = Object.assign({name: "No Name"}, jsonData );
+
     if (!validate.contains(jsonData, 'name')) { throw new Error('jsonData does not contain the "name" element'); }
     if (!validate.isString(jsonData.name)) { throw new Error('name must contain string data'); }
     if (validate.isEmpty(jsonData.name)) { throw new Error('name cannot be empty'); }
@@ -115,7 +117,7 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
 
     // validate defaultValue
     // If the optional element has been provided, it must contain string | number | boolean data
-    if ( validate.contains(jsonData, 'defaultValue')) {
+    if ( jsonData.defaultValue ) {
       if (!validate.isBoolean(jsonData.defaultValue)
           && !validate.isNumber(jsonData.defaultValue)
           && !validate.isString(jsonData.defaultValue as any)) {
@@ -124,20 +126,21 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
     }
 
     // If the validValues element has been provided, it must be an array
-    if ( validate.contains(jsonData, 'validValues') && !validate.isArray(jsonData.validValues)) {
+    if ( jsonData.validValues && !validate.isArray(jsonData.validValues)) {
       throw new Error('validValues must be an array');
     }
 
     // If a validator element has been provided, it must contain string data
-    if ( validate.contains(jsonData, 'validator') && !validate.isString(jsonData.validator as string)) {
+    if ( jsonData.validator && !validate.isString(jsonData.validator as string)) {
       throw new Error('validator must be a string');
     }
 
+    //noinspection PointlessBooleanExpressionJS
     return new PropertyDefBuilder()
       .Name(jsonData.name)
       .Description(jsonData.description)
       .Type(jsonData.type)
-      .Optional(jsonData.optional)
+      .Optional(!!jsonData.optional)
       .DefaultValue(jsonData.defaultValue)
       .ValidValues(jsonData.validValues)
       .Validator(jsonData.validator);

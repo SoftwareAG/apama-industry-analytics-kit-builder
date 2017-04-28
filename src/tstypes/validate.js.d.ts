@@ -6,6 +6,7 @@ interface ValidateJS {
   isBoolean(data: any): boolean;
   isNumber(data: any): boolean;
   isArray(data: any): boolean;
+  isDefined(data: any): boolean;
 }
 
 declare module 'validate.js' {
