@@ -23,6 +23,7 @@ module.exports = function (config) {
     },
     files: [
       'node_modules/jasmine-promises/dist/jasmine-promises.js',
+      "node_modules/bootstrap/dist/css/bootstrap.min.css",
       { pattern: './src/test.ts', watched: false }
     ],
     preprocessors: {
