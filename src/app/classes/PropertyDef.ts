@@ -10,6 +10,7 @@ export interface PropertyDefJsonInterface {
   defaultValue?: string | number | boolean;
   validValues?: any[];
   validator?: string;
+  repeated?: boolean;
 }
 
 export interface PropertyDefInterface {
@@ -20,6 +21,7 @@ export interface PropertyDefInterface {
   defaultValue?: string | number | boolean;
   validValues?: string[] | number[] | boolean[];
   validator?: string;
+  repeated?: boolean;
 }
 
 export class PropertyDef extends AbstractModel<PropertyDefJsonInterface> {
@@ -30,6 +32,7 @@ export class PropertyDef extends AbstractModel<PropertyDefJsonInterface> {
   readonly defaultValue?: string | number | boolean;
   readonly validValues?: string[] | number[] | boolean[] | undefined;
   readonly validator?: string;
+  readonly repeated: boolean;
 
   constructor(obj: PropertyDefInterface) {
     super();
@@ -41,6 +44,8 @@ export class PropertyDef extends AbstractModel<PropertyDefJsonInterface> {
     this.defaultValue = obj.defaultValue;
     this.validValues = obj.validValues;
     this.validator = obj.validator;
+    //noinspection PointlessBooleanExpressionJS
+    this.repeated = !!obj.repeated;
   }
 }
 
@@ -48,10 +53,11 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
   name: string;
   description: string;
   type: "integer" | "string" | "float" | "decimal" | "boolean";
-  optional?: boolean = false;
+  optional: boolean = false;
   defaultValue?: string | number | boolean | undefined;
   validValues?: string[] | number[] | boolean[] | undefined;
   validator?: string | undefined;
+  repeated: boolean = false;
 
   Name(name: string): this {
     this.name = name;
@@ -65,7 +71,7 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
     this.type = type;
     return this;
   }
-  Optional(optional?: boolean): this {
+  Optional(optional: boolean): this {
     this.optional = optional;
     return this;
   }
@@ -81,6 +87,10 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
     this.validator = validator;
     return this;
   }
+  Repeated(repeated: boolean) : this {
+    this.repeated = repeated;
+    return this;
+  }
   build(): PropertyDef {
     return new PropertyDef(this);
   }
@@ -89,9 +99,6 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
 
     // validate jsonData object
     if (!validate.isObject(jsonData)) { throw new Error('jsonData is invalid'); }
-
-    // validate name
-    jsonData = Object.assign({name: "No Name"}, jsonData );
 
     if (!validate.contains(jsonData, 'name')) { throw new Error('jsonData does not contain the "name" element'); }
     if (!validate.isString(jsonData.name)) { throw new Error('name must contain string data'); }
@@ -113,11 +120,11 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
 
     // validate optional
     // If the optional element has been provided, it must contain boolean data
-    if ( validate.contains(jsonData, 'optional') && !validate.isBoolean(jsonData.optional)) { throw new Error('optional must contain Boolean data'); }
+    if ( validate.contains(jsonData, 'optional') && !validate.isBoolean(jsonData.optional) && !(validate.isString(jsonData.optional) && jsonData.optional.match(/^\s*function\s*\(.*\}\s*$/))) { throw new Error('optional must contain Boolean data'); }
 
     // validate defaultValue
     // If the optional element has been provided, it must contain string | number | boolean data
-    if ( jsonData.defaultValue ) {
+    if (jsonData.defaultValue !== undefined) {
       if (!validate.isBoolean(jsonData.defaultValue)
           && !validate.isNumber(jsonData.defaultValue)
           && !validate.isString(jsonData.defaultValue as any)) {
@@ -126,14 +133,18 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
     }
 
     // If the validValues element has been provided, it must be an array
-    if ( jsonData.validValues && !validate.isArray(jsonData.validValues)) {
+    if (jsonData.validValues !== undefined && !validate.isArray(jsonData.validValues)) {
       throw new Error('validValues must be an array');
     }
 
     // If a validator element has been provided, it must contain string data
-    if ( jsonData.validator && !validate.isString(jsonData.validator as string)) {
+    if (jsonData.validator !== undefined && !validate.isString(jsonData.validator)) {
       throw new Error('validator must be a string');
     }
+
+    // validate repeated
+    // If the repeated element has been provided, it must contain boolean data
+    if (validate.contains(jsonData, 'repeated') && !validate.isBoolean(jsonData.repeated)) { throw new Error('repeated must contain Boolean data'); }
 
     //noinspection PointlessBooleanExpressionJS
     return new PropertyDefBuilder()
@@ -143,7 +154,8 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
       .Optional(!!jsonData.optional)
       .DefaultValue(jsonData.defaultValue)
       .ValidValues(jsonData.validValues)
-      .Validator(jsonData.validator);
+      .Validator(jsonData.validator)
+      .Repeated(!!jsonData.repeated);
   }
 }
 

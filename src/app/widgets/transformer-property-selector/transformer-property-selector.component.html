@@ -1,45 +1,34 @@
-<div *ngFor="let transformerProperty of transformerProperties | async" class="transformer-property">
-  <div class="transformer-property-group">
+<div *ngFor="let transformerProperty of transformerProperties | async" class="w-100 container-fluid">
 
-    <div [ngSwitch]="transformerProperty.type">
+  <h6>{{transformerProperty.definition.name}}</h6>
 
-      <ng-template [ngSwitchCase]="'string'">
-        <label class="transformer-property-name">{{transformerProperty.name}}
-          <input class="transformer-property-value form-control" type="text" [ngModel]="transformerProperty.value | async" (ngModelChange)="transformerProperty.value.next($event)"/>
-          <!--select class="transformer-property-value">
-            <option>
-              {{transformerProperty.value | async}}
-            </option>
-          </select-->
-        </label>
-      </ng-template>
-
-      <ng-template [ngSwitchCase]="'decimal'">
-        <label class="transformer-property-name">{{transformerProperty.name}}
-          <input class="transformer-property-value form-control" type="number" [ngModel]="transformerProperty.value | async" (ngModelChange)="transformerProperty.value.next($event)"/>
-        </label>
-      </ng-template>
-
-      <ng-template [ngSwitchCase]="'integer'">
-        <label class="transformer-property-name">{{transformerProperty.name}}
-          <input class="transformer-property-value form-control" type="number" [ngModel]="transformerProperty.value | async" (ngModelChange)="transformerProperty.value.next($event)"/>
-        </label>
-      </ng-template>
-
-      <ng-template [ngSwitchCase]="'float'">
-        <label class="transformer-property-name">{{transformerProperty.name}}
-          <input class="transformer-property-value form-control" type="number" [ngModel]="transformerProperty.value | async" (ngModelChange)="transformerProperty.value.next($event)"/>
-        </label>
-      </ng-template>
-
-      <ng-template [ngSwitchCase]="'boolean'">
-        <label class="transformer-property-name">{{transformerProperty.name}}
-          <input class="transformer-property-value form-control" type="checkbox" [ngModel]="transformerProperty.value | async" (ngModelChange)="transformerProperty.value.next($event)">
-        </label>
-      </ng-template>
-
+  <div *ngFor="let prop of transformerProperty.values" class="row">
+    <div *ngIf="transformerProperty.definition.repeated || transformerProperty.definition.optional" class="col-1 px-0 mr-2">
+      <input class="form-control" type="button" value="-" (click)="removePropertyValue(prop)">
     </div>
 
+    <div class="col px-0" *ngIf="transformerProperty.definition.repeated"><input class="form-control" type="text" placeholder="Name" [ngModel]="prop.name | async" (ngModelChange)="prop.name.next($event)"/></div>
+    <div class="col px-0" [ngSwitch]="transformerProperty.definition.type" *ngIf="!transformerProperty.definition.validValues">
+      <input *ngSwitchCase="'string'" class="form-control" type="text" [ngModel]="prop.value | async" (ngModelChange)="prop.value.next($event)"/>
+      <input *ngSwitchCase="'decimal'" class="form-control" type="number" [ngModel]="prop.value | async" (ngModelChange)="prop.value.next($event)"/>
+      <input *ngSwitchCase="'integer'" class="form-control" type="number" [ngModel]="prop.value | async" (ngModelChange)="prop.value.next($event)"/>
+      <input *ngSwitchCase="'float'" class="form-control" type="number" [ngModel]="prop.value | async" (ngModelChange)="prop.value.next($event)"/>
+      <select *ngSwitchCase="'boolean'" class="form-control" [ngModel]="prop.value | async" (ngModelChange)="prop.value.next($event)">
+        <option value="true">True</option>
+        <option value="false">False</option>
+      </select>
+    </div>
+    <div class="col px-0" *ngIf="transformerProperty.definition.validValues">
+      <select class="form-control" [ngModel]="prop.value | async" (ngModelChange)="prop.value.next($event)">
+        <option *ngFor="let validValue of transformerProperty.definition.validValues" [value]="validValue" >{{validValue}}</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="transformerProperty.definition.repeated || (transformerProperty.definition.optional && transformerProperty.values.isEmpty())">
+    <div class="col-1 px-0 mr-2">
+      <input class="form-control" type="button" value="+" (click)="addPropertyValue(transformerProperty.definition)">
+    </div>
   </div>
 
 </div>

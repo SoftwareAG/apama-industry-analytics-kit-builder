@@ -48,59 +48,46 @@ describe('TransformerPropertySelectorComponent', () => {
     fixture.detectChanges();
 
     // Check that all of the transformer properties have rendered into the DOM
-    expect(el.querySelectorAll('.transformer-property').length).toEqual(10);
+    expect(el.children.length).toEqual(10);
 
     // Get the data so we can compare it against the DOM elements
-    Array.from(el.querySelectorAll('.transformer-property-name')).forEach((transformerPropertyEl, i) => {
-      let text: string = transformerPropertyEl.textContent || "";
-      switch(transformer.properties.getValue().get(i).type) {
-        case "decimal":
-        case "float":
-        case "integer":
-        case "boolean":
-          text = text.replace(/\n/g, "");
-          text = text.trim();
-          break;
-        case "string":
-          text = text.substr(0, text.indexOf('\n'));
-          break;
-      }
-      expect(text).toEqual(transformer.properties.getValue().get(i).name);
+    Array.from(el.querySelectorAll('h6')).forEach((transformerPropertyEl, i) => {
+      expect(transformerPropertyEl.textContent).toEqual(transformer.properties.get(i).name);
     });
   });
 });
 
 function getTransformer(): Transformer {
   return new TransformerBuilder()
-    .withProperty()
+    .withPopulatedProperty()
       .Name('decimalProperty_required')
       .Description('decimalPropertyDescription')
       .Type('decimal')
       .Optional(false)
       .Value(2.0)
       .endWith()
-    .withProperty()
+    .withPopulatedProperty()
       .Name('integerProperty_required')
       .Description('integerPropertyDescription')
       .Type('integer')
       .Optional(false)
       .Value(5)
       .endWith()
-    .withProperty()
+    .withPopulatedProperty()
       .Name('floatProperty_required')
       .Description('floatPropertyDescription')
       .Type('float')
       .Optional(false)
       .Value(5)
       .endWith()
-    .withProperty()
+    .withPopulatedProperty()
       .Name('booleanProperty_required')
       .Description('booleanPropertyDescription')
       .Type('boolean')
       .Optional(false)
       .Value(true)
       .endWith()
-    .withProperty()
+    .withPopulatedProperty()
       .Name('stringProperty_required')
       .Description('stringPropertyDescription')
       .Type('string')

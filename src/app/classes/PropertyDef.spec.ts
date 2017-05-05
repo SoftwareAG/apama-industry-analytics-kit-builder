@@ -92,7 +92,7 @@ describe('PropertyDef', () => {
   });
 
   describe('should be invalid if "defaultValue" element is provided with invalid data', () => {
-    [[], {}, null, undefined].forEach((invalidDefaultValue) => {
+    [[], {}, null].forEach((invalidDefaultValue) => {
       it(`invalid Default Value: ${invalidDefaultValue}`, () => {
        expect( () => {
          PropertyDefBuilder.fromJson(Object.assign({}, jsonData, {defaultValue: invalidDefaultValue})).build();
@@ -158,5 +158,24 @@ describe('PropertyDef', () => {
     });
   });
 
+  it('should be valid if "repeated" is not provided', () => {
+    let validJsonData = Object.assign({}, jsonData);
+    delete validJsonData['repeated'];
+    expect(PropertyDefBuilder.fromJson( validJsonData).build().repeated).toBe(false);
+  });
 
+  it('should be valid if "repeated" is provided', () => {
+    [true, false].forEach((repeated) => {
+      let validJsonData = Object.assign({repeated: repeated}, jsonData);
+      expect(PropertyDefBuilder.fromJson(validJsonData).build().repeated).toBe(repeated);
+    })
+  });
+
+  describe('should error if "repeated" is not a boolean', () => {
+    [null, {}, 1.0, 0, []].forEach((invalidData) => {
+      it(`Invalid Repeated:  ${JSON.stringify(invalidData)}`, () => {
+        expect(() => { PropertyDefBuilder.fromJson(Object.assign({}, jsonData, {repeated: invalidData})); }).toThrowError();
+      });
+    });
+  });
 });

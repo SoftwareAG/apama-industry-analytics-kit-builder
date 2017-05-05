@@ -1,4 +1,5 @@
-import {NestedPropertyBuilder, Property, PropertyBuilder, PropertyJsonInterface, PropertySerializer} from "./Property";
+import {NestedPropertyBuilder, Property, PropertyBuilder, PropertyJsonInterface, PropertySerializer,
+  NestedPopulatedPropertyBuilder} from "./Property";
 import {
   TransformerDef,
   TransformerDefBuilder,
@@ -6,110 +7,114 @@ import {
   TransformerDefJsonInterface
 } from "./TransformerDef";
 import {ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
-import {NestedTransformerChannelDefBuilder, TransformerChannelDef} from "app/classes/TransformerChannelDef";
 import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
 import {List} from "immutable";
 import {BehaviorSubject, Observable} from "rxjs";
-import {AbstractModel} from "./AbstractModel";
 import {RowJsonInterface} from "./Row";
 import {Injectable} from "@angular/core";
+import * as _ from 'lodash';
+import {PropertyDefBuilder} from "./PropertyDef";
 
 export interface TransformerJsonInterface extends TransformerDefJsonInterface {
   name: string;
-  properties?: PropertyJsonInterface[]
+  propertyValues?: PropertyJsonInterface[]
 }
 
 interface ModifiableTransformerInterface {
-  properties: Property[];
+  propertyValues: Property[];
 }
 
-interface UnmodifiableTransformerInterface {
-  name: string;
-  inputChannels: TransformerChannelDef[];
-  outputChannels: TransformerChannelDef[];
-}
+export interface TransformerInterface extends ModifiableTransformerInterface, TransformerDefInterface {}
 
-export interface TransformerInterface extends ModifiableTransformerInterface, UnmodifiableTransformerInterface {}
-
-export class Transformer extends AbstractModel<TransformerJsonInterface> implements AsObservable, BehaviorSubjectify<ModifiableTransformerInterface> {
+export class Transformer extends TransformerDef implements AsObservable, BehaviorSubjectify<ModifiableTransformerInterface> {
   readonly name: string;
-  readonly properties: BehaviorSubject<List<Property>>;
-  readonly inputChannels: List<TransformerChannelDef>;
-  readonly outputChannels: List<TransformerChannelDef>;
+  readonly propertyValues: BehaviorSubject<List<Property>>;
 
   constructor(obj: TransformerInterface) {
-    super();
+    super(obj);
     this.name = obj.name;
-    this.properties = new BehaviorSubject(List(obj.properties));
-    this.inputChannels = List(obj.inputChannels);
-    this.outputChannels = List(obj.outputChannels);
+    this.propertyValues = new BehaviorSubject(List(obj.propertyValues));
   }
 
   asObservable(): Observable<this> {
     return Observable.merge(
-      this.properties,
-      this.properties.switchMap(properties => Observable.merge(...properties.map(property => (property as Property).asObservable()).toArray()))
+      this.propertyValues,
+      this.propertyValues.switchMap(properties => Observable.merge(...properties.map(property => (property as Property).asObservable()).toArray()))
     ).mapTo(this);
   }
 }
 
-export class TransformerBuilder extends ClassBuilder<Transformer> implements TransformerInterface {
-  name: string;
-  properties: Property[] = [];
-  inputChannels: TransformerChannelDef[] = [];
-  outputChannels: TransformerChannelDef[] = [];
+export class TransformerBuilder extends TransformerDefBuilder implements TransformerInterface, ClassBuilder<Transformer> {
+  propertyValues: Property[] = [];
 
   Name(name): this {
     this.name = name;
     return this;
   }
-  Properties(properties: Property[]): this {
-    this.properties = properties;
+  PropertyValues(properties: Property[]): this {
+    this.propertyValues = properties;
     return this;
   }
-  pushProperty(...property: Property[]): this {
-    this.properties.push(...property);
+  pushPropertyValue(...property: Property[]): this {
+    this.propertyValues.push(...property);
     return this;
   }
-  withProperty(): NestedPropertyBuilder<this> {
-    return new NestedPropertyBuilder((property) => { this.properties.push(property); return this; })
+  withPropertyValue(): NestedPropertyBuilder<this> {
+    return new NestedPropertyBuilder((property) => { this.propertyValues.push(property); return this; })
   }
-  InputChannels(inputChannels: TransformerChannelDef[]): this {
-    this.inputChannels = inputChannels;
-    return this;
+  withPopulatedProperty(): NestedPopulatedPropertyBuilder<this> {
+    return new NestedPopulatedPropertyBuilder((propertyDef, property) => { this.properties.push(propertyDef); this.propertyValues.push(property); return this; })
   }
-  pushInputChannel(...inputChannel: TransformerChannelDef[]): this {
-    this.inputChannels.push(...inputChannel);
-    return this;
+
+  validate() {
+    const propertiesByName = this.properties.reduce((result, property) => {
+      result[property.name] = property;
+      return result;
+    }, {});
+
+    const propertyValsByDefName = this.propertyValues.reduce((result, propertyVal) => {
+      if (!result[propertyVal.definitionName]) {
+        result[propertyVal.definitionName] = []
+      }
+      result[propertyVal.definitionName].push(propertyVal);
+      return result;
+    }, {});
+
+    this.propertyValues.forEach(propertyVal => {
+      if (!propertiesByName.hasOwnProperty(propertyVal.definitionName)) { throw new Error(`PropertyDefinition "${propertyVal.definitionName}" does not exist so propertyValue shouldn't exist`); }
+    });
+
+    this.properties.forEach(propertyDef =>{
+      const propertyVals = propertyValsByDefName[propertyDef.name] || [];
+      if (propertyDef.repeated) {
+
+      } else if (propertyDef.optional) {
+        if (propertyVals.length > 1) { throw new Error(`Optional property [${propertyVals}] cannot have more than 1 value, there were: ${propertyVals.length}`)}
+      } else {
+        if (propertyVals.length !== 1) { throw new Error(`Non-optional property [${propertyVals}] must have exactly one value, there were: ${propertyVals.length}`)}
+      }
+    });
   }
-  withInputChannel(): NestedTransformerChannelDefBuilder<this> {
-    return new NestedTransformerChannelDefBuilder((channel) => { this.inputChannels.push(channel); return this;});
-  }
-  OutputChannels(outputChannels: TransformerChannelDef[]): this {
-    this.outputChannels = outputChannels;
-    return this;
-  }
-  pushOutputChannel(...outputChannels: TransformerChannelDef[]): this {
-    this.outputChannels.push(...outputChannels);
-    return this;
-  }
-  withOutputChannel(): NestedTransformerChannelDefBuilder<this> {
-    return new NestedTransformerChannelDefBuilder((channel) => {this.outputChannels.push(channel); return this; });
-  }
-  build(): Transformer {
+
+  build(skipValidation: boolean = false): Transformer {
+    if (!skipValidation) {
+      this.validate();
+    }
     return new Transformer(this);
   }
 
   static fromTransformerDefBuilder(transformerDefBuilder: TransformerDefBuilder): TransformerBuilder {
-    return new TransformerBuilder()
-      .Name(transformerDefBuilder.name)
-      .Properties(transformerDefBuilder.properties.map((propDef) => PropertyBuilder.fromJson(propDef.toJson()).build()))
-      .InputChannels(transformerDefBuilder.inputChannels)
-      .OutputChannels(transformerDefBuilder.outputChannels);
+    return Object.assign(new TransformerBuilder(), transformerDefBuilder)
+      .PropertyValues(
+        transformerDefBuilder.properties
+          .filter(propertyDef => !propertyDef.optional && !propertyDef.repeated)
+          .map(propertyDef => PropertyBuilder.fromPropertyDefBuilder(PropertyDefBuilder.fromJson(propertyDef.toJson())).build())
+      );
   }
 
   static fromJson(json: TransformerJsonInterface): TransformerBuilder {
-    return this.fromTransformerDefBuilder(TransformerDefBuilder.fromJson(json));
+    return this.fromTransformerDefBuilder(TransformerDefBuilder.fromJson(json))
+      .PropertyValues((json.propertyValues || []).map(propertyJson => PropertyBuilder.fromJson(propertyJson).build()));
   }
 }
 
@@ -142,7 +147,14 @@ export class TransformerSerializer {
         TransformerSerializer.getOutChannels(transformer, transformerIndex, row, rowIndex) +
       "]," +
       "{" +
-        (transformer.properties || []).map(property => this.propertySerializer.toApama(property)) +
+        (transformer.propertyValues || []).map(propertyVal => {
+          const propertyDef = _.find(transformer.properties || [], (propertyDef) => propertyDef.name === propertyVal.definitionName);
+          if (!propertyDef) {
+            console.error(`Unable to find PropertyDefinition for "${propertyVal.definitionName}", will assume type string`)
+          }
+          const type = propertyDef ? propertyDef.type : "string";
+          return this.propertySerializer.toApama(propertyVal, type);
+        }) +
       "}" +
     ")";
   }
