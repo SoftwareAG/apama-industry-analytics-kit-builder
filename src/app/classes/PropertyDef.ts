@@ -82,7 +82,7 @@ export class PropertyDef extends AbstractModel<PropertyDefJsonInterface, never> 
     // If the validValues element has been provided, it must be an array
     if (this.validValues !== undefined) {
       if (!(this.validValues instanceof List)) { throw new Error('validValues must be a List') }
-      (this.validValues as List<string | number | boolean>).forEach((validValue: any) => {
+      (this.validValues as List<string | number | boolean>).forEach((validValue: string | number | boolean) => {
         if (!validate.isBoolean(validValue) && !validate.isNumber(validValue) && !validate.isString(validValue)) {
           throw new Error('validValues must be a string, boolean, or number');
         }
