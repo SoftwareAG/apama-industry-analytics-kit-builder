@@ -1,6 +1,7 @@
 import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
 import {validate} from "validate.js";
 import {AbstractModel} from "app/classes/AbstractModel";
+import {List} from "immutable";
 
 export interface PropertyDefJsonInterface {
   name: string;
@@ -24,13 +25,13 @@ export interface PropertyDefInterface {
   repeated?: boolean;
 }
 
-export class PropertyDef extends AbstractModel<PropertyDefJsonInterface> {
+export class PropertyDef extends AbstractModel<PropertyDefJsonInterface, never> {
   readonly name: string;
   readonly description: string;
   readonly type: "integer" | "string" | "float" | "decimal" | "boolean";
-  readonly optional: boolean;
+  readonly optional: boolean | string; // string must be a function
   readonly defaultValue?: string | number | boolean;
-  readonly validValues?: string[] | number[] | boolean[] | undefined;
+  readonly validValues?: List<string> | List<number> | List<boolean>;
   readonly validator?: string;
   readonly repeated: boolean;
 
@@ -42,10 +43,59 @@ export class PropertyDef extends AbstractModel<PropertyDefJsonInterface> {
     //noinspection PointlessBooleanExpressionJS
     this.optional = !!obj.optional;
     this.defaultValue = obj.defaultValue;
-    this.validValues = obj.validValues;
+    this.validValues = obj.validValues !== undefined ? List(obj.validValues) as List<string> | List<number> | List<boolean> : undefined;
     this.validator = obj.validator;
     //noinspection PointlessBooleanExpressionJS
     this.repeated = !!obj.repeated;
+  }
+
+  validate(): this {
+    if (!validate.isString(this.name)) { throw new Error('name must be a string'); }
+    if (validate.isEmpty(this.name)) { throw new Error('name cannot be empty'); }
+
+    // validate description
+    if (!validate.isString(this.description)) { throw new Error('description must be a string'); }
+    if (validate.isEmpty(this.description)) { throw new Error('description cannot be empty'); }
+
+    // validate type
+    if (!validate.isString(this.type)) { throw new Error('type must be a string'); }
+    if(!["integer", "string", "float", "decimal", "boolean"].includes(this.type)) { throw new Error(`type cannot be ${this.type}`) }
+
+    function isFunctionString(value: any) {
+      return validate.isString(value) && value.match(/^\s*function\s*\(.*\)\s*{.*}\s*$/)
+    }
+
+    // validate optional
+    // If the optional element has been provided, it must contain boolean data
+    if (!validate.isBoolean(this.optional) && !isFunctionString(this.optional)) { throw new Error('optional must be a boolean or a function string') }
+
+    // validate defaultValue
+    // If the optional element has been provided, it must contain string | number | boolean data
+    if (this.defaultValue !== undefined) {
+      if (!validate.isBoolean(this.defaultValue)
+        && !validate.isNumber(this.defaultValue)
+        && !validate.isString(this.defaultValue)) {
+        throw new Error('defaultValue must contain String | Number | Boolean data');
+      }
+    }
+
+    // If the validValues element has been provided, it must be an array
+    if (this.validValues !== undefined) {
+      if (!(this.validValues instanceof List)) { throw new Error('validValues must be a List') }
+      (this.validValues as List<string | number | boolean>).forEach((validValue: any) => {
+        if (!validate.isBoolean(validValue) && !validate.isNumber(validValue) && !validate.isString(validValue)) {
+          throw new Error('validValues must be a string, boolean, or number');
+        }
+      });
+    }
+
+    // If a validator element has been provided, it must contain a function string
+    if (this.validator  !== undefined && !isFunctionString(this.validator)) { throw new Error('Must be a function string') }
+
+    // validate repeated
+    // If the repeated element has been provided, it must contain boolean data
+    if (this.repeated !== undefined && !validate.isBoolean(this.repeated)) { throw new Error('repeated must contain Boolean data'); }
+    return this;
   }
 }
 
@@ -56,7 +106,7 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
   optional: boolean = false;
   defaultValue?: string | number | boolean | undefined;
   validValues?: string[] | number[] | boolean[] | undefined;
-  validator?: string | undefined;
+  validator?: string;
   repeated: boolean = false;
 
   Name(name: string): this {
@@ -96,55 +146,11 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
   }
 
   static fromJson(jsonData: PropertyDefJsonInterface) : PropertyDefBuilder {
-
     // validate jsonData object
     if (!validate.isObject(jsonData)) { throw new Error('jsonData is invalid'); }
-
     if (!validate.contains(jsonData, 'name')) { throw new Error('jsonData does not contain the "name" element'); }
-    if (!validate.isString(jsonData.name)) { throw new Error('name must contain string data'); }
-    if (validate.isEmpty(jsonData.name)) { throw new Error('name cannot be empty'); }
-
-    // validate description
     if (!validate.contains(jsonData, 'description')) { throw new Error('jsonData does not contain the "description" element'); }
-    if (!validate.isString(jsonData.description)) { throw new Error('description must contain string data'); }
-    if (validate.isEmpty(jsonData.description)) { throw new Error('description cannot be empty'); }
-
-    // validate type
     if (!validate.contains(jsonData, 'type')) { throw new Error('jsonData does not contain the "type" element'); }
-    if (!validate.isString(jsonData.type)) { throw new Error('type must contain string data'); }
-
-    // Confirm that the data in the type element is valid
-    if(!validate.contains(["integer", "string", "float", "decimal", "boolean"], jsonData.type)) {
-      throw new Error(`type cannot contain ${jsonData.type} data`);
-    }
-
-    // validate optional
-    // If the optional element has been provided, it must contain boolean data
-    if ( validate.contains(jsonData, 'optional') && !validate.isBoolean(jsonData.optional) && !(validate.isString(jsonData.optional) && jsonData.optional.match(/^\s*function\s*\(.*\}\s*$/))) { throw new Error('optional must contain Boolean data'); }
-
-    // validate defaultValue
-    // If the optional element has been provided, it must contain string | number | boolean data
-    if (jsonData.defaultValue !== undefined) {
-      if (!validate.isBoolean(jsonData.defaultValue)
-          && !validate.isNumber(jsonData.defaultValue)
-          && !validate.isString(jsonData.defaultValue as any)) {
-        throw new Error('defaultValue must contain String | Number | Boolean data');
-      }
-    }
-
-    // If the validValues element has been provided, it must be an array
-    if (jsonData.validValues !== undefined && !validate.isArray(jsonData.validValues)) {
-      throw new Error('validValues must be an array');
-    }
-
-    // If a validator element has been provided, it must contain string data
-    if (jsonData.validator !== undefined && !validate.isString(jsonData.validator)) {
-      throw new Error('validator must be a string');
-    }
-
-    // validate repeated
-    // If the repeated element has been provided, it must contain boolean data
-    if (validate.contains(jsonData, 'repeated') && !validate.isBoolean(jsonData.repeated)) { throw new Error('repeated must contain Boolean data'); }
 
     //noinspection PointlessBooleanExpressionJS
     return new PropertyDefBuilder()

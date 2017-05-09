@@ -17,15 +17,11 @@ describe('Transformer', () => {
       it(`Type: ${testCase.type}`, () => {
         const result = TransformerBuilder.fromJson({
           name: "myFirstAnalytic",
-          properties: [
-            { name: "prop1", type: testCase.type as "string" | "integer" | "boolean" | "float" | "decimal", description: "A property"}
-          ],
           propertyValues: [
             { name: "prop1", definitionName: "prop1", value: testCase.value}
           ]
         }).build();
-        expect(result.properties.get(0).type).toEqual(testCase.type);
-        expect(result.propertyValues.getValue().get(0).value.getValue()).toEqual(testCase.value);
+        expect(result.propertyValues.get(0).value.getValue()).toEqual(testCase.value);
       });
     });
   });
@@ -35,13 +31,9 @@ describe('Transformer', () => {
       it(`number of values: ${i}`, () =>{
         const result = TransformerBuilder.fromJson({
           name: "myFirstAnalytic",
-          properties: [
-            { name: "prop1", type: "string", description: "A property", repeated: true}
-          ],
           propertyValues: new Array(i).fill(undefined).map(() => { return { name: `prop${i}`, definitionName: "prop1", value: ""} })
         }).build();
-        expect(result.properties.get(0).name).toEqual('prop1');
-        expect(result.propertyValues.getValue().size).toEqual(i);
+        expect(result.propertyValues.size).toEqual(i);
       });
     }
   });
@@ -51,53 +43,10 @@ describe('Transformer', () => {
       it(`number of values: ${i}`, () =>{
         const result = TransformerBuilder.fromJson({
           name: "myFirstAnalytic",
-          properties: [
-            { name: "prop1", type: "string", description: "A property", optional: true}
-          ],
           propertyValues: new Array(i).fill(undefined).map(() => { return { name: `prop${i}`, definitionName: "prop1", value: ""} })
         }).build();
-        expect(result.properties.get(0).name).toEqual('prop1');
-        expect(result.propertyValues.getValue().size).toEqual(i);
+        expect(result.propertyValues.size).toEqual(i);
       });
     }
-  });
-
-  it('should throw an error while parsing if no definition is available', () => {
-    expect(()=> {
-      TransformerBuilder.fromJson({
-        name: "myFirstAnalytic",
-        properties: [],
-        propertyValues: [
-          { name: "prop1", definitionName: "prop1", value: ""}
-        ]
-      }).build()
-    }).toThrowError();
-  });
-
-  it('should throw an error while parsing if too many values are provided for an optional property', () => {
-    expect(()=> {
-      TransformerBuilder.fromJson({
-        name: "myFirstAnalytic",
-        properties: [
-          { name: "prop1", type: "string", description: "A property", optional: true}
-        ],
-        propertyValues: [
-          { name: "prop1", definitionName: "prop1", value: ""},
-          { name: "prop2", definitionName: "prop1", value: ""}
-        ]
-      }).build()
-    }).toThrowError();
-  });
-
-  it('should throw an error while parsing if no values are provided for a non-optional property', () => {
-    expect(()=> {
-      TransformerBuilder.fromJson({
-        name: "myFirstAnalytic",
-        properties: [
-          { name: "prop1", type: "string", description: "A property"}
-        ],
-        propertyValues: []
-      }).build()
-    }).toThrowError();
   });
 });

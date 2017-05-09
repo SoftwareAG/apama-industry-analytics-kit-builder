@@ -1,15 +1,16 @@
-import {Component, ElementRef, OnInit} from "@angular/core";
+import {Component, ElementRef, HostListener, OnInit} from "@angular/core";
 import * as d3 from "d3";
 import * as deepFreeze from "deep-freeze";
 import {AbstractDataService} from "../../services/AbstractDataService";
 import {Config} from "../../classes/Config";
 import {Row} from "../../classes/Row";
 import {TransformerChannelDef} from "../../classes/TransformerChannelDef";
-import {Channel} from "../../classes/Channel";
+import {RowChannel} from "../../classes/Channel";
 import {Observable} from "rxjs";
 import {AbstractDragService, Dragged} from "../../services/AbstractDragService";
 import {TransformerDef, TransformerDefBuilder} from "../../classes/TransformerDef";
 import {Transformer, TransformerBuilder} from "../../classes/Transformer";
+import {AbstractMetadataService} from "../../services/MetadataService";
 
 @Component({
   selector: 'ladder-diagram',
@@ -18,7 +19,7 @@ import {Transformer, TransformerBuilder} from "../../classes/Transformer";
 export class LadderDiagramComponent implements OnInit {
   readonly nativeElement;
 
-  constructor(myElement: ElementRef, private readonly dataService: AbstractDataService, private readonly dragService: AbstractDragService) {
+  constructor(myElement: ElementRef, private readonly dataService: AbstractDataService, private readonly dragService: AbstractDragService, private readonly metadataService: AbstractMetadataService) {
     this.nativeElement = myElement.nativeElement;
   }
 
@@ -66,13 +67,16 @@ export class LadderDiagramComponent implements OnInit {
       const maxTransformerCount = row.maxTransformerCount.getValue();
       const transformerCount = row.transformers.getValue().size;
       const transWidth = transformerWidth(maxTransformerCount);
-      const rowInChannelCount = row.getInChannels().size;
-      const rowOutChannelCount = row.getOutChannels().size;
+      const metadata = component.metadataService.metadata.getValue();
+      const rowInChannelCount = row.getInChannels(metadata).size;
+      const rowOutChannelCount = row.getOutChannels(metadata).size;
+      const transformerDef = dragging instanceof TransformerDef ? dragging : metadata.getAnalytic(dragging.name);
 
+      // TODO: this need to be completed (handle mulitple in/out etc)
       if (
         transformerCount < maxTransformerCount &&
         rowInChannelCount <= 1 && rowOutChannelCount <= 1 &&
-        dragging.inputChannels.size === 1 && dragging.outputChannels.size === 1
+        transformerDef.inputChannels.size === 1 && transformerDef.outputChannels.size === 1
       ) {
         return new Array(transformerCount + 1).fill(undefined).map((ignored, i) => {
           return {
@@ -88,7 +92,7 @@ export class LadderDiagramComponent implements OnInit {
       selection
         .on('mouseup', (d, i) => {
           const dragged = component.dragService.dragging.getValue();
-          if (dragged && dragged.object instanceof Channel) {
+          if (dragged && dragged.object instanceof RowChannel) {
             component.dragService.stopDrag();
             d3.event.stopPropagation();
             if (type === 'input') {
@@ -109,7 +113,7 @@ export class LadderDiagramComponent implements OnInit {
           }
         })
         .on('mousedown', function(d) {
-          if (d.channel instanceof Channel) {
+          if (d.channel instanceof RowChannel) {
             component.dragService.startDrag({sourceElement: this as SVGGraphicsElement, object: d.channel});
             d3.event.preventDefault();
           }
@@ -162,7 +166,8 @@ export class LadderDiagramComponent implements OnInit {
       .switchMap(hierarchy => hierarchy.asObservable()) // subscribe to all of the sub-tree changes too
       .combineLatest(
         this.dragService.dragging,
-        (hierarchy, dragging) => hierarchy
+        this.metadataService.metadata,
+        (hierarchy) => hierarchy
       )
       .subscribe(data => {
 
@@ -182,7 +187,8 @@ export class LadderDiagramComponent implements OnInit {
         const inChannel = channelsUpdate.selectAll('.inChannel').data((d: Row) => {
           const transWidth = transformerWidth(d.maxTransformerCount.getValue());
           const lastTransformerX = d.transformers.getValue().size ? transformerX(transWidth, d.transformers.getValue().size - 1) : transformerX(transWidth, 0);
-          return d.getInChannels().toArray().map((channel) => { return { lastTransformerX: lastTransformerX, channel: channel, row: d } });
+          const metadata = component.metadataService.metadata.getValue();
+          return d.getInChannels(metadata).toArray().map(channel => { return { lastTransformerX: lastTransformerX, channel: channel, row: d } });
         });
         inChannel.exit().remove();
         const inChannelEnter = inChannel.enter().append('g')
@@ -209,7 +215,8 @@ export class LadderDiagramComponent implements OnInit {
         const outChannel = channelsUpdate.selectAll('.outChannel').data((d: Row) => {
           const transWidth = transformerWidth(d.maxTransformerCount.getValue());
           const firstTransformerX = transformerX(transWidth, 0);
-          return d.getOutChannels().toArray().map((channel) => { return { firstTransformerX: firstTransformerX, channel: channel, row: d } });
+          const metadata = component.metadataService.metadata.getValue();
+          return d.getOutChannels(metadata).toArray().map(channel => { return { firstTransformerX: firstTransformerX, channel: channel, row: d } });
         });
         outChannel.exit().remove();
         const outChannelEnter = outChannel.enter().append('g')
@@ -240,12 +247,16 @@ export class LadderDiagramComponent implements OnInit {
         const rowTransformersUpdate = rowUpdate.select('.transformers')
           .datum(d => { return { transformerWidth: transformerWidth(d.maxTransformerCount.getValue()), row: d } });
 
-        const transformer = rowTransformersUpdate.selectAll('.transformer').data(d => d.row.transformers.getValue().toArray().map(transformer => { return {
-          width: d.transformerWidth,
-          height: transformerHeight(transformer.inputChannels.size, transformer.outputChannels.size),
-          transformer: transformer,
-          row: d.row
-        }}));
+        const transformer = rowTransformersUpdate.selectAll('.transformer').data(d => d.row.transformers.getValue().toArray().map(transformer => {
+          const transformerDef = component.metadataService.getAnalytic(transformer.name);
+          return {
+            width: d.transformerWidth,
+            height: transformerHeight(transformerDef.inputChannels.size, transformerDef.outputChannels.size),
+            transformer: transformer,
+            transformerDef: transformerDef,
+            row: d.row
+          }
+        }));
         transformer.exit().remove();
 
         const transformerEnter = transformer.enter().append('g')
@@ -287,7 +298,7 @@ export class LadderDiagramComponent implements OnInit {
           .classed('transformer-inchannels', true);
         const transformerInChansUpdate = transformerUpdate.select('.transformer-inchannels')
           .attr('transform', d => `translate(${-d.width/2},0)`);
-        const transformerInChan = transformerInChansUpdate.selectAll('.channel').data((d) => d.transformer.inputChannels.toArray().map((chanDef) => { return { channel: chanDef } }));
+        const transformerInChan = transformerInChansUpdate.selectAll('.channel').data((d) => d.transformerDef.inputChannels.toArray().map((chanDef) => { return { channel: chanDef } }));
         transformerInChan.exit().remove();
         const transformerInChanEnter = transformerInChan.enter().append('circle')
           .classed('channel', true)
@@ -300,7 +311,7 @@ export class LadderDiagramComponent implements OnInit {
           .classed('transformer-outchannels', true);
         const transformerOutChansUpdate = transformerUpdate.select('.transformer-outchannels')
           .attr('transform', d => `translate(${d.width/2},0)`);
-        const transformerOutChan = transformerOutChansUpdate.selectAll('.channel').data((d) => d.transformer.outputChannels.toArray().map((chanDef) => { return { channel: chanDef } }));
+        const transformerOutChan = transformerOutChansUpdate.selectAll('.channel').data((d) => d.transformerDef.outputChannels.toArray().map((chanDef) => { return { channel: chanDef } }));
         transformerOutChan.exit().remove();
         const transformerOutChanEnter = transformerOutChan.enter().append('circle')
           .classed('channel', true)
@@ -310,8 +321,8 @@ export class LadderDiagramComponent implements OnInit {
           .attr('cy', (d,i) => (i+1) * defaultTransformerHeight/2);
 
         function rowChannelUpdate(selection) {
-          const channelSelection = selection.filter((d: {channel: TransformerChannelDef | Channel}) => d.channel instanceof Channel);
-          const channelDefSelection = selection.filter((d: {channel: TransformerChannelDef | Channel}) => d.channel instanceof TransformerChannelDef);
+          const channelSelection = selection.filter((d: {channel: TransformerChannelDef | RowChannel}) => d.channel instanceof RowChannel);
+          const channelDefSelection = selection.filter((d: {channel: TransformerChannelDef | RowChannel}) => d.channel instanceof TransformerChannelDef);
           channelSelection.select('text')
             .text(d => d.channel.name.getValue());
           channelDefSelection.select('text')
@@ -396,6 +407,13 @@ export class LadderDiagramComponent implements OnInit {
           .attr('width', width + padding.left + padding.right)
           .attr('height', finalHeight + padding.top + padding.bottom)
       });
+  }
+
+  @HostListener('mouseup', ['$event.target'])
+  parentMouseUp() {
+    if (!this.dragService.dragging.getValue()) {
+      this.dataService.selectedTransformer.next(undefined);
+    }
   }
 
 }

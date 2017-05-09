@@ -1,7 +1,7 @@
 
 import {BehaviorSubject} from "rxjs";
 import {TransformerDef} from "app/classes/TransformerDef";
-import {Channel} from "app/classes/Channel";
+import {RowChannel} from "app/classes/Channel";
 import {Transformer} from "../classes/Transformer";
 
 export interface Point {
@@ -11,7 +11,7 @@ export interface Point {
 
 export class Dragged implements Draggable {
   readonly sourceElement: SVGGraphicsElement;
-  readonly object: Channel | TransformerDef | Transformer;
+  readonly object: RowChannel | TransformerDef | Transformer;
   readonly currentLocation: BehaviorSubject<Point>;
 
   constructor(draggable: Draggable) {
@@ -28,7 +28,7 @@ export class Dragged implements Draggable {
 
 export interface Draggable {
   sourceElement: SVGGraphicsElement;
-  object: Channel|TransformerDef|Transformer;
+  object: RowChannel|TransformerDef|Transformer;
 }
 
 export abstract class AbstractDragService {

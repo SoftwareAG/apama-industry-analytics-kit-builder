@@ -2,41 +2,43 @@ import {
   NestedTransformerBuilder, Transformer, TransformerBuilder, TransformerJsonInterface,
   TransformerSerializer
 } from "./Transformer";
-import {Channel, ChannelJsonInterface, NestedChannelBuilder, ChannelBuilder} from "./Channel";
+import {RowChannel, ChannelJsonInterface, NestedChannelBuilder, ChannelBuilder} from "./Channel";
 import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
 import {TransformerChannelDef} from "./TransformerChannelDef";
 import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
 import {BehaviorSubject, Observable} from "rxjs";
-import {List} from "immutable";
+import {List, Map} from "immutable";
 import {AbstractModel} from "./AbstractModel";
 import {Injectable} from "@angular/core";
+import {Metadata} from "./Metadata";
+import * as _ from "lodash";
 
 export interface RowJsonInterface {
   maxTransformerCount: number;
   transformers : TransformerJsonInterface[];
-  inputChannelOverrides: (ChannelJsonInterface | undefined)[];
-  outputChannelOverrides: (ChannelJsonInterface | undefined)[];
+  inputChannelOverrides: {[i: number]: ChannelJsonInterface};
+  outputChannelOverrides: {[i: number]: ChannelJsonInterface};
 }
 
 export interface RowInterface {
   maxTransformerCount: number;
   transformers : Transformer[];
-  inputChannelOverrides: (Channel | undefined)[];
-  outputChannelOverrides: (Channel | undefined)[];
+  inputChannelOverrides: {[i: number]: RowChannel};
+  outputChannelOverrides: {[i: number]: RowChannel};
 }
 
-export class Row extends AbstractModel<RowJsonInterface> implements AsObservable, BehaviorSubjectify<RowInterface>  {
+export class Row extends AbstractModel<RowJsonInterface, never> implements AsObservable  {
   readonly maxTransformerCount: BehaviorSubject<number>;
-  readonly transformers : BehaviorSubject<List<Transformer>>;
-  readonly inputChannelOverrides: BehaviorSubject<List<Channel | undefined>>;
-  readonly outputChannelOverrides: BehaviorSubject<List<Channel | undefined>>;
+  readonly transformers: BehaviorSubject<List<Transformer>>;
+  readonly inputChannelOverrides: BehaviorSubject<Map<number, RowChannel>>;
+  readonly outputChannelOverrides: BehaviorSubject<Map<number, RowChannel>>;
 
   constructor(obj: RowInterface) {
     super();
     this.maxTransformerCount = new BehaviorSubject(obj.maxTransformerCount);
     this.transformers = new BehaviorSubject(List(obj.transformers));
-    this.inputChannelOverrides = new BehaviorSubject(List(obj.inputChannelOverrides));
-    this.outputChannelOverrides = new BehaviorSubject(List(obj.outputChannelOverrides));
+    this.inputChannelOverrides = new BehaviorSubject(Map<number, RowChannel>(_.map(obj.inputChannelOverrides, (chan, i: string) => [Math.round(parseFloat(i)), chan])));
+    this.outputChannelOverrides = new BehaviorSubject(Map<number, RowChannel>(_.map(obj.outputChannelOverrides, (chan, i: string) => [Math.round(parseFloat(i)), chan])));
   }
 
   asObservable(): Observable<this> {
@@ -51,26 +53,27 @@ export class Row extends AbstractModel<RowJsonInterface> implements AsObservable
     ).mapTo(this);
   }
 
-  getInChannels(): List<Channel | TransformerChannelDef> {
-    // Must have the same number of input channels as the first transformer
-    const requiredChannels = this.transformers.getValue().size ? this.transformers.getValue().first().inputChannels : List();
-    // If the row contains an override then return that otherwise return the Default ChannelDef from the first transformer
-    return requiredChannels.map((channelDef: TransformerChannelDef, i: number) => this.inputChannelOverrides.getValue().size > i && this.inputChannelOverrides.getValue().get(i) || channelDef) as List<Channel | TransformerChannelDef>;
+  getInChannels(metadata: Metadata): List<RowChannel | TransformerChannelDef> {
+    const requiredChannels = this.transformers.getValue().size ? metadata.getAnalytic(this.transformers.getValue().first().name).inputChannels : List();
+    return requiredChannels.map((channelDef: TransformerChannelDef, i: number) => this.inputChannelOverrides.getValue().get(i) || channelDef) as List<RowChannel | TransformerChannelDef>;
   }
 
-  getOutChannels(): List<Channel | TransformerChannelDef> {
-    // Must have the same number of output channels as the last transformer
-    const requiredChannels = this.transformers.getValue().size ? this.transformers.getValue().last().outputChannels : List();
-    // If the row contains an override then return that otherwise return the Default ChannelDef from the last transformer
-    return requiredChannels.map((channelDef: TransformerChannelDef, i: number) => { return this.outputChannelOverrides.getValue().size > i && this.outputChannelOverrides.getValue().get(i) || channelDef; }) as List<Channel | TransformerChannelDef>;
+  getOutChannels(metadata: Metadata): List<RowChannel | TransformerChannelDef> {
+    const requiredChannels = this.transformers.getValue().size ? metadata.getAnalytic(this.transformers.getValue().last().name).outputChannels : List();
+    return requiredChannels.map((channelDef: TransformerChannelDef, i: number) => this.outputChannelOverrides.getValue().get(i) || channelDef) as List<RowChannel | TransformerChannelDef>;
+  }
+
+  validate(): this {
+    // TODO: do some validation
+    return this
   }
 }
 
 export class RowBuilder extends ClassBuilder<Row> implements RowInterface {
   maxTransformerCount: number;
   transformers: Transformer[] = [];
-  inputChannelOverrides: (Channel | undefined)[] = [];
-  outputChannelOverrides: (Channel | undefined)[] = [];
+  inputChannelOverrides: { [i: number]: RowChannel; } = {};
+  outputChannelOverrides: { [i: number]: RowChannel; } = {};
 
   MaxTransformerCount(maxTransformerCount: number): this {
     this.maxTransformerCount = maxTransformerCount;
@@ -89,28 +92,28 @@ export class RowBuilder extends ClassBuilder<Row> implements RowInterface {
     return new NestedTransformerBuilder<this>((transformer) => { this.transformers.push(transformer); return this; });
   }
 
-  InputChannels(inputChannelOverrides: (Channel | undefined)[]): this {
+  InputChannels(inputChannelOverrides: { [i: number]: RowChannel; }): this {
     this.inputChannelOverrides = inputChannelOverrides;
     return this;
   }
-  pushInputChannel(...inputChannelOverride: (Channel | undefined)[]): this {
-    this.inputChannelOverrides.push(...inputChannelOverride);
+  pushInputChannel(inputChannelOverride: { [i: number]: RowChannel; }): this {
+    Object.assign(this.inputChannelOverrides, inputChannelOverride);
     return this;
   }
-  withInputChannel(): NestedChannelBuilder<this> {
-    return new NestedChannelBuilder((channel) => {this.inputChannelOverrides.push(channel); return this;})
+  withInputChannel(i: number): NestedChannelBuilder<this> {
+    return new NestedChannelBuilder((channel) => {this.inputChannelOverrides[i] = channel; return this;})
   }
 
-  OutputChannels(outputChannelOverrides: (Channel | undefined)[]): this {
+  OutputChannels(outputChannelOverrides: { [i: number]: RowChannel; }): this {
     this.outputChannelOverrides = outputChannelOverrides;
     return this;
   }
-  pushOutputChannel(...outputChannelOverride: (Channel | undefined)[]): this {
-    this.outputChannelOverrides.push(...outputChannelOverride);
+  pushOutputChannel(outputChannelOverrides: { [i: number]: RowChannel; }): this {
+    Object.assign(this.outputChannelOverrides, outputChannelOverrides);
     return this;
   }
-  withOutputChannel(): NestedChannelBuilder<this> {
-    return new NestedChannelBuilder((channel) => {this.outputChannelOverrides.push(channel); return this;})
+  withOutputChannel(i: number): NestedChannelBuilder<this> {
+    return new NestedChannelBuilder((channel) => {this.outputChannelOverrides[i] = channel; return this;})
   }
 
   build(): Row {
@@ -121,8 +124,8 @@ export class RowBuilder extends ClassBuilder<Row> implements RowInterface {
     return new RowBuilder()
       .MaxTransformerCount(json.maxTransformerCount)
       .Transformers(json.transformers.map((transformer) => TransformerBuilder.fromJson(transformer).build()))
-      .InputChannels(json.inputChannelOverrides.map((inChan) => inChan ? ChannelBuilder.fromJson(inChan).build() : undefined))
-      .OutputChannels(json.outputChannelOverrides.map((outChan) => outChan ? ChannelBuilder.fromJson(outChan).build() : undefined))
+      .InputChannels(_.mapValues(json.inputChannelOverrides, (chan: ChannelJsonInterface) => ChannelBuilder.fromJson(chan).build()))
+      .OutputChannels(_.mapValues(json.outputChannelOverrides, (chan: ChannelJsonInterface) => ChannelBuilder.fromJson(chan).build()))
   }
 }
 
@@ -147,13 +150,15 @@ export class RowSerializer {
 
   constructor(private transformerSerializer: TransformerSerializer) {}
 
-  toApama(row: RowJsonInterface, rowIndex: number) {
-    if (!row.transformers.length) {
+  toApama(metadata: Metadata, row: Row, rowIndex: number) {
+    row.validate();
+
+    if (!row.transformers.getValue().size) {
       return "";
     }
 
     return `\\\\ Row: ${rowIndex}\n` +
-      row.transformers.map((transformer, transformerIndex) => this.transformerSerializer.toApama(transformer, transformerIndex, row, rowIndex))
+      row.transformers.getValue().map((transformer: Transformer, transformerIndex: number) => this.transformerSerializer.toApama(transformer, metadata.getAnalytic(transformer.name), transformerIndex, row, rowIndex))
         .join('\n');
   }
 }

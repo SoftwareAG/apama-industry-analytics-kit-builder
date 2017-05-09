@@ -1,12 +1,38 @@
-import {TransformerSerializer} from "app/classes/Transformer";
+import {TransformerBuilder, TransformerSerializer} from "app/classes/Transformer";
 import {RowBuilder, RowSerializer} from "./Row";
 import {PropertySerializer} from "./Property";
 import {TestBed} from "@angular/core/testing";
 import {TestUtils} from "../services/TestUtil.spec";
+import {Metadata, MetadataBuilder} from "./Metadata";
 
 describe('RowSerializer', () => {
 
   let rowSerializer: RowSerializer;
+
+  const testMetadata: Metadata = new MetadataBuilder()
+  .Version("0.0")
+  .withAnalytic()
+    .Name("Analytic1")
+    .withInputChannel().Name("Analytic1:Input1").endWith()
+    .withOutputChannel().Name("Analytic1:Output1").endWith()
+    .endWith()
+  .withAnalytic()
+    .Name("Analytic2")
+    .withInputChannel().Name("Analytic2:Input1").endWith()
+    .withOutputChannel().Name("Analytic2:Output1").endWith()
+    .endWith()
+  .withAnalytic()
+    .Name("Analytic3")
+    .withInputChannel().Name("Analytic3:Input1").endWith()
+    .withInputChannel().Name("Analytic3:Input2").endWith()
+    .withInputChannel().Name("Analytic3:Input3").endWith()
+    .withInputChannel().Name("Analytic3:Input4").endWith()
+    .withOutputChannel().Name("Analytic3:Output1").endWith()
+    .withOutputChannel().Name("Analytic3:Output2").endWith()
+    .withOutputChannel().Name("Analytic3:Output3").endWith()
+    .withOutputChannel().Name("Analytic3:Output4").endWith()
+    .endWith()
+  .build();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -19,168 +45,126 @@ describe('RowSerializer', () => {
     rowSerializer = TestBed.get(RowSerializer) as RowSerializer;
   });
 
-  it('should handle an empty Row', () => {
-    const result = rowSerializer.toApama((new RowBuilder().build().toJson()), 0);
-    expect(result).toBe('')
+  it('should serialize a row with no analytics', () => {
+    const result = rowSerializer.toApama(
+      testMetadata,
+      new RowBuilder()
+        .MaxTransformerCount(3)
+        .build(),
+      0);
+
+    expect(result).toBe('');
   });
 
-  it('should serialize a single Analytic which has two inputs and a single output', () => {
-    const result = rowSerializer.toApama((new RowBuilder()
-      .MaxTransformerCount(3)
-      .withInputChannel().Name("Input Channel 1").endWith()
-      .withInputChannel().Name("Input Channel 2").endWith()
-      .withOutputChannel().Name("Output Channel 1").endWith()
-      .withTransformer()
-        .Name("Analytic 1")
-        .withInputChannel().Name("Analytic 1 : Input Channel 1").endWith()
-        .withInputChannel().Name("Analytic 1 : Input Channel 2").endWith()
-        .withOutputChannel().Name("Analytic 1 : Output Channel 1").endWith()
-      .endWith()
-      .build().toJson()), 0);
+  it('should serialize a row with 1 analytic', () => {
+    const result = rowSerializer.toApama(
+      testMetadata,
+      new RowBuilder()
+        .MaxTransformerCount(3)
+        .withTransformer().Name("Analytic1").endWith()
+        .build(),
+      0);
 
     const rows = TestUtils.findAll(/(\\\\ Row:\s)(.*)/g, result).map(match => match[1]);
     expect(rows).toEqual(["0"]);
 
     const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
-    expect(analytics).toEqual(['"Analytic 1",["Input Channel 1","Input Channel 2"],["Output Channel 1"],{}']);
+    expect(analytics).toEqual(['"Analytic1",["Row0:Input0"],["Row0:Output0"],{}']);
   });
 
-  it('should serialize a row with a single Analytic with one input and output channel', () => {
-    const result = rowSerializer.toApama((new RowBuilder()
-      .MaxTransformerCount(1)
-      .withInputChannel().Name("Input Channel 1").endWith()
-      .withOutputChannel().Name("Output Channel 1").endWith()
-      .withTransformer()
-        .Name("Analytic 1")
-        .withInputChannel().Name("Analytic 1 : Input Channel 1").endWith()
-        .withOutputChannel().Name("Analytic 1 : Output Channel 1").endWith()
-      .endWith()
-      .build().toJson()), 0);
+  it('should serialize a row with 2 analytics', () => {
+    const result = rowSerializer.toApama(
+      testMetadata,
+      new RowBuilder()
+        .MaxTransformerCount(3)
+        .withTransformer().Name("Analytic1").endWith()
+        .withTransformer().Name("Analytic2").endWith()
+        .build(),
+      0);
 
     const rows = TestUtils.findAll(/(\\\\ Row:\s)(.*)/g, result).map(match => match[1]);
     expect(rows).toEqual(["0"]);
-    const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
-    expect(analytics).toEqual(['"Analytic 1",["Input Channel 1"],["Output Channel 1"],{}']);
-  });
 
-  it('should serialize a row with two Analytics each with one input and output channel', () => {
-    const result = rowSerializer.toApama((new RowBuilder()
-      .MaxTransformerCount(1)
-      .withInputChannel().Name("Input Channel 1").endWith()
-      .withOutputChannel().Name("Output Channel 1").endWith()
-      .withTransformer()
-        .Name("Analytic 1")
-        .withInputChannel().Name("Analytic 1 : Input Channel 1").endWith()
-        .withOutputChannel().Name("Analytic 1 : Output Channel 1").endWith()
-      .endWith()
-      .withTransformer()
-        .Name("Analytic 2")
-        .withInputChannel().Name("Analytic 2 : Input Channel 1").endWith()
-        .withOutputChannel().Name("Analytic 2 : Output Channel 1").endWith()
-      .endWith()
-      .build().toJson()), 0);
-
-    const rows = TestUtils.findAll(/(\\\\ Row:\s)(.*)/g, result).map(match => match[1]);
-    expect(rows).toEqual(["0"]);
     const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
     expect(analytics).toEqual([
-        '"Analytic 1",["Input Channel 1"],["Row0:Channel1"],{}',
-        '"Analytic 2",["Row0:Channel1"],["Output Channel 1"],{}'
+      '"Analytic1",["Row0:Input0"],["Row0:Channel1"],{}',
+      '"Analytic2",["Row0:Channel1"],["Row0:Output0"],{}',
     ]);
   });
 
-  it('should serialize a row with a single Analytic with two input channels and one output channel', () => {
-    const result = rowSerializer.toApama((new RowBuilder()
-      .MaxTransformerCount(1)
-      .withInputChannel().Name("Input Channel 1").endWith()
-      .withInputChannel().Name("Input Channel 2").endWith()
-      .withOutputChannel().Name("Output Channel 1").endWith()
-      .withTransformer()
-        .Name("Analytic 1")
-        .withInputChannel().Name("Analytic 1 : Input Channel 1").endWith()
-        .withInputChannel().Name("Analytic 1 : Input Channel 2").endWith()
-        .withOutputChannel().Name("Analytic 1 : Output Channel 1").endWith()
-      .endWith()
-      .build().toJson()), 0);
+  it('should serialize a row with 1 analytic and overridden input and output channels', () => {
+    const result = rowSerializer.toApama(
+      testMetadata,
+      new RowBuilder()
+        .MaxTransformerCount(3)
+        .withInputChannel(0).Name("OverriddenInput").endWith()
+        .withOutputChannel(0).Name("OverriddenOutput").endWith()
+        .withTransformer().Name("Analytic1").endWith()
+        .build(),
+      0);
 
     const rows = TestUtils.findAll(/(\\\\ Row:\s)(.*)/g, result).map(match => match[1]);
     expect(rows).toEqual(["0"]);
+
     const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
-    expect(analytics).toEqual(['"Analytic 1",["Input Channel 1","Input Channel 2"],["Output Channel 1"],{}']);
+    expect(analytics).toEqual(['"Analytic1",["OverriddenInput"],["OverriddenOutput"],{}']);
   });
 
-  it('should serialize a row with a single Analytic with one input channel and two output channels', () => {
-    const result = rowSerializer.toApama((new RowBuilder()
-      .MaxTransformerCount(1)
-      .withInputChannel().Name("Input Channel 1").endWith()
-      .withOutputChannel().Name("Output Channel 1").endWith()
-      .withOutputChannel().Name("Output Channel 2").endWith()
-      .withTransformer()
-        .Name("Analytic 1")
-        .withInputChannel().Name("Analytic 1 : Input Channel 1").endWith()
-        .withOutputChannel().Name("Analytic 1 : Output Channel 1").endWith()
-        .withOutputChannel().Name("Analytic 1 : Output Channel 2").endWith()
-      .endWith()
-      .build().toJson()), 0);
+  it('should serialize a row with 2 analytics and overridden input and output channels', () => {
+    const result = rowSerializer.toApama(
+      testMetadata,
+      new RowBuilder()
+        .MaxTransformerCount(3)
+        .withInputChannel(0).Name("OverriddenInput").endWith()
+        .withOutputChannel(0).Name("OverriddenOutput").endWith()
+        .withTransformer().Name("Analytic1").endWith()
+        .withTransformer().Name("Analytic2").endWith()
+        .build(),
+      0);
 
     const rows = TestUtils.findAll(/(\\\\ Row:\s)(.*)/g, result).map(match => match[1]);
     expect(rows).toEqual(["0"]);
+
     const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
-    expect(analytics).toEqual(['"Analytic 1",["Input Channel 1"],["Output Channel 1","Output Channel 2"],{}']);
+    expect(analytics).toEqual([
+      '"Analytic1",["OverriddenInput"],["Row0:Channel1"],{}',
+      '"Analytic2",["Row0:Channel1"],["OverriddenOutput"],{}',
+    ]);
   });
 
-  it('should serialize a row with a single Analytic with two input channels and two output channels', () => {
-    const result = rowSerializer.toApama((new RowBuilder()
-      .MaxTransformerCount(1)
-      .withInputChannel().Name("Input Channel 1").endWith()
-      .withInputChannel().Name("Input Channel 2").endWith()
-      .withOutputChannel().Name("Output Channel 1").endWith()
-      .withOutputChannel().Name("Output Channel 2").endWith()
-      .withTransformer()
-        .Name("Analytic 1")
-        .withInputChannel().Name("Analytic 1 : Input Channel 1").endWith()
-        .withInputChannel().Name("Analytic 1 : Input Channel 2").endWith()
-        .withOutputChannel().Name("Analytic 1 : Output Channel 1").endWith()
-        .withOutputChannel().Name("Analytic 1 : Output Channel 2").endWith()
-      .endWith()
-      .build().toJson()), 0);
+  describe('should correctly override any input or output channel', () => {
+    for(let i = 0; i < 4; i++) {
+      it(`OverriddenChannelNumber: ${i}`, () => {
+        const result = rowSerializer.toApama(
+          testMetadata,
+          new RowBuilder()
+            .MaxTransformerCount(3)
+            .withInputChannel(i).Name("OverriddenInput").endWith()
+            .withOutputChannel(i).Name("OverriddenOutput").endWith()
+            .withTransformer().Name("Analytic3").endWith()
+            .build(),
+          0);
 
-    const rows = TestUtils.findAll(/(\\\\ Row:\s)(.*)/g, result).map(match => match[1]);
-    expect(rows).toEqual(["0"]);
-    const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
-    expect(analytics).toEqual([    '"Analytic 1",["Input Channel 1","Input Channel 2"],["Output Channel 1","Output Channel 2"],{}']);
+        const rows = TestUtils.findAll(/(\\\\ Row:\s)(.*)/g, result).map(match => match[1]);
+        expect(rows).toEqual(["0"]);
+
+        const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
+        const expectedInputChannels = [
+          "Row0:Input0",
+          "Row0:Input1",
+          "Row0:Input2",
+          "Row0:Input3"
+        ];
+        expectedInputChannels[i] = "OverriddenInput";
+        const expectedOutputChannels = [
+          "Row0:Output0",
+          "Row0:Output1",
+          "Row0:Output2",
+          "Row0:Output3"
+        ];
+        expectedOutputChannels[i] = "OverriddenOutput";
+        expect(analytics).toEqual([`"Analytic3",["${expectedInputChannels.join('","')}"],["${expectedOutputChannels.join('","')}"],{}`]);
+      })
+    }
   });
-
-  it('should serialize a row with a single Analytic with no input channels and one output channel', () => {
-    const result = rowSerializer.toApama((new RowBuilder()
-      .MaxTransformerCount(1)
-      .withOutputChannel().Name("Output Channel 1").endWith()
-      .withTransformer()
-        .Name("Analytic 1")
-        .withOutputChannel().Name("Analytic 1 : Output Channel 1").endWith()
-      .endWith()
-      .build().toJson()), 0);
-
-    const rows = TestUtils.findAll(/(\\\\ Row:\s)(.*)/g, result).map(match => match[1]);
-    expect(rows).toEqual(["0"]);
-    const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
-    expect(analytics).toEqual(['"Analytic 1",[""],["Output Channel 1"],{}']);
-  });
-
-  it('should serialize a row with a single Analytic with one input channel and no output channels', () => {
-    const result = rowSerializer.toApama((new RowBuilder()
-      .MaxTransformerCount(1)
-      .withInputChannel().Name("Input Channel 1").endWith()
-      .withTransformer()
-        .Name("Analytic 1")
-        .withInputChannel().Name("Analytic 1 : Input Channel 1").endWith()
-      .endWith()
-      .build().toJson()), 0);
-
-    const rows = TestUtils.findAll(/(\\\\ Row:\s)(.*)/g, result).map(match => match[1]);
-    expect(rows).toEqual(["0"]);
-    const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
-    expect(analytics).toEqual(['"Analytic 1",["Input Channel 1"],[""],{}']);
-  });
-
 });

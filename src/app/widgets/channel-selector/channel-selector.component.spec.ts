@@ -1,6 +1,6 @@
 import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 import {Injectable} from "@angular/core";
-import {Channel, ChannelArrayBuilder} from "../../classes/Channel";
+import {RowChannel, ChannelArrayBuilder} from "../../classes/Channel";
 import {ChannelSelectorComponent} from "./channel-selector.component";
 import {AbstractDataService} from "../../services/AbstractDataService";
 import {BehaviorSubject} from "rxjs";
@@ -41,7 +41,7 @@ describe('ChannelSelectorComponent', () => {
   beforeEach(() => {
     channelDataService = TestBed.get(AbstractDataService) as DataServiceMock;
 
-    channelDataService.channels.next(List<Channel>());
+    channelDataService.channels.next(List<RowChannel>());
     fixture = TestBed.createComponent(ChannelSelectorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

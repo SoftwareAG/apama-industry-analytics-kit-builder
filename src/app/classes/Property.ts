@@ -4,6 +4,7 @@ import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
 import {BehaviorSubject, Observable} from "rxjs";
 import {AbstractModel} from "./AbstractModel";
 import {Injectable} from "@angular/core";
+import {validate} from "validate.js";
 
 export interface PropertyJsonInterface {
   name: string;
@@ -22,7 +23,7 @@ interface UnmodifiablePropertyInterface {
 
 export interface PropertyInterface extends ModifiablePropertyInterface, UnmodifiablePropertyInterface {}
 
-export class Property extends AbstractModel<PropertyJsonInterface> implements AsObservable, BehaviorSubjectify<ModifiablePropertyInterface>, UnmodifiablePropertyInterface {
+export class Property extends AbstractModel<PropertyJsonInterface, PropertyDef> implements AsObservable, BehaviorSubjectify<ModifiablePropertyInterface>, UnmodifiablePropertyInterface {
   readonly name: BehaviorSubject<string>;
   readonly definitionName: string;
   readonly value: BehaviorSubject<number | string | boolean>;
@@ -40,6 +41,27 @@ export class Property extends AbstractModel<PropertyJsonInterface> implements As
       this.value
     ).mapTo(this);
   }
+
+  validate(propertyDef: PropertyDef): this {
+    if (validate.isString(this.definitionName) && !this.definitionName) { throw new Error("Must have a valid definition name"); }
+    if (this.definitionName !== propertyDef.name) { throw new Error(`Definition name [${this.definitionName}] must match name of definition [${propertyDef.name}]`); }
+    if (this.value === undefined) { throw new Error("Must have a value"); }
+    const value = this.value.getValue();
+    switch(propertyDef.type) {
+      case 'string':
+        if (!validate.isString(value)) { throw new Error(`value [${value}] is wrong type, should be: string`) }
+        break;
+      case 'float':
+      case 'decimal':
+      case 'integer':
+        if (!validate.isNumber(value)) { throw new Error(`value [${value}] is wrong type, should be: number`) }
+        break;
+      case 'boolean':
+        if (!validate.isBoolean(value)) { throw new Error(`value [${value}] is wrong type, should be: boolean`) }
+        break;
+    }
+    return this;
+  }
 }
 
 export class PropertyBuilder implements PropertyInterface {
@@ -47,6 +69,11 @@ export class PropertyBuilder implements PropertyInterface {
   definitionName: string;
   value: number | string | boolean;
 
+  NameAndDef(name: string) : this {
+    this.name = name;
+    this.definitionName = name;
+    return this;
+  }
   Name(name: string): this {
     this.name = name;
     return this;
@@ -61,9 +88,6 @@ export class PropertyBuilder implements PropertyInterface {
   }
 
   build(): Property {
-    if (!this.definitionName) { throw new Error("Must have a valid definition name"); }
-    if (this.value === undefined) { throw new Error("Must have a value"); }
-
     return new Property(this);
   }
 
@@ -178,13 +202,10 @@ export class PropertyArrayBuilder extends ClassArrayBuilder<Property, NestedProp
 @Injectable()
 export class PropertySerializer {
   //noinspection JSMethodCanBeStatic
-  toApama(property: PropertyJsonInterface, apamaType: "integer" | "string" | "float" | "decimal" | "boolean") {
-    if (!property.name) {
-      console.error("SerializationError: Property should have a name");
-      return "";
-    }
+  toApama(property: Property, propertyDef: PropertyDef) {
+    property.validate(propertyDef);
 
-    return `"${property.name}":"${PropertySerializer.valueFromType(property.value, apamaType)}"`;
+    return `"${property.name.getValue()}":"${PropertySerializer.valueFromType(property.value.getValue(), propertyDef.type)}"`;
   }
 
   private static valueFromType(jsValue: number | string | boolean | undefined, apamaType: "integer" | "string" | "float" | "decimal" | "boolean") {

@@ -1,6 +1,7 @@
 import {TransformerSerializer} from "app/classes/Transformer";
 import {PropertyBuilder, PropertySerializer} from "./Property";
 import {TestBed} from "@angular/core/testing";
+import {PropertyDefBuilder} from "./PropertyDef";
 
 describe('PropertySerializer', () => {
 
@@ -83,7 +84,7 @@ describe('PropertySerializer', () => {
           .build();
 
         it(`PropertyType : ${jasmine.pp(testCase)}`, () => {
-          const serialisedData = propertySerializer.toApama(property.toJson(), testCase.type as "integer" | "string" | "float" | "decimal" | "boolean");
+          const serialisedData = propertySerializer.toApama(property, new PropertyDefBuilder().Name(property.definitionName).Type(testCase.type as "integer" | "string" | "float" | "decimal" | "boolean").build());
           expect(serialisedData).toEqual(
             testCase.result
           );

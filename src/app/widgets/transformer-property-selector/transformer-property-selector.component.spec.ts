@@ -5,36 +5,106 @@ import {Injectable} from "@angular/core";
 import {AbstractDataService} from "../../services/AbstractDataService";
 import {BehaviorSubject} from "rxjs";
 import {Config} from "../../classes/Config";
-import {Channel} from "../../classes/Channel";
+import {RowChannel} from "../../classes/Channel";
 import {FormsModule} from "@angular/forms";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {List} from "immutable";
+import {MetadataBuilder} from "../../classes/Metadata";
+import {AbstractMetadataService, MetadataService} from "../../services/MetadataService";
 
 @Injectable()
 class DataServiceMock extends AbstractDataService {}
 
 describe('TransformerPropertySelectorComponent', () => {
   let dataService: DataServiceMock;
+  let metadataService: MetadataService;
   let component: TransformerPropertySelectorComponent;
   let fixture: ComponentFixture<TransformerPropertySelectorComponent>;
   let el: HTMLElement;
+
+  const testMetadata = new MetadataBuilder()
+    .withAnalytic()
+      .Name("Analytic1")
+      .withProperty()
+        .Name('decimalProperty_required')
+        .Description('decimalPropertyDescription')
+        .Type('decimal')
+        .Optional(false)
+        .endWith()
+      .withProperty()
+        .Name('integerProperty_required')
+        .Description('integerPropertyDescription')
+        .Type('integer')
+        .Optional(false)
+        .endWith()
+      .withProperty()
+        .Name('floatProperty_required')
+        .Description('floatPropertyDescription')
+        .Type('float')
+        .Optional(false)
+        .endWith()
+      .withProperty()
+        .Name('booleanProperty_required')
+        .Description('booleanPropertyDescription')
+        .Type('boolean')
+        .Optional(false)
+        .endWith()
+      .withProperty()
+        .Name('stringProperty_required')
+        .Description('stringPropertyDescription')
+        .Type('string')
+        .Optional(false)
+        .endWith()
+      .withProperty()
+        .Name('decimalProperty_optional')
+        .Description('decimalPropertyDescription')
+        .Type('decimal')
+        .Optional(true)
+        .endWith()
+      .withProperty()
+        .Name('integerProperty_optional')
+        .Description('integerPropertyDescription')
+        .Type('integer')
+        .Optional(true)
+        .endWith()
+      .withProperty()
+        .Name('floatProperty_optional')
+        .Description('floatPropertyDescription')
+        .Type('float')
+        .Optional(true)
+        .endWith()
+      .withProperty()
+        .Name('booleanProperty_optional')
+        .Description('booleanPropertyDescription')
+        .Type('boolean')
+        .Optional(true)
+        .endWith()
+      .withProperty()
+        .Name('stringProperty_optional')
+        .Description('stringPropertyDescription')
+        .Type('string')
+        .Optional(true)
+        .endWith()
+      .endWith()
+    .build();
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ TransformerPropertySelectorComponent ],
       providers: [
-        {provide: AbstractDataService, useClass: DataServiceMock}
+        {provide: AbstractDataService, useClass: DataServiceMock},
+        {provide: AbstractMetadataService, useClass: MetadataService},
       ],
       imports: [
         FormsModule,
         NgbModule.forRoot()
       ]
-
     }).compileComponents();
   }));
 
   beforeEach(() => {
     dataService = TestBed.get(AbstractDataService) as DataServiceMock;
+    metadataService = TestBed.get(AbstractMetadataService) as MetadataService;
     fixture = TestBed.createComponent(TransformerPropertySelectorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -42,9 +112,23 @@ describe('TransformerPropertySelectorComponent', () => {
   });
 
   it('should create transformer property elements', () => {
+    const transformer = new TransformerBuilder()
+      .Name("Analytic1")
+      .withPropertyValue().NameAndDef('decimalProperty_required').Value(2.0).endWith()
+      .withPropertyValue().NameAndDef('integerProperty_required').Value(5).endWith()
+      .withPropertyValue().NameAndDef('floatProperty_required').Value(5).endWith()
+      .withPropertyValue().NameAndDef('booleanProperty_required').Value(true).endWith()
+      .withPropertyValue().NameAndDef('stringProperty_required').Value("Test String").endWith()
+      .withPropertyValue().NameAndDef('decimalProperty_optional').endWith()
+      .withPropertyValue().NameAndDef('integerProperty_optional').endWith()
+      .withPropertyValue().NameAndDef('floatProperty_optional').endWith()
+      .withPropertyValue().NameAndDef('booleanProperty_optional').endWith()
+      .withPropertyValue().NameAndDef('stringProperty_optional') .endWith()
+      .build();
 
-    const transformer = getTransformer();
+    metadataService.metadata.next(testMetadata);
     dataService.selectedTransformer.next(transformer);
+
     fixture.detectChanges();
 
     // Check that all of the transformer properties have rendered into the DOM
@@ -52,77 +136,7 @@ describe('TransformerPropertySelectorComponent', () => {
 
     // Get the data so we can compare it against the DOM elements
     Array.from(el.querySelectorAll('h6')).forEach((transformerPropertyEl, i) => {
-      expect(transformerPropertyEl.textContent).toEqual(transformer.properties.get(i).name);
+      expect(transformerPropertyEl.textContent).toEqual(testMetadata.getAnalytic("Analytic1").properties.get(i).name);
     });
   });
 });
-
-function getTransformer(): Transformer {
-  return new TransformerBuilder()
-    .withPopulatedProperty()
-      .Name('decimalProperty_required')
-      .Description('decimalPropertyDescription')
-      .Type('decimal')
-      .Optional(false)
-      .Value(2.0)
-      .endWith()
-    .withPopulatedProperty()
-      .Name('integerProperty_required')
-      .Description('integerPropertyDescription')
-      .Type('integer')
-      .Optional(false)
-      .Value(5)
-      .endWith()
-    .withPopulatedProperty()
-      .Name('floatProperty_required')
-      .Description('floatPropertyDescription')
-      .Type('float')
-      .Optional(false)
-      .Value(5)
-      .endWith()
-    .withPopulatedProperty()
-      .Name('booleanProperty_required')
-      .Description('booleanPropertyDescription')
-      .Type('boolean')
-      .Optional(false)
-      .Value(true)
-      .endWith()
-    .withPopulatedProperty()
-      .Name('stringProperty_required')
-      .Description('stringPropertyDescription')
-      .Type('string')
-      .Optional(false)
-      .Value("Test String")
-      .endWith()
-    .withProperty()
-      .Name('decimalProperty_optional')
-      .Description('decimalPropertyDescription')
-      .Type('decimal')
-      .Optional(true)
-      .endWith()
-    .withProperty()
-      .Name('integerProperty_optional')
-      .Description('integerPropertyDescription')
-      .Type('integer')
-      .Optional(true)
-      .endWith()
-    .withProperty()
-      .Name('floatProperty_optional')
-      .Description('floatPropertyDescription')
-      .Type('float')
-      .Optional(true)
-      .endWith()
-    .withProperty()
-      .Name('booleanProperty_optional')
-      .Description('booleanPropertyDescription')
-      .Type('boolean')
-      .Optional(true)
-      .endWith()
-    .withProperty()
-      .Name('stringProperty_optional')
-      .Description('stringPropertyDescription')
-      .Type('string')
-      .Optional(true)
-      .endWith()
-    .build()
-}

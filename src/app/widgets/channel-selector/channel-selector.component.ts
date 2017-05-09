@@ -1,6 +1,6 @@
 import {Component, ElementRef, OnInit} from "@angular/core";
 import * as d3 from "d3";
-import {Channel} from "../../classes/Channel";
+import {RowChannel} from "../../classes/Channel";
 import {AbstractDataService} from "../../services/AbstractDataService";
 import {Observable} from "rxjs";
 import {List} from "immutable";
@@ -13,7 +13,7 @@ import {AbstractDragService} from "../../services/AbstractDragService";
 })
 export class ChannelSelectorComponent implements OnInit {
   readonly nativeElement;
-  readonly channels: Observable<List<Channel>>;
+  readonly channels: Observable<List<RowChannel>>;
   readonly dataService : AbstractDataService;
   readonly dragService: AbstractDragService;
 
@@ -39,7 +39,7 @@ export class ChannelSelectorComponent implements OnInit {
     const container = svg.append("g")
       .attr("transform", `translate(${padding.left},${padding.top})`);
 
-    this.channels.subscribe((channels: List<Channel>) => {
+    this.channels.subscribe((channels: List<RowChannel>) => {
       const groups = container.selectAll(".channel").data(channels.toArray());
       groups.exit().remove();
       const groupsEnter = groups.enter().append("g")
@@ -70,7 +70,7 @@ export class ChannelSelectorComponent implements OnInit {
 
       groupsUpdate.select('text')
         .classed('unselectable', true)
-        .text((d: Channel) => d.name.getValue());
+        .text((d: RowChannel) => d.name.getValue());
     })
   }
 

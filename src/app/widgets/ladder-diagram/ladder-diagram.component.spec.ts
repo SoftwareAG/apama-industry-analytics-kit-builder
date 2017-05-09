@@ -11,6 +11,8 @@ import {NestedRowBuilder, RowBuilder} from "app/classes/Row";
 import {DragService} from "app/services/DragService";
 import {TransformerChannelDef} from "../../classes/TransformerChannelDef";
 import {TestUtils} from "../../services/TestUtil.spec";
+import {AbstractMetadataService, MetadataService} from "../../services/MetadataService";
+import {Metadata, MetadataBuilder} from "../../classes/Metadata";
 
 @Injectable()
 class DataServiceMock extends AbstractDataService {}
@@ -21,13 +23,47 @@ describe('LadderDiagramComponent', () => {
   let el: HTMLElement;
   let dataService: DataServiceMock;
   let dragService: DragService;
+  let metadataService: MetadataService;
+
+  const testMetadata = new MetadataBuilder()
+    .withAnalytic()
+      .Name('Analytic1')
+      .withInputChannel().Name("Analytic1:In1").endWith()
+      .withOutputChannel().Name("Analytic1:Out1").endWith()
+      .endWith()
+    .withAnalytic()
+      .Name('Analytic2')
+      .withInputChannel().Name("Analytic2:In1").endWith()
+      .withOutputChannel().Name("Analytic2:Out1").endWith()
+      .endWith()
+    .withAnalytic()
+      .Name('Analytic3')
+      .withInputChannel().Name("Analytic3:In1").endWith()
+      .withInputChannel().Name("Analytic3:In2").endWith()
+      .withOutputChannel().Name("Analytic3:Out1").endWith()
+      .endWith()
+    .withAnalytic()
+      .Name('Analytic4')
+      .withInputChannel().Name("Analytic3:In1").endWith()
+      .withOutputChannel().Name("Analytic3:Out1").endWith()
+      .withOutputChannel().Name("Analytic3:Out2").endWith()
+      .endWith()
+    .withAnalytic()
+      .Name('Analytic5')
+      .withInputChannel().Name("Analytic5:In1").endWith()
+      .withInputChannel().Name("Analytic5:In2").endWith()
+      .withOutputChannel().Name("Analytic5:Out1").endWith()
+      .withOutputChannel().Name("Analytic5:Out2").endWith()
+      .endWith()
+    .build();
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ LadderDiagramComponent ],
       providers: [
         {provide: AbstractDataService, useClass: DataServiceMock},
-        {provide: AbstractDragService, useClass: DragService}
+        {provide: AbstractDragService, useClass: DragService},
+        {provide: AbstractMetadataService, useClass: MetadataService},
       ]
     })
     .compileComponents();
@@ -36,6 +72,7 @@ describe('LadderDiagramComponent', () => {
   beforeEach(() => {
     dataService = TestBed.get(AbstractDataService) as DataServiceMock;
     dragService = TestBed.get(AbstractDragService) as DragService;
+    metadataService = TestBed.get(AbstractMetadataService) as MetadataService;
     fixture = TestBed.createComponent(LadderDiagramComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -66,33 +103,42 @@ describe('LadderDiagramComponent', () => {
       let rowBuilder = new ConfigBuilder().withRow()
         .MaxTransformerCount(4);
       for (let j = 0; j < i; j++) {
-        rowBuilder = rowBuilder.withTransformer().Name(`Transformer${j}`).endWith();
+        rowBuilder = rowBuilder.withTransformer().Name('Analytic1').endWith();
       }
       const config: Config = rowBuilder.endWith().build();
 
+      metadataService.metadata.next(testMetadata);
       dataService.hierarchy.next(config);
       fixture.detectChanges();
 
       const transformers = Array.from(el.querySelectorAll('.rows')[0].querySelectorAll('.transformers > .transformer'));
       expect(transformers).toBeArrayOfSize(i);
-      transformers.forEach((transformer, z) => {
-        expect(transformer.querySelectorAll('text')[0].textContent).toEqual(`Transformer${z}`);
-      });
+      transformers.forEach(transformer => {
+        expect(transformer.querySelectorAll('text')[0].textContent).toEqual('Analytic1');
+      })
     }
   });
 
   describe('should create correct number of inputChannels', () => {
     for(let i = 0; i < 5; i++) {
       it(`InputChannels: ${i}`, () => {
-        let transformerBuilder = new ConfigBuilder().withRow()
-          .MaxTransformerCount(4)
-          .withTransformer();
-        for (let j = 0; j < i; j++) {
-          transformerBuilder = transformerBuilder.withInputChannel().Name(`InChannel${j}`).endWith();
-        }
-        const config: Config = transformerBuilder.endWith().endWith().build();
+        let transformerDefBuilder = new MetadataBuilder()
+          .withAnalytic().Name('Analytic1');
 
-        dataService.hierarchy.next(config);
+        for (let j = 0; j < i; j++) {
+          transformerDefBuilder = transformerDefBuilder.withInputChannel().Name(`InChannel${j}`).endWith();
+        }
+        const metadata: Metadata = transformerDefBuilder.endWith().build();
+
+        metadataService.metadata.next(metadata);
+
+        dataService.hierarchy.next(new ConfigBuilder()
+          .withRow()
+            .MaxTransformerCount(4)
+            .withTransformer().Name('Analytic1').endWith()
+            .endWith()
+          .build()
+        );
         fixture.detectChanges();
 
         const inChannels = Array.from(el.querySelectorAll('.channels > .inChannel'));
@@ -107,15 +153,23 @@ describe('LadderDiagramComponent', () => {
   describe('should create correct number of outputChannels', () => {
     for(let i = 0; i < 5; i++) {
       it(`OutputChannels: ${i}`, () => {
-        let transformerBuilder = new ConfigBuilder().withRow()
-          .MaxTransformerCount(4)
-          .withTransformer();
-        for (let j = 0; j < i; j++) {
-          transformerBuilder = transformerBuilder.withOutputChannel().Name(`OutChannel${j}`).endWith();
-        }
-        const config: Config = transformerBuilder.endWith().endWith().build();
+        let transformerDefBuilder = new MetadataBuilder()
+          .withAnalytic().Name('Analytic1');
 
-        dataService.hierarchy.next(config);
+        for (let j = 0; j < i; j++) {
+          transformerDefBuilder = transformerDefBuilder.withOutputChannel().Name(`OutChannel${j}`).endWith();
+        }
+        const metadata: Metadata = transformerDefBuilder.endWith().build();
+
+        metadataService.metadata.next(metadata);
+
+        dataService.hierarchy.next(new ConfigBuilder()
+          .withRow()
+            .MaxTransformerCount(4)
+            .withTransformer().Name('Analytic1').endWith()
+            .endWith()
+          .build()
+        );
         fixture.detectChanges();
 
         const outChannels = Array.from(el.querySelectorAll('.channels > .outChannel'));
@@ -130,9 +184,9 @@ describe('LadderDiagramComponent', () => {
   describe('should correctly create placeholder and user-defined channel endpoints', () => {
     for(let i = 0; i < 5; i++) {
       it(`OutputChannels: ${i}`, () => {
-        let rowBuilder = new ConfigBuilder().withRow()
-          .MaxTransformerCount(4)
-          .withTransformer()
+        const metadata = new MetadataBuilder()
+          .withAnalytic()
+            .Name('Analytic1')
             .withInputChannel().Name('InChannel0').endWith()
             .withInputChannel().Name('InChannel1').endWith()
             .withInputChannel().Name('InChannel2').endWith()
@@ -143,18 +197,19 @@ describe('LadderDiagramComponent', () => {
             .withOutputChannel().Name('OutChannel2').endWith()
             .withOutputChannel().Name('OutChannel3').endWith()
             .withOutputChannel().Name('OutChannel4').endWith()
-            .endWith();
-        for (let j = 0; j < 5; j++) {
-          if (j == i) {
-            rowBuilder = rowBuilder.withInputChannel().Name('UserIn').endWith();
-            rowBuilder = rowBuilder.withOutputChannel().Name('UserOut').endWith();
-          } else {
-            rowBuilder = rowBuilder.pushInputChannel(undefined);
-            rowBuilder = rowBuilder.pushOutputChannel(undefined);
-          }
-        }
-        const config: Config = rowBuilder.endWith().build();
+            .endWith()
+          .build();
 
+        const config: Config = new ConfigBuilder()
+          .withRow()
+            .MaxTransformerCount(4)
+            .withTransformer().Name('Analytic1').endWith()
+            .withInputChannel(i).Name('UserIn').endWith()
+            .withOutputChannel(i).Name('UserOut').endWith()
+            .endWith()
+          .build();
+
+        metadataService.metadata.next(metadata);
         dataService.hierarchy.next(config);
         fixture.detectChanges();
 
@@ -176,37 +231,42 @@ describe('LadderDiagramComponent', () => {
   });
 
   it('should correctly handle a complex config', () => {
+    const metadata = new MetadataBuilder()
+      .withAnalytic()
+        .Name('Analytic1')
+        .withInputChannel().Name("Analytic1:In1").endWith()
+        .withOutputChannel().Name("Analytic1:Out1").endWith()
+        .endWith()
+      .withAnalytic()
+        .Name('Analytic2')
+        .withInputChannel().Name("Analytic2:In1").endWith()
+        .withOutputChannel().Name("Analytic2:Out1").endWith()
+        .endWith()
+      .withAnalytic()
+        .Name('Analytic3')
+        .withInputChannel().Name("Analytic3:In1").endWith()
+        .withInputChannel().Name("Analytic3:In2").endWith()
+        .withInputChannel().Name("Analytic3:In3").endWith()
+        .withOutputChannel().Name("Analytic3:Out1").endWith()
+        .endWith()
+      .build();
+
     const config = new ConfigBuilder()
       .withRow()
         .MaxTransformerCount(3)
-        .withInputChannel().Name("hello").endWith()
-        .withOutputChannel().Name("goodbye").endWith()
-        .withTransformer()
-          .Name("MyFirstAnalytic")
-          .withInputChannel().Name("MyFirstAnalytic:In1").endWith()
-          .withOutputChannel().Name("MyFirstAnalytic:Out1").endWith()
-        .endWith()
-        .withTransformer()
-          .Name("MySecondAnalytic")
-          .withInputChannel().Name("MySecondAnalytic:In1").endWith()
-          .withOutputChannel().Name("MySecondAnalytic:Out1").endWith()
-        .endWith()
+        .withInputChannel(0).Name("hello").endWith()
+        .withOutputChannel(0).Name("goodbye").endWith()
+        .withTransformer().Name("Analytic1").endWith()
+        .withTransformer().Name("Analytic2").endWith()
       .endWith()
       .withRow()
         .MaxTransformerCount(3)
-        .pushInputChannel(undefined)
-        .pushInputChannel(undefined)
-        .withInputChannel().Name("hello").endWith()
-        .withTransformer()
-          .Name("MyThirdAnalytic")
-          .withInputChannel().Name("MyThirdAnalytic:In1").endWith()
-          .withInputChannel().Name("MyThirdAnalytic:In2").endWith()
-          .withInputChannel().Name("MyThirdAnalytic:In3").endWith()
-          .withOutputChannel().Name("MyThirdAnalytic:Out1").endWith()
-        .endWith()
+        .withInputChannel(2).Name("hello").endWith()
+        .withTransformer().Name("Analytic3").endWith()
       .endWith()
       .build();
 
+    metadataService.metadata.next(metadata);
     dataService.hierarchy.next(config);
     fixture.detectChanges();
 
@@ -217,8 +277,8 @@ describe('LadderDiagramComponent', () => {
     const row0transformers = Array.from(row0.querySelectorAll('.transformers > .transformer'));
     expect(row0transformers).toBeArrayOfSize(2);
 
-    expect(row0transformers[0].querySelectorAll('text')[0].textContent).toEqual('MyFirstAnalytic');
-    expect(row0transformers[1].querySelectorAll('text')[0].textContent).toEqual('MySecondAnalytic');
+    expect(row0transformers[0].querySelectorAll('text')[0].textContent).toEqual('Analytic1');
+    expect(row0transformers[1].querySelectorAll('text')[0].textContent).toEqual('Analytic2');
 
     expect(Array.from(row0.querySelectorAll('.channels > .inChannel'))).toBeArrayOfSize(1);
     expect(Array.from(row0.querySelectorAll('.channels > .outChannel'))).toBeArrayOfSize(1);
@@ -228,7 +288,7 @@ describe('LadderDiagramComponent', () => {
     const row1transformers = Array.from(row1.querySelectorAll('.transformers > .transformer'));
     expect(row1transformers).toBeArrayOfSize(1);
 
-    expect(row1transformers[0].querySelectorAll('text')[0].textContent).toEqual('MyThirdAnalytic');
+    expect(row1transformers[0].querySelectorAll('text')[0].textContent).toEqual('Analytic3');
 
     expect(Array.from(row1.querySelectorAll('.channels > .inChannel'))).toBeArrayOfSize(3);
     expect(Array.from(row1.querySelectorAll('.channels > .outChannel'))).toBeArrayOfSize(1);
@@ -244,13 +304,12 @@ describe('LadderDiagramComponent', () => {
       .withRow()
         .MaxTransformerCount(3)
         .withTransformer()
-          .Name("My First Analytic")
-          .withInputChannel().Name("Input Channel 1").endWith()
-          .withOutputChannel().Name("Output Channel 1").endWith()
+          .Name("Analytic1")
         .endWith()
       .endWith()
       .build();
 
+    metadataService.metadata.next(testMetadata);
     dataService.hierarchy.next(config);
     fixture.detectChanges();
 
@@ -259,14 +318,10 @@ describe('LadderDiagramComponent', () => {
       .Description("This configuration demonstrates a single row with a single Analytic containing two input channels and two output channels")
       .withRow()
         .MaxTransformerCount(3)
-        .withInputChannel().Name("OverriddenInput").endWith()
-        .withOutputChannel().Name("OverriddenOutput").endWith()
+        .withInputChannel(0).Name("OverriddenInput").endWith()
+        .withOutputChannel(0).Name("OverriddenOutput").endWith()
         .withTransformer()
-          .Name("My Second Analytic")
-          .withInputChannel().Name("InChannel0").endWith()
-          .withOutputChannel().Name("OutChannel0").endWith()
-          .withInputChannel().Name("InChannel1").endWith()
-          .withOutputChannel().Name("OutChannel1").endWith()
+          .Name("Analytic5")
         .endWith()
       .endWith()
       .build();
@@ -279,18 +334,18 @@ describe('LadderDiagramComponent', () => {
     expect(Array.from(inChannels[0].querySelectorAll('.placeholder-channel'))).toBeEmptyArray();
     expect(Array.from(inChannels[1].querySelectorAll('.placeholder-channel'))).toBeArrayOfSize(1);
     expect(inChannels[0].querySelectorAll('text')[0].textContent).toEqual(`OverriddenInput`);
-    expect(inChannels[1].querySelectorAll('text')[0].textContent).toEqual(`InChannel1`);
+    expect(inChannels[1].querySelectorAll('text')[0].textContent).toEqual(`Analytic5:In2`);
 
     const outChannels = Array.from(el.querySelectorAll('.channels > .outChannel'));
     expect(outChannels).toBeArrayOfSize(2);
     expect(Array.from(outChannels[0].querySelectorAll('.placeholder-channel'))).toBeEmptyArray();
     expect(Array.from(outChannels[1].querySelectorAll('.placeholder-channel'))).toBeArrayOfSize(1);
     expect(outChannels[0].querySelectorAll('text')[0].textContent).toEqual(`OverriddenOutput`);
-    expect(outChannels[1].querySelectorAll('text')[0].textContent).toEqual(`OutChannel1`);
+    expect(outChannels[1].querySelectorAll('text')[0].textContent).toEqual(`Analytic5:Out2`);
 
     const transformerName = Array.from(el.querySelectorAll('.transformer > text'));
     expect(transformerName).toBeArrayOfSize(1);
-    expect(transformerName[0].textContent).toEqual("My Second Analytic");
+    expect(transformerName[0].textContent).toEqual("Analytic5");
 
   });
 
@@ -300,42 +355,28 @@ describe('LadderDiagramComponent', () => {
         description: "RowSize: 1, Transformers: 1",
         setup: (row: RowBuilder): RowBuilder => {
           return row.MaxTransformerCount(1)
-            .withTransformer()
-              .withInputChannel().endWith()
-              .withOutputChannel().endWith()
-            .endWith()
+            .withTransformer().Name("Analytic1").endWith()
         },
         dropTargetCount: 0,
       },{
         description: "RowSize: 2, Transformers: 1",
         setup: (row: RowBuilder): RowBuilder => {
           return row.MaxTransformerCount(2)
-            .withTransformer()
-              .withInputChannel().endWith()
-              .withOutputChannel().endWith()
-            .endWith()
+            .withTransformer().Name("Analytic1").endWith()
         },
         dropTargetCount: 2
       },{
         description: "RowSize: 2, Transformers: 1 (Multiple Inputs)",
         setup: (row: RowBuilder): RowBuilder => {
           return row.MaxTransformerCount(2)
-            .withTransformer()
-              .withInputChannel().endWith()
-              .withInputChannel().endWith()
-              .withOutputChannel().endWith()
-            .endWith()
+            .withTransformer().Name("Analytic3").endWith()
         },
         dropTargetCount: 0
       },{
         description: "RowSize: 2, Transformers: 1 (Multiple Outputs)",
         setup: (row: RowBuilder): RowBuilder => {
           return row.MaxTransformerCount(2)
-            .withTransformer()
-              .withInputChannel().endWith()
-              .withOutputChannel().endWith()
-              .withOutputChannel().endWith()
-            .endWith()
+            .withTransformer().Name("Analytic4").endWith()
         },
         dropTargetCount: 0
       }
@@ -343,12 +384,13 @@ describe('LadderDiagramComponent', () => {
       it(testCase.description + ', DropTargets: ' + testCase.dropTargetCount, () => {
         const config = (testCase.setup(new ConfigBuilder().withRow()) as NestedRowBuilder<ConfigBuilder>).endWith().build();
 
+        metadataService.metadata.next(testMetadata);
         dataService.hierarchy.next(config);
         fixture.detectChanges();
 
         // Create a temporary dom element and transformer to simulate that one has been dragged
         const dragEl = TestUtils.withTempSvg().append('rect').attr('width', 100).attr('height', 100).node() as SVGRectElement;
-        dragService.startDrag({ sourceElement: dragEl, object: new TransformerBuilder().withInputChannel().endWith().withOutputChannel().endWith().build() });
+        dragService.startDrag({ sourceElement: dragEl, object: new TransformerBuilder().Name("Analytic1").build() });
 
         fixture.detectChanges();
 
@@ -364,17 +406,18 @@ describe('LadderDiagramComponent', () => {
         const config = new ConfigBuilder()
           .withRow()
             .MaxTransformerCount(3)
-            .withTransformer().withInputChannel().endWith().withOutputChannel().endWith().endWith()
-            .withTransformer().withInputChannel().endWith().withOutputChannel().endWith().endWith()
+            .withTransformer().Name("Analytic1").endWith()
+            .withTransformer().Name("Analytic1").endWith()
           .endWith()
           .build();
 
+        metadataService.metadata.next(testMetadata);
         dataService.hierarchy.next(config);
         fixture.detectChanges();
 
         // Create a temporary dom element and transformer to simulate that one has been dragged
         const dragEl = TestUtils.withTempSvg().append('rect').attr('width', 100).attr('height', 100).node() as SVGRectElement;
-        const dragTransformer = new TransformerBuilder().withInputChannel().endWith().withOutputChannel().endWith().build();
+        const dragTransformer = new TransformerBuilder().Name("Analytic1").build();
         dragService.startDrag({ sourceElement: dragEl, object: dragTransformer });
 
         fixture.detectChanges();
@@ -406,12 +449,13 @@ describe('LadderDiagramComponent', () => {
     const config = new ConfigBuilder()
       .withRow()
         .MaxTransformerCount(3)
-        .withTransformer().withInputChannel().endWith().withOutputChannel().endWith().endWith()
-        .withTransformer().withInputChannel().endWith().withOutputChannel().endWith().endWith()
-        .withTransformer().withInputChannel().endWith().withOutputChannel().endWith().endWith()
+        .withTransformer().Name("Analytic1").endWith()
+        .withTransformer().Name("Analytic1").endWith()
+        .withTransformer().Name("Analytic1").endWith()
       .endWith()
       .build();
 
+    metadataService.metadata.next(testMetadata);
     dataService.hierarchy.next(config);
     fixture.detectChanges();
 
@@ -468,10 +512,11 @@ describe('LadderDiagramComponent', () => {
     const config = new ConfigBuilder()
       .withRow()
         .MaxTransformerCount(1)
-        .withTransformer().withInputChannel().endWith().withOutputChannel().endWith().endWith()
+        .withTransformer().Name("Analytic1").endWith()
       .endWith()
       .build();
 
+    metadataService.metadata.next(testMetadata);
     dataService.hierarchy.next(config);
     fixture.detectChanges();
 
@@ -533,15 +578,22 @@ describe('LadderDiagramComponent', () => {
       },
     ].forEach((testCase) => {
       it(testCase.description, () => {
+        const rowBuilder = new RowBuilder()
+          .MaxTransformerCount(1)
+          .withTransformer().Name("Analytic1").endWith();
+
+        if (testCase.inputChannel) {
+          rowBuilder.pushInputChannel({0: testCase.inputChannel})
+        }
+        if (testCase.outputChannel) {
+          rowBuilder.pushOutputChannel({0: testCase.outputChannel})
+        }
+
         const config = new ConfigBuilder()
-          .withRow()
-            .MaxTransformerCount(1)
-            .pushInputChannel(testCase.inputChannel)
-            .pushOutputChannel(testCase.outputChannel)
-            .withTransformer().withInputChannel().endWith().withOutputChannel().endWith().endWith()
-          .endWith()
+          .pushRow(rowBuilder.build())
           .build();
 
+        metadataService.metadata.next(testMetadata);
         dataService.hierarchy.next(config);
         fixture.detectChanges();
 

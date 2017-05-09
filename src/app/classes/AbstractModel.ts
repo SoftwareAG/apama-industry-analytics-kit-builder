@@ -1,7 +1,7 @@
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {List} from "immutable";
 
-export abstract class AbstractModel<JsonModel> {
+export abstract class AbstractModel<JsonModel, Definition> {
   toJson(): JsonModel {
     return Object.keys(this).reduce((result, key) => {
       let value = this[key];
@@ -13,7 +13,7 @@ export abstract class AbstractModel<JsonModel> {
           if (val instanceof AbstractModel) {
             return val.toJson();
           } else {
-            console.error(`Can't convert nested value of type: ${typeof val}, it's not an AbstractModel`)
+            return val;
           }
         })
       } else {
@@ -22,4 +22,6 @@ export abstract class AbstractModel<JsonModel> {
       return result;
     }, {}) as JsonModel;
   }
+
+  abstract validate(def?: Definition): this;
 }

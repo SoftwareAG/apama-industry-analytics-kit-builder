@@ -11,7 +11,7 @@ export interface ChannelInterface {
   name: string;
 }
 
-export class Channel extends AbstractModel<ChannelJsonInterface> implements AsObservable, BehaviorSubjectify<ChannelInterface> {
+export class RowChannel extends AbstractModel<ChannelJsonInterface, never> implements AsObservable, BehaviorSubjectify<ChannelInterface> {
   readonly name: BehaviorSubject<string>;
 
   constructor(obj: ChannelInterface) {
@@ -24,9 +24,13 @@ export class Channel extends AbstractModel<ChannelJsonInterface> implements AsOb
       this.name
     ).mapTo(this);
   }
+
+  validate(): this {
+    return this;
+  }
 }
 
-export class ChannelBuilder extends ClassBuilder<Channel> implements ChannelInterface {
+export class ChannelBuilder extends ClassBuilder<RowChannel> implements ChannelInterface {
   name: string;
 
   Name(name: string): this {
@@ -34,8 +38,8 @@ export class ChannelBuilder extends ClassBuilder<Channel> implements ChannelInte
     return this
   }
 
-  build(): Channel {
-    return new Channel(this);
+  build(): RowChannel {
+    return new RowChannel(this);
   }
 
   static fromJson(json: ChannelJsonInterface) {
@@ -45,7 +49,7 @@ export class ChannelBuilder extends ClassBuilder<Channel> implements ChannelInte
 }
 
 export class NestedChannelBuilder<Parent> extends ChannelBuilder implements NestedClassBuilder<Parent> {
-  constructor(private callback: (channel: Channel) => Parent) {
+  constructor(private callback: (channel: RowChannel) => Parent) {
     super();
   }
 
@@ -54,7 +58,7 @@ export class NestedChannelBuilder<Parent> extends ChannelBuilder implements Nest
   }
 }
 
-export class ChannelArrayBuilder extends ClassArrayBuilder<Channel, NestedChannelBuilder<ChannelArrayBuilder>> {
+export class ChannelArrayBuilder extends ClassArrayBuilder<RowChannel, NestedChannelBuilder<ChannelArrayBuilder>> {
   constructor() {
     super(NestedChannelBuilder);
   }

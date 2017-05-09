@@ -15,7 +15,7 @@ export interface TransformerChannelDefInterface {
   optional: boolean;
 }
 
-export class TransformerChannelDef extends AbstractModel<TransformerChannelDefJsonInterface> {
+export class TransformerChannelDef extends AbstractModel<TransformerChannelDefJsonInterface, never> {
   readonly name: string;
   readonly description: string;
   readonly repeated: boolean;
@@ -27,6 +27,11 @@ export class TransformerChannelDef extends AbstractModel<TransformerChannelDefJs
     this.description = obj.description;
     this.repeated = obj.repeated;
     this.optional = obj.optional;
+  }
+
+  validate(): this {
+    //TODO: do some validation
+    return this;
   }
 }
 

@@ -6,7 +6,7 @@ import {
   TransformerChannelDefBuilder,
   TransformerChannelDefJsonInterface
 } from "./TransformerChannelDef";
-import {List} from "immutable";
+import {List, OrderedMap} from "immutable";
 import {AbstractModel} from "./AbstractModel";
 
 export interface TransformerDefJsonInterface {
@@ -29,14 +29,17 @@ export interface TransformerDefInterface {
   outputChannels: TransformerChannelDef[];
 }
 
-export class TransformerDef extends AbstractModel<TransformerDefJsonInterface> {
+export class TransformerDef extends AbstractModel<TransformerDefJsonInterface, never> {
   readonly name: string;
   readonly description: string;
   readonly group: string;
   readonly documentation: string;
-  readonly properties: List<PropertyDef>;
-  readonly inputChannels: List<TransformerChannelDef>;
-  readonly outputChannels: List<TransformerChannelDef>;
+  readonly propertiesByName: OrderedMap<string, PropertyDef>;
+  readonly inputChannelsByName: OrderedMap<string, TransformerChannelDef>;
+  readonly outputChannelsByName: OrderedMap<string, TransformerChannelDef>;
+  get properties(){ return List(this.propertiesByName.valueSeq()) };
+  get inputChannels(){ return List(this.inputChannelsByName.valueSeq()) };
+  get outputChannels(){ return List(this.outputChannelsByName.valueSeq()) };
 
   constructor(obj: TransformerDefInterface) {
     super();
@@ -44,9 +47,38 @@ export class TransformerDef extends AbstractModel<TransformerDefJsonInterface> {
     this.description = obj.description;
     this.group = obj.group;
     this.documentation = obj.documentation;
-    this.properties = List(obj.properties);
-    this.inputChannels = List(obj.inputChannels);
-    this.outputChannels = List(obj.outputChannels);
+    this.propertiesByName = OrderedMap<string, PropertyDef>(obj.properties.map(prop => [prop.name, prop]));
+    this.inputChannelsByName = OrderedMap<string, TransformerChannelDef>(obj.inputChannels.map(chan => [chan.name, chan]));
+    this.outputChannelsByName = OrderedMap<string, TransformerChannelDef>(obj.outputChannels.map(chan => [chan.name, chan]));
+  }
+
+  toJson(): TransformerDefJsonInterface {
+    return {
+      name: this.name,
+      description: this.description,
+      group: this.group,
+      documentation: this.documentation,
+      properties: this.properties.toArray().map(prop => prop.toJson()),
+      inputChannels: this.inputChannels.toArray().map(chan => chan.toJson()),
+      outputChannels: this.outputChannels.toArray().map(chan => chan.toJson())
+    }
+  }
+
+  validate(): this {
+    //TODO: do some validation
+    return this;
+  }
+
+  getProperty(name: string): PropertyDef {
+    return this.propertiesByName.get(name);
+  }
+
+  getInputChannel(name: string): TransformerChannelDef {
+    return this.inputChannelsByName.get(name);
+  }
+
+  getOutputChannel(name: string): TransformerChannelDef {
+    return this.outputChannelsByName.get(name);
   }
 }
 

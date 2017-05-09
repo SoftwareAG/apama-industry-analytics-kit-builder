@@ -6,6 +6,7 @@ import {List} from "immutable";
 import {PropertyDef} from "../../classes/PropertyDef";
 import {Transformer} from "../../classes/Transformer";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {AbstractMetadataService} from "../../services/MetadataService";
 
 @Component({
   selector: 'transformer-property-selector',
@@ -17,34 +18,31 @@ export class TransformerPropertySelectorComponent implements OnInit {
   readonly transformerProperties: Observable<List<{definition: PropertyDef, values: List<Property>}>>;
   readonly selectedTransformer: BehaviorSubject<Transformer | undefined>;
 
-
-
-  constructor(dataService: AbstractDataService) {
+  constructor(dataService: AbstractDataService, metadataService: AbstractMetadataService) {
     this.selectedTransformer = dataService.selectedTransformer;
+    const metadata = metadataService.metadata;
 
-    this.transformerProperties = this.selectedTransformer
-      .map(transformer => transformer ? transformer.properties : List<PropertyDef>())
+    this.transformerProperties = this.selectedTransformer // Track the selectedTransformer changes
+      .switchMap((selectedTransformer) => selectedTransformer ? selectedTransformer.propertyValuesByDefName.mapTo(selectedTransformer) : Observable.of(undefined)) // Track additions/removals from the propertyValues Map
       .combineLatest(
-        this.selectedTransformer.switchMap(transformer => transformer ? transformer.propertyValues : Observable.of(List<Property>())),
-        (propertyDefs, propertyVals) => {
-          return propertyDefs.map((propertyDef: PropertyDef) => {
-            return { definition: propertyDef, values: propertyVals.filter((propertyVal: Property) => propertyVal.definitionName === propertyDef.name) };
-          })
-        }
-      );
+        metadata,
+        (selectedTransformer, metadata) => selectedTransformer ? metadata.getAnalytic(selectedTransformer.name).properties.map((propertyDef: PropertyDef) => {
+          return { definition: propertyDef, values: selectedTransformer.getPropertyValues(propertyDef.name) }
+        }) : List()
+      )
   }
 
   addPropertyValue(propertyDef) {
     const selectedTransformer = this.selectedTransformer.getValue();
     if (selectedTransformer) {
-      selectedTransformer.propertyValues.next(selectedTransformer.propertyValues.getValue().push(PropertyBuilder.fromPropertyDefBuilder(propertyDef).build()))
+      selectedTransformer.addPropertyValue(propertyDef.name, PropertyBuilder.fromPropertyDefBuilder(propertyDef).build());
     }
   }
 
   removePropertyValue(property: Property) {
     const selectedTransformer = this.selectedTransformer.getValue();
     if (selectedTransformer) {
-      selectedTransformer.propertyValues.next(selectedTransformer.propertyValues.getValue().filter(p => p !== property) as List<Property>)
+      selectedTransformer.removePropertyValue(property)
     }
   }
 

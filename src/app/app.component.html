@@ -1,53 +1,35 @@
 <div class="container-fluid">
   <drag-overlay></drag-overlay>
   <div class="row">
-    <div class="col-12" style="background-color: #e3f2fd;">
+    <div class="col" style="background-color: #e3f2fd;">
       <nav-bar></nav-bar>
     </div>
   </div>
   <div class="row">
     <div class="col-2" >
       <div class="row">
-        <div class="col-md-12" style="background-color: #e3f2fd;">
-          Channel Selector
+        <div class="col p-0" style="background-color: #e3f2fd;">
+          <h6>Channel Selector</h6>
           <channel-selector></channel-selector>
         </div>
       </div>
 
       <div class="row">
-        <div class="col-md-12" style="background-color: lightpink; width: 200px; height: 500px; overflow-y: scroll;">
-          Transformers
+        <div class="col p-0" style="background-color: lightpink; width: 200px; height: 500px; overflow-y: scroll;">
+          <h6>Transformers</h6>
           <transformer-selector></transformer-selector>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
         </div>
       </div>
 
     </div>
-    <div class="col-md-8" style="background-color: lightcyan">
-      Transformer Ladder
-      <ladder-diagram></ladder-diagram>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
+    <div class="col p-0 d-flex flex-column" style="background-color: lightcyan;">
+      <h6>Transformer Ladder</h6>
+      <ladder-diagram class="inline-flex h-100 w-100" style="overflow: auto"></ladder-diagram>
     </div>
 
-    <div class="col-2" style="background-color: lightskyblue">
-      Transformer Properties
+    <div class="col-2 p-0" style="background-color: lightskyblue">
+      <h6>Transformer Properties</h6>
       <transformer-property-selector></transformer-property-selector>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
     </div>
   </div>
 </div>

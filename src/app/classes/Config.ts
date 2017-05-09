@@ -5,6 +5,7 @@ import {BehaviorSubject, Observable} from "rxjs";
 import {List} from "immutable";
 import {AbstractModel} from "./AbstractModel";
 import {Inject, Injectable} from "@angular/core";
+import {Metadata} from "./Metadata";
 
 export interface ConfigJsonInterface {
   name: string;
@@ -25,7 +26,7 @@ interface UnmodifiableConfigInterface {
 
 export interface ConfigInterface extends ModifiableConfigInterface, UnmodifiableConfigInterface {}
 
-export class Config extends AbstractModel<ConfigJsonInterface> implements AsObservable, BehaviorSubjectify<ModifiableConfigInterface>, UnmodifiableConfigInterface {
+export class Config extends AbstractModel<ConfigJsonInterface, never> implements AsObservable, BehaviorSubjectify<ModifiableConfigInterface>, UnmodifiableConfigInterface {
   readonly name: BehaviorSubject<string>;
   readonly description: BehaviorSubject<string>;
   readonly metadataVersion: string;
@@ -46,6 +47,11 @@ export class Config extends AbstractModel<ConfigJsonInterface> implements AsObse
       this.rows,
       this.rows.switchMap(rows => Observable.merge(...rows.toArray().map(row => row.asObservable())))
     ).mapTo(this);
+  }
+
+  validate(): this {
+    //TODO: do some validation
+    return this;
   }
 }
 
@@ -115,12 +121,12 @@ export class ConfigSerializer {
 
   constructor(private rowSerializer: RowSerializer) {}
 
-  toApama(config: ConfigJsonInterface) {
+  toApama(metadata: Metadata, config: Config) {
 
     return "" +
-      (config.name  ? `\\\\ Name: ${config.name}\n` : '') +
-      (config.description  ? `\\\\ Description: ${config.description}\n` : '') +
+      (config.name.getValue()  ? `\\\\ Name: ${config.name.getValue()}\n` : '') +
+      (config.description.getValue()  ? `\\\\ Description: ${config.description.getValue()}\n` : '') +
       `\\\\ Version: ${config.metadataVersion}\n` +
-      config.rows.map((row, i) => this.rowSerializer.toApama(row, i)).join('\n\n');
+      config.rows.getValue().map((row: Row, i: number) => this.rowSerializer.toApama(metadata, row, i)).join('\n\n');
   }
 }

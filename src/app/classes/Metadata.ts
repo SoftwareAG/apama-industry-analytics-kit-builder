@@ -1,6 +1,6 @@
 import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
 import {NestedTransformerDefBuilder, TransformerDef, TransformerDefJsonInterface, TransformerDefBuilder} from "./TransformerDef";
-import {List} from "immutable";
+import {List, OrderedMap} from "immutable";
 import {AbstractModel} from "./AbstractModel";
 
 export interface MetadataJsonInterface {
@@ -15,16 +15,33 @@ export interface MetadataInterface {
   analytics: TransformerDef[]
 }
 
-export class Metadata extends AbstractModel<MetadataJsonInterface> {
+export class Metadata extends AbstractModel<MetadataJsonInterface, never> {
   readonly version: string;
   readonly groupOrder: List<string>;
-  readonly analytics: List<TransformerDef>;
+  readonly analyticsByName: OrderedMap<string, TransformerDef>;
+  get analytics() { return List(this.analyticsByName.valueSeq()) }
 
   constructor(obj: MetadataInterface) {
     super();
     this.version = obj.version;
     this.groupOrder = List(obj.groupOrder);
-    this.analytics = List(obj.analytics);
+    this.analyticsByName = OrderedMap<string, TransformerDef>((obj.analytics.map(analytic => [analytic.name, analytic])));
+  }
+
+  toJson(): MetadataJsonInterface {
+    return {
+      version: this.version,
+      groupOrder: this.groupOrder.toArray(),
+      analytics: this.analytics.toArray().map(analytic => analytic.toJson())
+    }
+  }
+
+  validate(): this {
+    return this;
+  }
+
+  getAnalytic(name: string): TransformerDef {
+      return this.analyticsByName.get(name);
   }
 }
 
