@@ -91,17 +91,17 @@ export class PropertyBuilder implements PropertyInterface {
     return new Property(this);
   }
 
-  static fromPropertyDefBuilder(propertyDefBuilder: PropertyDefBuilder): PropertyBuilder {
+  static fromPropertyDef(propertyDef: PropertyDef): PropertyBuilder {
     const result = new PropertyBuilder()
-      .DefinitionName(propertyDefBuilder.name);
-    if (!propertyDefBuilder.repeated) {
-      result.Name(propertyDefBuilder.name)
+      .DefinitionName(propertyDef.name);
+    if (!propertyDef.repeated) {
+      result.Name(propertyDef.name)
     }
     // Deliberately does not use defaultValue, defaultValue is just a string label to be used by the UI
-    if (propertyDefBuilder.validValues && propertyDefBuilder.validValues.length) {
-      result.Value(propertyDefBuilder.validValues[0]);
+    if (propertyDef.validValues && propertyDef.validValues.size) {
+      result.Value(propertyDef.validValues.get(0));
     } else {
-      switch (propertyDefBuilder.type) {
+      switch (propertyDef.type) {
         case 'string':
           result.Value("");
           break;

@@ -2,6 +2,7 @@ import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilde
 import {NestedTransformerDefBuilder, TransformerDef, TransformerDefJsonInterface, TransformerDefBuilder} from "./TransformerDef";
 import {List, OrderedMap} from "immutable";
 import {AbstractModel} from "./AbstractModel";
+import {Transformer, TransformerBuilder} from "./Transformer";
 
 export interface MetadataJsonInterface {
   version: string;
@@ -42,6 +43,10 @@ export class Metadata extends AbstractModel<MetadataJsonInterface, never> {
 
   getAnalytic(name: string): TransformerDef {
       return this.analyticsByName.get(name);
+  }
+
+  createAnalytic(name: string): Transformer {
+    return TransformerBuilder.fromTransformerDef(this.getAnalytic(name)).build();
   }
 }
 

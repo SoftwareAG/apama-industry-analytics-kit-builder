@@ -6,17 +6,27 @@ import {List, Map} from "immutable";
 import {BehaviorSubject, Observable} from "rxjs";
 import {Row} from "./Row";
 import {Injectable} from "@angular/core";
-import {PropertyDef, PropertyDefBuilder} from "./PropertyDef";
+import {PropertyDef} from "./PropertyDef";
 import {AbstractModel} from "./AbstractModel";
+import {
+  NestedTransformerChannelBuilder,
+  TransformerChannel,
+  TransformerChannelBuilder,
+  TransformerChannelJsonInterface
+} from "./TransformerChannel";
 
 export interface TransformerJsonInterface {
   name: string;
   propertyValues?: PropertyJsonInterface[]
+  inputChannels?: TransformerChannelJsonInterface[]
+  outputChannels?: TransformerChannelJsonInterface[]
 }
 
 export interface TransformerInterface {
   name: string;
   propertyValues: Property[];
+  inputChannels: TransformerChannel[];
+  outputChannels: TransformerChannel[];
 }
 
 export class Transformer implements AbstractModel<TransformerJsonInterface, TransformerDef>, AsObservable {
@@ -28,6 +38,20 @@ export class Transformer implements AbstractModel<TransformerJsonInterface, Tran
   get observablePropertyValues(): Observable<List<Property>> {
     return this.propertyValuesByDefName.map(propertyValuesByDefName => List(propertyValuesByDefName.valueSeq().flatten(true)));
   }
+  readonly inputChannelsByDefName: BehaviorSubject<Map<string, List<TransformerChannel>>>;
+  get inputChannels(): List<TransformerChannel> {
+  return List(this.inputChannelsByDefName.getValue().valueSeq().flatten(true));
+}
+  get observableInputChannels(): Observable<List<TransformerChannel>> {
+    return this.inputChannelsByDefName.map(channelsByDefName => List(channelsByDefName.valueSeq().flatten(true)));
+  }
+  readonly outputChannelsByDefName: BehaviorSubject<Map<string, List<TransformerChannel>>>;
+  get outputChannels(): List<TransformerChannel> {
+    return List(this.outputChannelsByDefName.getValue().valueSeq().flatten(true));
+  }
+  get observableOutputChannels(): Observable<List<TransformerChannel>> {
+    return this.outputChannelsByDefName.map(channelsByDefName => List(channelsByDefName.valueSeq().flatten(true)));
+  }
 
   constructor(obj: TransformerInterface) {
     this.name = obj.name;
@@ -38,11 +62,27 @@ export class Transformer implements AbstractModel<TransformerJsonInterface, Tran
         result.get(propertyVal.definitionName, List<Property>()).push(propertyVal)
       ), Map<string, List<Property>>())
     );
+
+    this.inputChannelsByDefName = new BehaviorSubject(
+      obj.inputChannels.reduce((result, channel) => result.set(
+        channel.name,
+        result.get(channel.name, List<TransformerChannel>()).push(channel)
+      ), Map<string, List<TransformerChannel>>())
+    );
+
+    this.outputChannelsByDefName = new BehaviorSubject(
+      obj.outputChannels.reduce((result, channel) => result.set(
+        channel.name,
+        result.get(channel.name, List<TransformerChannel>()).push(channel)
+      ), Map<string, List<TransformerChannel>>())
+    )
   }
 
   asObservable(): Observable<this> {
     return Observable.merge(
       this.propertyValuesByDefName,
+      this.observableInputChannels,
+      this.observableOutputChannels,
       this.observablePropertyValues.switchMap(properties => Observable.merge(...properties.map((property: Property) => property.asObservable()).toArray()))
     ).mapTo(this);
   }
@@ -100,6 +140,8 @@ export class Transformer implements AbstractModel<TransformerJsonInterface, Tran
 export class TransformerBuilder implements TransformerInterface, ClassBuilder<Transformer> {
   name: string;
   propertyValues: Property[] = [];
+  inputChannels: TransformerChannel[] = [];
+  outputChannels: TransformerChannel[] = [];
 
   Name(name): this {
     this.name = name;
@@ -114,25 +156,61 @@ export class TransformerBuilder implements TransformerInterface, ClassBuilder<Tr
     return this;
   }
   withPropertyValue(): NestedPropertyBuilder<this> {
-    return new NestedPropertyBuilder((property) => { this.propertyValues.push(property); return this; })
+    return new NestedPropertyBuilder(property => { this.propertyValues.push(property); return this; })
+  }
+  InputChannels(channels: TransformerChannel[]): this {
+  this.inputChannels = channels;
+  return this;
+}
+  pushInputChannel(...channel: TransformerChannel[]): this {
+    this.inputChannels.push(...channel);
+    return this;
+  }
+  withInputChannel(): NestedTransformerChannelBuilder<this> {
+    return new NestedTransformerChannelBuilder(channel => { this.inputChannels.push(channel); return this; })
+  }
+  OutputChannels(channels: TransformerChannel[]): this {
+    this.outputChannels = channels;
+    return this;
+  }
+  pushOutputChannel(...channel: TransformerChannel[]): this {
+    this.outputChannels.push(...channel);
+    return this;
+  }
+  withOutputChannel(): NestedTransformerChannelBuilder<this> {
+    return new NestedTransformerChannelBuilder(channel => { this.outputChannels.push(channel); return this; })
   }
 
   build(): Transformer {
     return new Transformer(this);
   }
 
-  static fromTransformerDefBuilder(transformerDefBuilder: TransformerDefBuilder): TransformerBuilder {
-    return Object.assign(new TransformerBuilder(), transformerDefBuilder)
+  static fromTransformerDef(transformerDef: TransformerDef): TransformerBuilder {
+    return new TransformerBuilder()
+      .Name(transformerDef.name)
       .PropertyValues(
-        transformerDefBuilder.properties
+        transformerDef.properties.toArray()
           .filter(propertyDef => !propertyDef.optional && !propertyDef.repeated)
-          .map(propertyDef => PropertyBuilder.fromPropertyDefBuilder(PropertyDefBuilder.fromJson(propertyDef.toJson())).build())
+          .map(propertyDef => PropertyBuilder.fromPropertyDef(propertyDef).build())
+      )
+      .InputChannels(
+        transformerDef.inputChannels.toArray()
+          .filter(channelDef => !channelDef.optional && !channelDef.repeated)
+          .map(channelDef => TransformerChannelBuilder.fromTransformerChannelDef(channelDef).build())
+      )
+      .OutputChannels(
+        transformerDef.outputChannels.toArray()
+          .filter(channelDef => !channelDef.optional && !channelDef.repeated)
+          .map(channelDef => TransformerChannelBuilder.fromTransformerChannelDef(channelDef).build())
       );
   }
 
   static fromJson(json: TransformerJsonInterface): TransformerBuilder {
-    return this.fromTransformerDefBuilder(TransformerDefBuilder.fromJson(json))
-      .PropertyValues((json.propertyValues || []).map(propertyJson => PropertyBuilder.fromJson(propertyJson).build()));
+    return new TransformerBuilder()
+      .Name(json.name)
+      .PropertyValues((json.propertyValues || []).map(propertyJson => PropertyBuilder.fromJson(propertyJson).build()))
+      .InputChannels((json.inputChannels || []).map(channelJson => TransformerChannelBuilder.fromJson(channelJson).build()))
+      .OutputChannels((json.outputChannels || []).map(channelJson => TransformerChannelBuilder.fromJson(channelJson).build()));
   }
 }
 

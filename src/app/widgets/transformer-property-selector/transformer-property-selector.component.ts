@@ -32,10 +32,10 @@ export class TransformerPropertySelectorComponent implements OnInit {
       )
   }
 
-  addPropertyValue(propertyDef) {
+  addPropertyValue(propertyDef: PropertyDef) {
     const selectedTransformer = this.selectedTransformer.getValue();
     if (selectedTransformer) {
-      selectedTransformer.addPropertyValue(propertyDef.name, PropertyBuilder.fromPropertyDefBuilder(propertyDef).build());
+      selectedTransformer.addPropertyValue(propertyDef.name, PropertyBuilder.fromPropertyDef(propertyDef).build());
     }
   }
 

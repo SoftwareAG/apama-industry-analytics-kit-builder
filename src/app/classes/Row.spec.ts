@@ -24,7 +24,7 @@ describe('Row', () => {
     for(let i = 0; i<4; i++) {
       it(`Overridden Channel: ${i}`, () => {
         const row = new RowBuilder()
-          .withTransformer().Name("Analytic1").endWith()
+          .pushTransformer(metadata.createAnalytic("Analytic1"))
           .withInputChannel(i).Name("OverriddenInput").endWith()
           .withOutputChannel(i).Name("OverriddenOutput").endWith()
           .build();

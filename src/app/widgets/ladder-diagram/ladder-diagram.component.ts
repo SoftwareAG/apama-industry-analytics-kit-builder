@@ -4,11 +4,10 @@ import * as deepFreeze from "deep-freeze";
 import {AbstractDataService} from "../../services/AbstractDataService";
 import {Config} from "../../classes/Config";
 import {Row} from "../../classes/Row";
-import {TransformerChannelDef} from "../../classes/TransformerChannelDef";
+import {TransformerChannel} from "../../classes/TransformerChannel";
 import {RowChannel} from "../../classes/Channel";
-import {Observable} from "rxjs";
-import {AbstractDragService, Dragged} from "../../services/AbstractDragService";
-import {TransformerDef, TransformerDefBuilder} from "../../classes/TransformerDef";
+import {AbstractDragService} from "../../services/AbstractDragService";
+import {TransformerDef} from "../../classes/TransformerDef";
 import {Transformer, TransformerBuilder} from "../../classes/Transformer";
 import {AbstractMetadataService} from "../../services/MetadataService";
 
@@ -70,13 +69,12 @@ export class LadderDiagramComponent implements OnInit {
       const metadata = component.metadataService.metadata.getValue();
       const rowInChannelCount = row.getInChannels(metadata).size;
       const rowOutChannelCount = row.getOutChannels(metadata).size;
-      const transformerDef = dragging instanceof TransformerDef ? dragging : metadata.getAnalytic(dragging.name);
 
       // TODO: this need to be completed (handle mulitple in/out etc)
       if (
         transformerCount < maxTransformerCount &&
         rowInChannelCount <= 1 && rowOutChannelCount <= 1 &&
-        transformerDef.inputChannels.size === 1 && transformerDef.outputChannels.size === 1
+        dragging.inputChannels.size === 1 && dragging.outputChannels.size === 1
       ) {
         return new Array(transformerCount + 1).fill(undefined).map((ignored, i) => {
           return {
@@ -251,7 +249,7 @@ export class LadderDiagramComponent implements OnInit {
           const transformerDef = component.metadataService.getAnalytic(transformer.name);
           return {
             width: d.transformerWidth,
-            height: transformerHeight(transformerDef.inputChannels.size, transformerDef.outputChannels.size),
+            height: transformerHeight(transformer.inputChannels.size, transformer.outputChannels.size),
             transformer: transformer,
             transformerDef: transformerDef,
             row: d.row
@@ -298,7 +296,7 @@ export class LadderDiagramComponent implements OnInit {
           .classed('transformer-inchannels', true);
         const transformerInChansUpdate = transformerUpdate.select('.transformer-inchannels')
           .attr('transform', d => `translate(${-d.width/2},0)`);
-        const transformerInChan = transformerInChansUpdate.selectAll('.channel').data((d) => d.transformerDef.inputChannels.toArray().map((chanDef) => { return { channel: chanDef } }));
+        const transformerInChan = transformerInChansUpdate.selectAll('.channel').data((d) => d.transformer.inputChannels.toArray().map((chan) => { return { channel: chan } }));
         transformerInChan.exit().remove();
         const transformerInChanEnter = transformerInChan.enter().append('circle')
           .classed('channel', true)
@@ -311,7 +309,7 @@ export class LadderDiagramComponent implements OnInit {
           .classed('transformer-outchannels', true);
         const transformerOutChansUpdate = transformerUpdate.select('.transformer-outchannels')
           .attr('transform', d => `translate(${d.width/2},0)`);
-        const transformerOutChan = transformerOutChansUpdate.selectAll('.channel').data((d) => d.transformerDef.outputChannels.toArray().map((chanDef) => { return { channel: chanDef } }));
+        const transformerOutChan = transformerOutChansUpdate.selectAll('.channel').data((d) => d.transformer.outputChannels.toArray().map((chan) => { return { channel: chan } }));
         transformerOutChan.exit().remove();
         const transformerOutChanEnter = transformerOutChan.enter().append('circle')
           .classed('channel', true)
@@ -321,20 +319,20 @@ export class LadderDiagramComponent implements OnInit {
           .attr('cy', (d,i) => (i+1) * defaultTransformerHeight/2);
 
         function rowChannelUpdate(selection) {
-          const channelSelection = selection.filter((d: {channel: TransformerChannelDef | RowChannel}) => d.channel instanceof RowChannel);
-          const channelDefSelection = selection.filter((d: {channel: TransformerChannelDef | RowChannel}) => d.channel instanceof TransformerChannelDef);
-          channelSelection.select('text')
+          const rowChannelSelection = selection.filter((d: {channel: TransformerChannel | RowChannel}) => d.channel instanceof RowChannel);
+          const transformerChanSelection = selection.filter((d: {channel: TransformerChannel | RowChannel}) => d.channel instanceof TransformerChannel);
+          rowChannelSelection.select('text')
             .text(d => d.channel.name.getValue());
-          channelDefSelection.select('text')
+          transformerChanSelection.select('text')
             .text(d => d.channel.name);
 
-          channelSelection
+          rowChannelSelection
             .classed('placeholder-channel', false)
               .select('circle')
               .attr('fill', 'steelblue')
               .attr('stroke-dasharray', null);
 
-          channelDefSelection
+          transformerChanSelection
             .classed('placeholder-channel', true)
             .select('circle')
               .attr('fill', 'white')
@@ -361,7 +359,7 @@ export class LadderDiagramComponent implements OnInit {
               if (dragging.object instanceof Transformer) {
                 d.row.transformers.next(d.row.transformers.getValue().insert(i, dragging.object));
               } else if (dragging.object instanceof TransformerDef) {
-                d.row.transformers.next(d.row.transformers.getValue().insert(i, TransformerBuilder.fromTransformerDefBuilder(TransformerDefBuilder.fromJson(dragging.object.toJson())).build()));
+                d.row.transformers.next(d.row.transformers.getValue().insert(i, TransformerBuilder.fromTransformerDef(dragging.object).build()));
               }
               this.dragService.stopDrag();
               d3.event.stopPropagation();

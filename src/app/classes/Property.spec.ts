@@ -16,7 +16,7 @@ describe('Property', () => {
       {type: "float", expectedDefault: 0}
     ].forEach((testCase) => {
       it(`Type: ${testCase.type}`, () => {
-        expect(PropertyBuilder.fromPropertyDefBuilder(new PropertyDefBuilder().Type(testCase.type as "integer" | "string" | "float" | "decimal" | "boolean")).value).toEqual(testCase.expectedDefault);
+        expect(PropertyBuilder.fromPropertyDef(new PropertyDefBuilder().Type(testCase.type as "integer" | "string" | "float" | "decimal" | "boolean").build()).value).toEqual(testCase.expectedDefault);
       })
     })
   });
@@ -30,7 +30,7 @@ describe('Property', () => {
       {type: "float", validValues: [0.3, 0.6, 1], expectedDefault: 0.3}
     ].forEach((testCase) => {
       it(`Type: ${testCase.type}, ValidValues: ${testCase.validValues}`, () => {
-        expect(PropertyBuilder.fromPropertyDefBuilder(new PropertyDefBuilder().Type(testCase.type as "integer" | "string" | "float" | "decimal" | "boolean").ValidValues(testCase.validValues)).value).toEqual(testCase.expectedDefault);
+        expect(PropertyBuilder.fromPropertyDef(new PropertyDefBuilder().Type(testCase.type as "integer" | "string" | "float" | "decimal" | "boolean").ValidValues(testCase.validValues).build()).value).toEqual(testCase.expectedDefault);
       })
     })
   });

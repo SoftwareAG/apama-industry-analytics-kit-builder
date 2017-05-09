@@ -1,17 +1,20 @@
 import {
-  NestedTransformerBuilder, Transformer, TransformerBuilder, TransformerJsonInterface,
+  NestedTransformerBuilder,
+  Transformer,
+  TransformerBuilder,
+  TransformerJsonInterface,
   TransformerSerializer
 } from "./Transformer";
-import {RowChannel, ChannelJsonInterface, NestedChannelBuilder, ChannelBuilder} from "./Channel";
+import {ChannelBuilder, ChannelJsonInterface, NestedChannelBuilder, RowChannel} from "./Channel";
 import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
-import {TransformerChannelDef} from "./TransformerChannelDef";
-import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
+import {AsObservable} from "../interfaces/interfaces";
 import {BehaviorSubject, Observable} from "rxjs";
 import {List, Map} from "immutable";
 import {AbstractModel} from "./AbstractModel";
 import {Injectable} from "@angular/core";
 import {Metadata} from "./Metadata";
 import * as _ from "lodash";
+import {TransformerChannel} from "app/classes/TransformerChannel";
 
 export interface RowJsonInterface {
   maxTransformerCount: number;
@@ -53,14 +56,14 @@ export class Row extends AbstractModel<RowJsonInterface, never> implements AsObs
     ).mapTo(this);
   }
 
-  getInChannels(metadata: Metadata): List<RowChannel | TransformerChannelDef> {
-    const requiredChannels = this.transformers.getValue().size ? metadata.getAnalytic(this.transformers.getValue().first().name).inputChannels : List();
-    return requiredChannels.map((channelDef: TransformerChannelDef, i: number) => this.inputChannelOverrides.getValue().get(i) || channelDef) as List<RowChannel | TransformerChannelDef>;
+  getInChannels(metadata: Metadata): List<RowChannel | TransformerChannel> {
+    const requiredChannels = this.transformers.getValue().size ? this.transformers.getValue().first().inputChannels : List();
+    return requiredChannels.map((channelDef: TransformerChannel, i: number) => this.inputChannelOverrides.getValue().get(i) || channelDef) as List<RowChannel | TransformerChannel>;
   }
 
-  getOutChannels(metadata: Metadata): List<RowChannel | TransformerChannelDef> {
-    const requiredChannels = this.transformers.getValue().size ? metadata.getAnalytic(this.transformers.getValue().last().name).outputChannels : List();
-    return requiredChannels.map((channelDef: TransformerChannelDef, i: number) => this.outputChannelOverrides.getValue().get(i) || channelDef) as List<RowChannel | TransformerChannelDef>;
+  getOutChannels(metadata: Metadata): List<RowChannel | TransformerChannel> {
+    const requiredChannels = this.transformers.getValue().size ? this.transformers.getValue().last().outputChannels : List();
+    return requiredChannels.map((channelDef: TransformerChannel, i: number) => this.outputChannelOverrides.getValue().get(i) || channelDef) as List<RowChannel | TransformerChannel>;
   }
 
   validate(): this {

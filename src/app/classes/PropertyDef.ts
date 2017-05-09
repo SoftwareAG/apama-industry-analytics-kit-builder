@@ -31,7 +31,7 @@ export class PropertyDef extends AbstractModel<PropertyDefJsonInterface, never> 
   readonly type: "integer" | "string" | "float" | "decimal" | "boolean";
   readonly optional: boolean | string; // string must be a function
   readonly defaultValue?: string | number | boolean;
-  readonly validValues?: List<string> | List<number> | List<boolean>;
+  readonly validValues?: List<string | number | boolean>;
   readonly validator?: string;
   readonly repeated: boolean;
 
@@ -82,7 +82,7 @@ export class PropertyDef extends AbstractModel<PropertyDefJsonInterface, never> 
     // If the validValues element has been provided, it must be an array
     if (this.validValues !== undefined) {
       if (!(this.validValues instanceof List)) { throw new Error('validValues must be a List') }
-      (this.validValues as List<string | number | boolean>).forEach((validValue: string | number | boolean) => {
+      this.validValues.forEach((validValue: string | number | boolean) => {
         if (!validate.isBoolean(validValue) && !validate.isNumber(validValue) && !validate.isString(validValue)) {
           throw new Error('validValues must be a string, boolean, or number');
         }

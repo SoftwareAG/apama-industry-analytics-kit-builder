@@ -5,14 +5,13 @@ import {AbstractDataService} from "../../services/AbstractDataService";
 import {ChannelBuilder} from "../../classes/Channel";
 import {Config, ConfigBuilder} from "app/classes/Config";
 import {LadderDiagramComponent} from "./ladder-diagram.component";
-import {TransformerBuilder} from "../../classes/Transformer";
 import {AbstractDragService, Dragged} from "../../services/AbstractDragService";
 import {NestedRowBuilder, RowBuilder} from "app/classes/Row";
 import {DragService} from "app/services/DragService";
-import {TransformerChannelDef} from "../../classes/TransformerChannelDef";
 import {TestUtils} from "../../services/TestUtil.spec";
 import {AbstractMetadataService, MetadataService} from "../../services/MetadataService";
 import {Metadata, MetadataBuilder} from "../../classes/Metadata";
+import {TransformerChannel} from "../../classes/TransformerChannel";
 
 @Injectable()
 class DataServiceMock extends AbstractDataService {}
@@ -135,7 +134,7 @@ describe('LadderDiagramComponent', () => {
         dataService.hierarchy.next(new ConfigBuilder()
           .withRow()
             .MaxTransformerCount(4)
-            .withTransformer().Name('Analytic1').endWith()
+            .pushTransformer(metadata.createAnalytic('Analytic1'))
             .endWith()
           .build()
         );
@@ -166,7 +165,7 @@ describe('LadderDiagramComponent', () => {
         dataService.hierarchy.next(new ConfigBuilder()
           .withRow()
             .MaxTransformerCount(4)
-            .withTransformer().Name('Analytic1').endWith()
+            .pushTransformer(metadata.createAnalytic("Analytic1"))
             .endWith()
           .build()
         );
@@ -203,7 +202,7 @@ describe('LadderDiagramComponent', () => {
         const config: Config = new ConfigBuilder()
           .withRow()
             .MaxTransformerCount(4)
-            .withTransformer().Name('Analytic1').endWith()
+            .pushTransformer(metadata.createAnalytic("Analytic1"))
             .withInputChannel(i).Name('UserIn').endWith()
             .withOutputChannel(i).Name('UserOut').endWith()
             .endWith()
@@ -256,13 +255,13 @@ describe('LadderDiagramComponent', () => {
         .MaxTransformerCount(3)
         .withInputChannel(0).Name("hello").endWith()
         .withOutputChannel(0).Name("goodbye").endWith()
-        .withTransformer().Name("Analytic1").endWith()
-        .withTransformer().Name("Analytic2").endWith()
+        .pushTransformer(metadata.createAnalytic("Analytic1"))
+        .pushTransformer(metadata.createAnalytic("Analytic2"))
       .endWith()
       .withRow()
         .MaxTransformerCount(3)
         .withInputChannel(2).Name("hello").endWith()
-        .withTransformer().Name("Analytic3").endWith()
+        .pushTransformer(metadata.createAnalytic("Analytic3"))
       .endWith()
       .build();
 
@@ -320,9 +319,7 @@ describe('LadderDiagramComponent', () => {
         .MaxTransformerCount(3)
         .withInputChannel(0).Name("OverriddenInput").endWith()
         .withOutputChannel(0).Name("OverriddenOutput").endWith()
-        .withTransformer()
-          .Name("Analytic5")
-        .endWith()
+        .pushTransformer(testMetadata.createAnalytic("Analytic5"))
       .endWith()
       .build();
 
@@ -355,28 +352,28 @@ describe('LadderDiagramComponent', () => {
         description: "RowSize: 1, Transformers: 1",
         setup: (row: RowBuilder): RowBuilder => {
           return row.MaxTransformerCount(1)
-            .withTransformer().Name("Analytic1").endWith()
+            .pushTransformer(testMetadata.createAnalytic("Analytic1"))
         },
         dropTargetCount: 0,
       },{
         description: "RowSize: 2, Transformers: 1",
         setup: (row: RowBuilder): RowBuilder => {
           return row.MaxTransformerCount(2)
-            .withTransformer().Name("Analytic1").endWith()
+            .pushTransformer(testMetadata.createAnalytic("Analytic1"))
         },
         dropTargetCount: 2
       },{
         description: "RowSize: 2, Transformers: 1 (Multiple Inputs)",
         setup: (row: RowBuilder): RowBuilder => {
           return row.MaxTransformerCount(2)
-            .withTransformer().Name("Analytic3").endWith()
+            .pushTransformer(testMetadata.createAnalytic("Analytic3"))
         },
         dropTargetCount: 0
       },{
         description: "RowSize: 2, Transformers: 1 (Multiple Outputs)",
         setup: (row: RowBuilder): RowBuilder => {
           return row.MaxTransformerCount(2)
-            .withTransformer().Name("Analytic4").endWith()
+            .pushTransformer(testMetadata.createAnalytic("Analytic4"))
         },
         dropTargetCount: 0
       }
@@ -390,7 +387,7 @@ describe('LadderDiagramComponent', () => {
 
         // Create a temporary dom element and transformer to simulate that one has been dragged
         const dragEl = TestUtils.withTempSvg().append('rect').attr('width', 100).attr('height', 100).node() as SVGRectElement;
-        dragService.startDrag({ sourceElement: dragEl, object: new TransformerBuilder().Name("Analytic1").build() });
+        dragService.startDrag({ sourceElement: dragEl, object: testMetadata.createAnalytic("Analytic1") });
 
         fixture.detectChanges();
 
@@ -406,8 +403,8 @@ describe('LadderDiagramComponent', () => {
         const config = new ConfigBuilder()
           .withRow()
             .MaxTransformerCount(3)
-            .withTransformer().Name("Analytic1").endWith()
-            .withTransformer().Name("Analytic1").endWith()
+            .pushTransformer(testMetadata.createAnalytic("Analytic1"))
+            .pushTransformer(testMetadata.createAnalytic("Analytic1"))
           .endWith()
           .build();
 
@@ -417,7 +414,7 @@ describe('LadderDiagramComponent', () => {
 
         // Create a temporary dom element and transformer to simulate that one has been dragged
         const dragEl = TestUtils.withTempSvg().append('rect').attr('width', 100).attr('height', 100).node() as SVGRectElement;
-        const dragTransformer = new TransformerBuilder().Name("Analytic1").build();
+        const dragTransformer = testMetadata.createAnalytic("Analytic1");
         dragService.startDrag({ sourceElement: dragEl, object: dragTransformer });
 
         fixture.detectChanges();
@@ -449,9 +446,9 @@ describe('LadderDiagramComponent', () => {
     const config = new ConfigBuilder()
       .withRow()
         .MaxTransformerCount(3)
-        .withTransformer().Name("Analytic1").endWith()
-        .withTransformer().Name("Analytic1").endWith()
-        .withTransformer().Name("Analytic1").endWith()
+        .pushTransformer(testMetadata.createAnalytic("Analytic1"))
+        .pushTransformer(testMetadata.createAnalytic("Analytic1"))
+        .pushTransformer(testMetadata.createAnalytic("Analytic1"))
       .endWith()
       .build();
 
@@ -512,7 +509,7 @@ describe('LadderDiagramComponent', () => {
     const config = new ConfigBuilder()
       .withRow()
         .MaxTransformerCount(1)
-        .withTransformer().Name("Analytic1").endWith()
+        .pushTransformer(testMetadata.createAnalytic("Analytic1"))
       .endWith()
       .build();
 
@@ -580,7 +577,7 @@ describe('LadderDiagramComponent', () => {
       it(testCase.description, () => {
         const rowBuilder = new RowBuilder()
           .MaxTransformerCount(1)
-          .withTransformer().Name("Analytic1").endWith();
+          .pushTransformer(testMetadata.createAnalytic("Analytic1"));
 
         if (testCase.inputChannel) {
           rowBuilder.pushInputChannel({0: testCase.inputChannel})
@@ -623,7 +620,7 @@ describe('LadderDiagramComponent', () => {
         fixture.detectChanges();
 
         expect((dragService.dragging.getValue() as Dragged).object).toBe(dragChan);
-        expect((d3.select(el.querySelectorAll(testCase.fromSelector)[0]).datum() as any).channel).toEqual(jasmine.any(TransformerChannelDef)); // Replaced with placeholder
+        expect((d3.select(el.querySelectorAll(testCase.fromSelector)[0]).datum() as any).channel).toEqual(jasmine.any(TransformerChannel)); // Replaced with placeholder
 
         toChanEl.dispatchEvent(new MouseEvent("mouseup", {
           bubbles: true,
