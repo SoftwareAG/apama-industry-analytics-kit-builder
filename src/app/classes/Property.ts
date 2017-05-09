@@ -1,5 +1,5 @@
-import {PropertyDef, PropertyDefBuilder, PropertyDefInterface, PropertyDefJsonInterface} from "./PropertyDef";
-import {NestedClassBuilder, ClassArrayBuilder} from "./ClassBuilder";
+import {PropertyDef, PropertyDefBuilder} from "./PropertyDef";
+import {ClassArrayBuilder, NestedClassBuilder} from "./ClassBuilder";
 import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
 import {BehaviorSubject, Observable} from "rxjs";
 import {AbstractModel} from "./AbstractModel";
@@ -222,6 +222,36 @@ export class PropertySerializer {
         return jsValue ? "true" : "false";
       default:
         throw new Error(`Unhandled apamaType: ${apamaType}`);
+    }
+  }
+
+  public static parseStringWithPropertyDef(stringValue: string, propertyDef: PropertyDef) {
+    switch(propertyDef.type) {
+      case "integer":
+      case "decimal":
+        const value = Number.parseInt(stringValue);
+        if (Number.isNaN(value)) {
+          throw new Error(`Property value "${stringValue}" cannot be converted to the required property ${propertyDef.type} type`);
+        }
+        return value;
+      case "float":
+        const floatValue = Number.parseFloat(stringValue);
+        if (Number.isNaN(floatValue)) {
+          throw new Error(`Property value "${stringValue}" cannot be converted to the required property ${propertyDef.type} type`);
+        }
+        return floatValue;
+      case "string":
+        return stringValue;
+      case "boolean":
+        if (stringValue === 'true') {
+          return true;
+        } else if (stringValue === 'false') {
+          return false;
+        } else {
+          throw new Error(`Unable to parse "${stringValue}" to boolean`);
+        }
+      default:
+        throw new Error(`Unhandled PropertyDef Type: ${propertyDef.type}`);
     }
   }
 

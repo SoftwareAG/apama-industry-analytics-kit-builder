@@ -148,7 +148,7 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
   static fromJson(jsonData: PropertyDefJsonInterface) : PropertyDefBuilder {
     // validate jsonData object
     if (!validate.isObject(jsonData)) { throw new Error('jsonData is invalid'); }
-    if (!validate.contains(jsonData, 'name')) { throw new Error('jsonData does not contain the "name" element'); }
+    if (!validate.contains(jsonData, 'name')) { throw new Error(`jsonData does not contain the "name" element : ${JSON.stringify(jsonData)}`); }
     if (!validate.contains(jsonData, 'description')) { throw new Error('jsonData does not contain the "description" element'); }
     if (!validate.contains(jsonData, 'type')) { throw new Error('jsonData does not contain the "type" element'); }
 

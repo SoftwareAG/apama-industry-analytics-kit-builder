@@ -14,6 +14,7 @@ import {
   TransformerChannelBuilder,
   TransformerChannelJsonInterface
 } from "./TransformerChannel";
+import {validate} from "validate.js";
 
 export interface TransformerJsonInterface {
   name: string;
@@ -95,6 +96,7 @@ export class Transformer implements AbstractModel<TransformerJsonInterface, Tran
   }
 
   validate(transformerDef: TransformerDef): this {
+    if (validate.isEmpty(this.name)) { throw new Error('Name cannot be empty'); }
     this.propertyValues.forEach((propertyVal: Property) => {
       if (!transformerDef.propertiesByName.has(propertyVal.definitionName)) { throw new Error(`PropertyDefinition "${propertyVal.definitionName}" does not exist so propertyValue shouldn't exist`); }
     });

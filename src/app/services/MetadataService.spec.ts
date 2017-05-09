@@ -1,6 +1,6 @@
 
 import {TestBed} from "@angular/core/testing";
-import {MetadataService} from "./MetadataService";
+import {AbstractMetadataService, MetadataService} from "./MetadataService";
 
 describe('MetadataService', () => {
   let metadataService: MetadataService;
@@ -8,10 +8,10 @@ describe('MetadataService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        MetadataService
+        {provide: AbstractMetadataService, useClass: MetadataService}
       ]
     });
-    metadataService = TestBed.get(MetadataService) as MetadataService;
+    metadataService = TestBed.get(AbstractMetadataService) as MetadataService;
   });
 
   it('should correctly parse a valid metadata json object', () => {

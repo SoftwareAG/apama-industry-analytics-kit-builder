@@ -68,6 +68,7 @@ export class Row extends AbstractModel<RowJsonInterface, never> implements AsObs
 
   validate(): this {
     // TODO: do some validation
+    if (this.maxTransformerCount.getValue() <= 0) { throw new Error('Max transformer count must be greater than 0'); }
     return this
   }
 }

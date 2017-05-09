@@ -6,6 +6,7 @@ import {TestBed} from "@angular/core/testing";
 import {TestUtils} from "../services/TestUtil.spec";
 import {Metadata, MetadataBuilder} from "./Metadata";
 import * as _ from "lodash";
+import {AbstractMetadataService, MetadataService} from "../services/MetadataService";
 
 describe('ConfigSerializer', () => {
 
@@ -36,7 +37,8 @@ describe('ConfigSerializer', () => {
         ConfigSerializer,
         RowSerializer,
         TransformerSerializer,
-        PropertySerializer
+        PropertySerializer,
+        {provide: AbstractMetadataService, useClass: MetadataService},
       ]
      });
     configSerializer = TestBed.get(ConfigSerializer) as ConfigSerializer;
