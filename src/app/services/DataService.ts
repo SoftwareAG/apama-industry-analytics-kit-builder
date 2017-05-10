@@ -9,8 +9,8 @@ export class DataService extends AbstractDataService {
 
     this.configurations.next(this.configurations.getValue().push(
       new ConfigBuilder()
-        .Name("Single row with a single Analytic containing one input and output channel")
-        .Description("This configuration demonstrates a single row with a single Analytic containing one input and output channel")
+        .Name("Blank Row")
+        .Description("")
         .withRow()
           .MaxTransformerCount(3)
         .endWith()

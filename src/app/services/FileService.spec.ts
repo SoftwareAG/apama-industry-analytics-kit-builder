@@ -324,6 +324,15 @@ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1
   expect( () => { fileService.deserialize(apama); }).toThrowError('Unable to parse "ABC" to boolean');
   });
 
+  it('should pass even where no properties exist for an Analytic', () => {
+    const apama = `\\ Name: New one
+\\ Description: new one description
+\\ Version: 0.0.0.0
+\\ Row: 0
+  com.industry.analytics.Analytic("Corridor",["Row0:Input0"],["Row0:Channel1"],{})`;
+  expect( () => { fileService.deserialize(apama); }).toBeDefined();
+  });
+
 });
 
 

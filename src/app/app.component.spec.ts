@@ -19,6 +19,7 @@ import {PropertySerializer} from "app/classes/Property";
 import {TransformerSerializer} from "./classes/Transformer";
 import {FileService} from "./services/FileService";
 import {AbstractMetadataService, MetadataService} from "./services/MetadataService";
+import {SaveConfigurationComponent} from "./dialog/save-configuration/save-configuration.component";
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
@@ -31,7 +32,8 @@ describe('AppComponent', () => {
         TransformerSelectorComponent,
         TransformerPropertySelectorComponent,
         NavBarComponent,
-        DragOverlayComponent
+        DragOverlayComponent,
+        SaveConfigurationComponent
       ],
       imports: [
         FormsModule,
@@ -50,7 +52,6 @@ describe('AppComponent', () => {
         RowSerializer,
         TransformerSerializer,
         PropertySerializer
-
       ],
     }).compileComponents();
   }));

@@ -291,8 +291,6 @@ export class ConfigSerializer {
             throw new Error(`Property must contain name and value pair e.g. "offset":"2.0d" (invalid property data is ${data})`);
           }
         });
-      } else {
-        throw new Error(`Property must contain name and value pair e.g. "offset":"2.0d" (invalid property data is ${analyticProperties})`);
       }
     }
   }

@@ -2,10 +2,12 @@ import {Component, OnInit} from "@angular/core";
 import {Config} from "../../classes/Config";
 import {AbstractDataService} from "../../services/AbstractDataService";
 import {Observable} from "rxjs";
-import {Set, List} from "immutable";
+import {List, Set} from "immutable";
 import {FileService, UserCancelled} from "../../services/FileService";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {AbstractMetadataService} from "../../services/MetadataService";
+import {SaveConfigurationComponent} from "app/dialog/save-configuration/save-configuration.component";
+import {ModalDismissReasons, NgbModal} from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'nav-bar',
@@ -19,14 +21,12 @@ export class NavBarComponent implements OnInit {
   readonly currentMetaVersion: Observable<string>;
   isNavbarCollapsed: boolean = true;
 
-  constructor(dataService: AbstractDataService, private fileService: FileService, private readonly metadataService: AbstractMetadataService) {
+  constructor(dataService: AbstractDataService, private fileService: FileService, private readonly metadataService: AbstractMetadataService, public modalService: NgbModal) {
     this.dataService = dataService;
     this.configurations = this.dataService.configurations.asObservable();
     this.metadataVersions = new BehaviorSubject(Set.of("1.0.0", "1.1.0", "1.1.1", "1.2.x-BETA"));
     this.currentMetaVersion = metadataService.metadata.map(metadata => metadata.version);
     this.currentMetaVersion.subscribe(version => this.metadataVersions.next(this.metadataVersions.getValue().add(version)));
-
-
   }
 
   ngOnInit() {
@@ -47,22 +47,32 @@ export class NavBarComponent implements OnInit {
         if (error instanceof UserCancelled) {
 
         } else {
-          throw error;
+          alert(error);
         }
       })
   }
 
-  saveConfig() {
-    let saveFile = document.createElement("a");
-    const config = this.dataService.hierarchy.getValue();
-    const data = this.fileService.serialize(config);
-    saveFile.href = "data:application/octet-stream," + encodeURI(data);
-    saveFile.download = config.name.getValue() + ".evt";
-    saveFile.click();
+  openSaveConfigurationDialog() {
+    let closeResult: string;
+    this.modalService.open(SaveConfigurationComponent, {size: "lg"})
+      .result.then((result) => {
+      closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  private getDismissReason(reason: any): string {
+    if (reason === ModalDismissReasons.ESC) {
+      return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+      return 'by clicking on a backdrop';
+    } else {
+      return  `with: ${reason}`;
+    }
   }
 
   metadataVersionChange(value) {
-
   }
 
   loadCustomMetadata() {

@@ -21,6 +21,7 @@ import {TransformerSerializer} from "./classes/Transformer";
 import {PropertySerializer} from "./classes/Property";
 import {FileService} from "./services/FileService";
 import {AbstractMetadataService, MetadataService} from "./services/MetadataService";
+import {SaveConfigurationComponent } from './dialog/save-configuration/save-configuration.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import {AbstractMetadataService, MetadataService} from "./services/MetadataServi
     TransformerSelectorComponent,
     TransformerPropertySelectorComponent,
     NavBarComponent,
-    DragOverlayComponent
+    DragOverlayComponent,
+    SaveConfigurationComponent
   ],
   imports: [
     BrowserModule,
@@ -48,6 +50,9 @@ import {AbstractMetadataService, MetadataService} from "./services/MetadataServi
     RowSerializer,
     TransformerSerializer,
     PropertySerializer
+  ],
+  entryComponents: [
+    SaveConfigurationComponent
   ],
   bootstrap: [AppComponent]
 })

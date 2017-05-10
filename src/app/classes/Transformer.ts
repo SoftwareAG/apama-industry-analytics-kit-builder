@@ -1,5 +1,5 @@
 import {NestedPropertyBuilder, Property, PropertyBuilder, PropertyJsonInterface, PropertySerializer} from "./Property";
-import {TransformerDef, TransformerDefBuilder} from "./TransformerDef";
+import {TransformerDef} from "./TransformerDef";
 import {ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
 import {AsObservable} from "../interfaces/interfaces";
 import {List, Map} from "immutable";
@@ -102,13 +102,13 @@ export class Transformer implements AbstractModel<TransformerJsonInterface, Tran
     });
 
     transformerDef.propertiesByName.forEach((propertyDef: PropertyDef) => {
-      const propertyVals = this.propertyValuesByDefName.getValue().get(propertyDef.name) || [];
+      const propertyVals = this.getPropertyValues(propertyDef.name);
       if (propertyDef.repeated) {
 
       } else if (propertyDef.optional) {
-        if (propertyVals.size > 1) { throw new Error(`Optional property [${propertyVals}] cannot have more than 1 value, there were: ${propertyVals.size}`)}
+        if (propertyVals.size > 1) { throw new Error(`Transformer ${transformerDef.name}\n\nOptional property :[${propertyDef.name}] cannot have more than 1 value, there were: ${propertyVals.size}`)}
       } else {
-        if (propertyVals.size !== 1) { throw new Error(`Non-optional property [${propertyVals}] must have exactly one value, there were: ${propertyVals.size}`)}
+        if (propertyVals.size !== 1) { throw new Error(`Transformer ${transformerDef.name}\n\nNon-optional property :[${propertyDef.name}] must have exactly one value, there were: ${propertyVals.size}`)}
       }
     });
 
@@ -153,8 +153,15 @@ export class TransformerBuilder implements TransformerInterface, ClassBuilder<Tr
     this.propertyValues = properties;
     return this;
   }
-  pushPropertyValue(...property: Property[]): this {
-    this.propertyValues.push(...property);
+  pushPropertyValue(...properties: Property[]): this {
+    properties.forEach( property => {
+      const idx = this.propertyValues.findIndex(existingProperty => existingProperty.name.getValue() === property.name.getValue());
+      if (idx >=0) {
+        this.propertyValues[idx] = property;
+      } else {
+        this.propertyValues.push(...properties);
+      }
+    });
     return this;
   }
   withPropertyValue(): NestedPropertyBuilder<this> {

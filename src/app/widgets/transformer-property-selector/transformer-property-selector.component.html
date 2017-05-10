@@ -13,7 +13,7 @@
       <input *ngSwitchCase="'decimal'" class="form-control" type="number" [ngModel]="prop.value | async" (ngModelChange)="prop.value.next($event)"/>
       <input *ngSwitchCase="'integer'" class="form-control" type="number" [ngModel]="prop.value | async" (ngModelChange)="prop.value.next($event)"/>
       <input *ngSwitchCase="'float'" class="form-control" type="number" [ngModel]="prop.value | async" (ngModelChange)="prop.value.next($event)"/>
-      <select *ngSwitchCase="'boolean'" class="form-control" [ngModel]="prop.value | async" (ngModelChange)="prop.value.next($event)">
+      <select *ngSwitchCase="'boolean'" class="form-control" [ngModel]="prop.value | async" (ngModelChange)="prop.value.next($event === 'true')">
         <option value="true">True</option>
         <option value="false">False</option>
       </select>

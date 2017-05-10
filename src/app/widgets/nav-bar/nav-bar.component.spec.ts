@@ -11,6 +11,8 @@ import {RowSerializer} from "../../classes/Row";
 import {PropertySerializer} from "../../classes/Property";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {AbstractMetadataService, MetadataService} from "../../services/MetadataService";
+import {FormsModule} from "@angular/forms";
+import {BrowserModule} from "@angular/platform-browser";
 
 @Injectable()
 class DataServiceMock extends AbstractDataService {
@@ -56,6 +58,8 @@ describe('NavBarComponent', () => {
         PropertySerializer
       ],
       imports: [
+        BrowserModule,
+        FormsModule,
         NgbModule.forRoot()
       ]
       })
