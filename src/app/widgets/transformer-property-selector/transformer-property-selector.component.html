@@ -1,6 +1,9 @@
 <div *ngFor="let transformerProperty of transformerProperties | async" class="w-100 container-fluid">
 
-  <h6>{{transformerProperty.definition.name}}</h6>
+  <div class="row">
+    <i class="fa fa-question-circle mx-1 mt-1" ngbTooltip="{{transformerProperty.definition.description}}" container="body"></i>
+    <h6>{{transformerProperty.definition.name}}</h6>
+  </div>
 
   <div *ngFor="let prop of transformerProperty.values" class="row">
     <div *ngIf="transformerProperty.definition.repeated || transformerProperty.definition.optional" class="col-1 px-0 mr-2">
