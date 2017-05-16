@@ -100,6 +100,52 @@ describe('FileService', () => {
             validator: "function(value) { return value >= 0 || 'Must be greater than or equal to 0' }"
           }
         ]
+      },{
+        "description": "Detect data outside a corridor.",
+        "group": "Detectors",
+        "name": "Corridor",
+        "properties": [
+          {
+            "description": "Defines the upper threshold value that is used to detect breaches",
+            "name": "upperThreshold",
+            "type": "decimal"
+          },
+          {
+            "description": "Defines the lower threshold value that is used to detect breaches",
+            "name": "lowerThreshold",
+            "type": "decimal"
+          },
+          {
+            "description": "Defines whether to check for data inside or outside the corridor",
+            "name": "zone",
+            "type": "string",
+            "validValues": [
+              "inside",
+              "outside"
+            ]
+          },
+          {
+            "defaultValue": 0,
+            "description": "Defines how long (in seconds) the threshold may be breached before an Anomaly Data is generated. If the value is 0.0d then the Anomaly Data is generated immediately.",
+            "name": "duration",
+            "optional": true,
+            "type": "decimal",
+            "validator": "function(value) { return value >= 0 || 'Value must be greater than or equal to 0' }"
+          }
+        ]
+      },{
+        "description": "Combines multiple data streams into a single stream.",
+        "group": "Flow Manipulation",
+        "name": "Combiner",
+        "properties": [
+          {
+            "description": "Modify all data events to use this sourceId",
+            "name": "aggregatedSourceId",
+            "optional": true,
+            "type": "string",
+            "validator": "function(value) { return value.length > 0 | 'Must not be empty' }"
+          }
+        ]
       }]
     });
   });
@@ -325,12 +371,30 @@ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1
   });
 
   it('should pass even where no properties exist for an Analytic', () => {
-    const apama = `\\ Name: New one
-\\ Description: new one description
-\\ Version: 0.0.0.0
-\\ Row: 0
-  com.industry.analytics.Analytic("Corridor",["Row0:Input0"],["Row0:Channel1"],{})`;
-  expect( () => { fileService.deserialize(apama); }).toBeDefined();
+    const apama = `\\\\ Name: New one
+\\\\ Description: new one description
+\\\\ Version: 0.0.0.0
+\\\\ Row: 0
+com.industry.analytics.Analytic("Combiner",["Row0:Input0"],["Row0:Channel1"],{})`;
+    const config: Config = fileService.deserialize(apama);
+    expect( config.rows.getValue().first().transformers.getValue().first().name).toEqual('Combiner');
+    expect(config.rows.getValue().last().transformers.getValue().first().propertyValues.size).toEqual(0);
+  });
+
+  it('should parse multiple properties in an Analytic', () => {
+    const apama = `\\\\ Name: my config
+\\\\ Description: with a description
+\\\\ Version: 0.0.0.0
+\\\\ Row: 0
+com.industry.analytics.Analytic("Corridor",["Row0:Channel1"],["Row0"],{"upperThreshold":"20.0d","lowerThreshold":"10.0d","zone":"outside","duration":"5.0d"})`;
+    const config: Config = fileService.deserialize(apama);
+    expect(config.rows.getValue().size).toEqual(1);
+    expect( config.rows.getValue().first().transformers.getValue().size).toEqual(1);
+    expect(config.rows.getValue().last().transformers.getValue().first().propertyValues.size).toEqual(4);
+    expect(config.rows.getValue().last().transformers.getValue().first().getPropertyValues("upperThreshold").get(0).value.getValue()).toEqual(20);
+    expect(config.rows.getValue().last().transformers.getValue().first().getPropertyValues("lowerThreshold").get(0).value.getValue()).toEqual(10);
+    expect(config.rows.getValue().last().transformers.getValue().first().getPropertyValues("zone").get(0).value.getValue()).toEqual("outside");
+    expect(config.rows.getValue().last().transformers.getValue().first().getPropertyValues("duration").get(0).value.getValue()).toEqual(5.0);
   });
 
 });

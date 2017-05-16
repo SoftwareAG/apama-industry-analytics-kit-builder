@@ -260,7 +260,7 @@ export class ConfigSerializer {
 
     function buildProperties(analyticProperties: string, transformerBuilder: TransformerBuilder) {
       const validateProperties = /^{\s*(("[^"]*"\s*:\s*"[^"]*")(\s*,\s*("[^"]*"\s*:\s*"[^"]*"))*\s*)?}$/;
-      const propertiesPattern = /("[^"]*"\s*:\s*"[^"]*")/;
+      const propertiesPattern = /("[^"]*"\s*:\s*"[^"]*")/g;
       const propertyPattern = /"([^"]*)"/g;
 
       if (!analyticProperties.match(validateProperties)) {
