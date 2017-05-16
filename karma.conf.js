@@ -24,7 +24,7 @@ module.exports = function (config) {
     files: [
       'node_modules/jasmine-promises/dist/jasmine-promises.js',
       "node_modules/font-awesome/css/font-awesome.min.css",
-      "node_modules/bootstrap/dist/css/bootstrap.min.css",
+      "./src/custom-bootstrap/bootstrap.min.css",
       { pattern: './src/test.ts', watched: false }
     ],
     preprocessors: {

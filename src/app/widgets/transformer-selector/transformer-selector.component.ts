@@ -9,8 +9,8 @@ import {AbstractMetadataService} from "../../services/MetadataService";
 
 @Component({
   selector: 'transformer-selector',
-  template: '<svg class="transformer-selector"></svg>',
-  styleUrls: ['./transformer-selector.component.css']
+  templateUrl: './transformer-selector.component.html',
+  styleUrls: ['./transformer-selector.component.scss']
 })
 export class TransformerSelectorComponent implements OnInit {
   readonly nativeElement;
@@ -31,7 +31,7 @@ export class TransformerSelectorComponent implements OnInit {
     const height = 1000 - padding.top - padding.bottom;
     const transformerHeight = 50;
 
-    const svg = d3.select(this.nativeElement).select('.transformer-selector')
+    const svg = d3.select(this.nativeElement).select('svg')
       .attr('width', width + padding.left + padding.right)
       .attr('height', height + padding.top + padding.bottom);
 

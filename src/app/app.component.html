@@ -1,35 +1,12 @@
-<div class="container-fluid">
+<div class="d-flex flex-column h-100">
   <drag-overlay></drag-overlay>
-  <div class="row">
-    <div class="col" style="background-color: #e3f2fd;">
-      <nav-bar></nav-bar>
+  <nav-bar></nav-bar>
+  <div class="w-100 h-100 d-flex">
+    <div class="col-2 d-flex flex-column p-0 left-panel" >
+      <channel-selector class="h-50 p-2 scroll" channel-selector></channel-selector>
+      <transformer-selector class="h-100 p-2 scroll"></transformer-selector>
     </div>
-  </div>
-  <div class="row">
-    <div class="col-2" >
-      <div class="row">
-        <div class="col p-0" style="background-color: #e3f2fd;">
-          <h6>Channel Selector</h6>
-          <channel-selector></channel-selector>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col p-0" style="background-color: lightpink; width: 200px; height: 500px; overflow-y: scroll;">
-          <h6>Analytics</h6>
-          <transformer-selector></transformer-selector>
-        </div>
-      </div>
-
-    </div>
-    <div class="col p-0 d-flex flex-column" style="background-color: lightcyan;">
-      <h6>Analytics Ladder</h6>
-      <ladder-diagram class="inline-flex h-100 w-100" style="overflow: auto"></ladder-diagram>
-    </div>
-
-    <div class="col-2 p-0" style="background-color: lightskyblue">
-      <h6>Analytic Properties</h6>
-      <transformer-property-selector></transformer-property-selector>
-    </div>
+    <ladder-diagram class="col p-0 h-100 scroll"></ladder-diagram>
+    <transformer-property-selector class="col-2 p-2 scroll"></transformer-property-selector>
   </div>
 </div>

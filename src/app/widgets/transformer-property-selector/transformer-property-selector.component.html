@@ -1,7 +1,11 @@
+
+<h4>Properties</h4>
+<hr>
+
 <div *ngFor="let transformerProperty of transformerProperties | async" class="w-100 container-fluid">
 
   <div class="row">
-    <i class="fa fa-question-circle mx-1 mt-1" ngbTooltip="{{transformerProperty.definition.description}}" container="body"></i>
+    <i class="fa fa-question-circle mx-1" placement="left" ngbTooltip="{{transformerProperty.definition.description}}" container="body"></i>
     <h6>{{transformerProperty.definition.name}}</h6>
   </div>
 

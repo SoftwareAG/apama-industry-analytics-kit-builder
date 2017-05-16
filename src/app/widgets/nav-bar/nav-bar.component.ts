@@ -1,18 +1,18 @@
 import {Component, OnInit} from "@angular/core";
-import {Config} from "../../classes/Config";
+import {Config, ConfigBuilder} from "../../classes/Config";
 import {AbstractDataService} from "../../services/AbstractDataService";
 import {Observable} from "rxjs";
 import {List, Set} from "immutable";
 import {FileService, UserCancelled} from "../../services/FileService";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {AbstractMetadataService} from "../../services/MetadataService";
-import {SaveConfigurationComponent} from "app/dialog/save-configuration/save-configuration.component";
+import {SaveConfigurationComponent} from "app/widgets/save-configuration/save-configuration.component";
 import {ModalDismissReasons, NgbModal} from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'nav-bar',
   templateUrl: './nav-bar.component.html',
-  styleUrls: ['./nav-bar.component.css']
+  styleUrls: ['./nav-bar.component.scss']
 })
 export class NavBarComponent implements OnInit {
   readonly configurations: Observable<List<Config>>;
@@ -33,6 +33,14 @@ export class NavBarComponent implements OnInit {
   }
 
   onConfigurationClick(config: Config) {
+    this.dataService.hierarchy.next(config);
+  }
+
+  newConfig() {
+    const config = new ConfigBuilder()
+      .Name('New Configuration')
+      .withRow().endWith()
+      .build();
     this.dataService.hierarchy.next(config);
   }
 

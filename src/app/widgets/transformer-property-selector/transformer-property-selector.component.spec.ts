@@ -132,7 +132,7 @@ describe('TransformerPropertySelectorComponent', () => {
     fixture.detectChanges();
 
     // Check that all of the transformer properties have rendered into the DOM
-    expect(el.children.length).toEqual(10);
+    expect(el.children.length).toEqual(12);
 
     // Get the data so we can compare it against the DOM elements
     Array.from(el.querySelectorAll('h6')).forEach((transformerPropertyEl, i) => {

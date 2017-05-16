@@ -11,7 +11,7 @@ import {AbstractMetadataService} from "../../services/MetadataService";
 @Component({
   selector: 'transformer-property-selector',
   templateUrl: './transformer-property-selector.component.html',
-  styleUrls: ['./transformer-property-selector.component.css']
+  styleUrls: ['./transformer-property-selector.component.scss']
 })
 export class TransformerPropertySelectorComponent implements OnInit {
 

@@ -1,0 +1,19 @@
+@import '../_theme.scss';
+
+.left-panel {
+  border-right: 1px solid $gray-lighter;
+}
+
+transformer-property-selector {
+  background-color: $gray-lightest;
+  border-left: 1px solid $gray-lighter;
+}
+
+transformer-selector {
+  background-color: $gray-lightest;
+  border-top: 1px solid $gray-lighter;
+}
+
+channel-selector {
+  background-color: $gray-lightest;
+}

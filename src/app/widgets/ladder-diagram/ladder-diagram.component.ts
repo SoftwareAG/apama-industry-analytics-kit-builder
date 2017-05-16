@@ -17,7 +17,7 @@ import {BaseType, Selection} from "d3-selection";
 @Component({
   selector: 'ladder-diagram',
   template: '<svg></svg>',
-  styleUrls: ['./ladder-diagram.component.css']
+  styleUrls: ['./ladder-diagram.component.scss']
 })
 export class LadderDiagramComponent implements OnInit {
   readonly nativeElement;

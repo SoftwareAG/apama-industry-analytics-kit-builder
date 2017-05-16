@@ -19,7 +19,7 @@ import {PropertySerializer} from "app/classes/Property";
 import {TransformerSerializer} from "./classes/Transformer";
 import {FileService} from "./services/FileService";
 import {AbstractMetadataService, MetadataService} from "./services/MetadataService";
-import {SaveConfigurationComponent} from "./dialog/save-configuration/save-configuration.component";
+import {SaveConfigurationComponent} from "./widgets/save-configuration/save-configuration.component";
 
 describe('AppComponent', () => {
   beforeEach(async(() => {

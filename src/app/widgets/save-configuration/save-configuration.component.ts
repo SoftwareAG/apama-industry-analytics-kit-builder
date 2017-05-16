@@ -6,7 +6,7 @@ import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 @Component({
   selector: 'save-configuration-dialog',
   templateUrl: './save-configuration.component.html',
-  styleUrls: ['./save-configuration.component.css']
+  styleUrls: ['./save-configuration.component.scss']
 })
 export class SaveConfigurationComponent implements OnInit {
 
@@ -38,6 +38,7 @@ export class SaveConfigurationComponent implements OnInit {
 
 
 ngOnInit() {
+
   }
 
 }

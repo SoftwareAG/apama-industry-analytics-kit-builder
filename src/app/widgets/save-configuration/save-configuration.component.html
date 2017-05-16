@@ -1,4 +1,4 @@
-  <div class="modal-header">
+  <div class="modal-header bg-primary">
     <h4 class="modal-title">Save Configuration</h4>
     <button type="button" class="close" (click)="dismiss('Cross click')">
       <span>&times;</span>
@@ -8,7 +8,7 @@
     <div class="modal-body">
       <div class="form-group row"
            [class.has-danger]="name.invalid && (name.dirty || name.touched)">
-        <label for="name" class="col-2 col-form-label">Name</label>
+        <label for="name" class="col-2 col-form-label" focus>Name</label>
         <div class="col-10">
           <input [ngModel]="dataService.hierarchy.getValue().name.getValue()"
                  (ngModelChange)="dataService.hierarchy.getValue().name.next($event)"

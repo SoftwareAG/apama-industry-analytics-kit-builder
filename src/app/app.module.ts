@@ -21,7 +21,8 @@ import {TransformerSerializer} from "./classes/Transformer";
 import {PropertySerializer} from "./classes/Property";
 import {FileService} from "./services/FileService";
 import {AbstractMetadataService, MetadataService} from "./services/MetadataService";
-import {SaveConfigurationComponent } from './dialog/save-configuration/save-configuration.component';
+import {SaveConfigurationComponent } from './widgets/save-configuration/save-configuration.component';
+import {FocusDirective} from "./directives/focus.directive";
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import {SaveConfigurationComponent } from './dialog/save-configuration/save-conf
     TransformerPropertySelectorComponent,
     NavBarComponent,
     DragOverlayComponent,
-    SaveConfigurationComponent
+    SaveConfigurationComponent,
+    FocusDirective
   ],
   imports: [
     BrowserModule,

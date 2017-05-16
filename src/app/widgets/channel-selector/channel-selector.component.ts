@@ -7,9 +7,9 @@ import {List} from "immutable";
 import {AbstractDragService} from "../../services/AbstractDragService";
 
 @Component({
-  template: '<svg class="channel-selector"></svg>',
+  templateUrl: './channel-selector.component.html',
   selector: 'channel-selector',
-  styleUrls: ['./channel-selector.component.css']
+  styleUrls: ['./channel-selector.component.scss']
 })
 export class ChannelSelectorComponent implements OnInit {
   readonly nativeElement;
@@ -32,7 +32,7 @@ export class ChannelSelectorComponent implements OnInit {
     const height = 300 - padding.top - padding.bottom;
     const channelHeight = 50;
 
-    const svg = d3.select(this.nativeElement).select(".channel-selector")
+    const svg = d3.select(this.nativeElement).select("svg")
       .attr("width", width + padding.left + padding.right)
       .attr("height", height + padding.top + padding.bottom);
 

@@ -49,7 +49,7 @@ describe('ChannelSelectorComponent', () => {
   });
 
   it('should have an svg child element', () => {
-    expect(el.children[0].nodeName).toEqual('svg');
+    expect(el.children[2].nodeName).toEqual('svg');
   });
 
   it('should create transformer elements', () => {
