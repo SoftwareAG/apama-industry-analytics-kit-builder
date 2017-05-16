@@ -1,0 +1,10 @@
+* >>> .no-pointer {
+  pointer-events: none;
+}
+
+* >>> .grabbable {
+  cursor: move;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+  cursor: grab;
+}

@@ -5,7 +5,7 @@ import {
   TransformerJsonInterface,
   TransformerSerializer
 } from "./Transformer";
-import {ChannelBuilder, ChannelJsonInterface, NestedChannelBuilder, RowChannel} from "./Channel";
+import {RowChannelBuilder, ChannelJsonInterface, NestedChannelBuilder, RowChannel} from "./Channel";
 import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
 import {AsObservable} from "../interfaces/interfaces";
 import {BehaviorSubject, Observable} from "rxjs";
@@ -15,6 +15,7 @@ import {Injectable} from "@angular/core";
 import {Metadata} from "./Metadata";
 import * as _ from "lodash";
 import {TransformerChannel} from "app/classes/TransformerChannel";
+import {TransformerChannelDef} from "./TransformerChannelDef";
 
 export interface RowJsonInterface {
   maxTransformerCount: number;
@@ -57,12 +58,14 @@ export class Row extends AbstractModel<RowJsonInterface, never> implements AsObs
   }
 
   getInChannels(metadata: Metadata): List<RowChannel | TransformerChannel> {
-    const requiredChannels = this.transformers.getValue().size ? this.transformers.getValue().first().inputChannels : List();
+    // Guarantee ordering by iterating the channelDefs rather than the channels
+    const requiredChannels = this.transformers.getValue().isEmpty() ? List() : metadata.getAnalytic(this.transformers.getValue().first().name).inputChannels.flatMap((channel: TransformerChannelDef) => this.transformers.getValue().first().getInputChannels(channel.name)) as List<TransformerChannel>;
     return requiredChannels.map((channelDef: TransformerChannel, i: number) => this.inputChannelOverrides.getValue().get(i) || channelDef) as List<RowChannel | TransformerChannel>;
   }
 
   getOutChannels(metadata: Metadata): List<RowChannel | TransformerChannel> {
-    const requiredChannels = this.transformers.getValue().size ? this.transformers.getValue().last().outputChannels : List();
+    // Guarantee ordering by iterating the channelDefs rather than the channels
+    const requiredChannels = this.transformers.getValue().isEmpty() ? List() : metadata.getAnalytic(this.transformers.getValue().last().name).outputChannels.flatMap((channel: TransformerChannelDef) => this.transformers.getValue().last().getOutputChannels(channel.name)) as List<TransformerChannel>;
     return requiredChannels.map((channelDef: TransformerChannel, i: number) => this.outputChannelOverrides.getValue().get(i) || channelDef) as List<RowChannel | TransformerChannel>;
   }
 
@@ -70,6 +73,10 @@ export class Row extends AbstractModel<RowJsonInterface, never> implements AsObs
     // TODO: do some validation
     if (this.maxTransformerCount.getValue() <= 0) { throw new Error('Max transformer count must be greater than 0'); }
     return this
+  }
+
+  removeTransformer(transformer: Transformer) {
+    this.transformers.next(List<Transformer>(this.transformers.getValue().filter(t => t !== transformer)))
   }
 }
 
@@ -128,8 +135,8 @@ export class RowBuilder extends ClassBuilder<Row> implements RowInterface {
     return new RowBuilder()
       .MaxTransformerCount(json.maxTransformerCount)
       .Transformers(json.transformers.map((transformer) => TransformerBuilder.fromJson(transformer).build()))
-      .InputChannels(_.mapValues(json.inputChannelOverrides, (chan: ChannelJsonInterface) => ChannelBuilder.fromJson(chan).build()))
-      .OutputChannels(_.mapValues(json.outputChannelOverrides, (chan: ChannelJsonInterface) => ChannelBuilder.fromJson(chan).build()))
+      .InputChannels(_.mapValues(json.inputChannelOverrides, (chan: ChannelJsonInterface) => RowChannelBuilder.fromJson(chan).build()))
+      .OutputChannels(_.mapValues(json.outputChannelOverrides, (chan: ChannelJsonInterface) => RowChannelBuilder.fromJson(chan).build()))
   }
 }
 

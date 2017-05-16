@@ -1,5 +1,5 @@
 import {ConfigBuilder} from "../classes/Config";
-import {ChannelBuilder} from "../classes/Channel";
+import {RowChannelBuilder} from "../classes/Channel";
 import {AbstractDataService} from "./AbstractDataService";
 import {Injectable} from "@angular/core";
 
@@ -138,13 +138,13 @@ export class DataService extends AbstractDataService {
   loadChannels()
   {
     this.channels.next(this.channels.getValue().push(
-      new ChannelBuilder()
+      new RowChannelBuilder()
         .Name("Channel 1")
         .build()
     ));
 
     this.channels.next(this.channels.getValue().push(
-      new ChannelBuilder()
+      new RowChannelBuilder()
         .Name("Channel 2")
         .build()
     ));

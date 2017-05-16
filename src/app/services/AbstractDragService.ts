@@ -1,6 +1,4 @@
-
 import {BehaviorSubject} from "rxjs";
-import {TransformerDef} from "app/classes/TransformerDef";
 import {RowChannel} from "app/classes/Channel";
 import {Transformer} from "../classes/Transformer";
 
@@ -11,7 +9,7 @@ export interface Point {
 
 export class Dragged implements Draggable {
   readonly sourceElement: SVGGraphicsElement;
-  readonly object: RowChannel | TransformerDef | Transformer;
+  readonly object: RowChannel | Transformer;
   readonly currentLocation: BehaviorSubject<Point>;
 
   constructor(draggable: Draggable) {
@@ -28,7 +26,7 @@ export class Dragged implements Draggable {
 
 export interface Draggable {
   sourceElement: SVGGraphicsElement;
-  object: RowChannel|TransformerDef|Transformer;
+  object: RowChannel|Transformer;
 }
 
 export abstract class AbstractDragService {
@@ -37,4 +35,13 @@ export abstract class AbstractDragService {
   abstract startDrag(draggable: Draggable)
   abstract stopDrag(): Dragged | undefined
   abstract drag(newLocation: Point)
+
+  isDragging(): boolean {
+    return this.dragging.getValue() !== undefined;
+  }
+
+  isDraggingClass(clazz: any) {
+    const dragging = this.dragging.getValue();
+    return dragging && dragging.object instanceof clazz;
+  }
 }

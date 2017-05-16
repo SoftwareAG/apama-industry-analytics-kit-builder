@@ -2,7 +2,7 @@ import {NestedPropertyBuilder, Property, PropertyBuilder, PropertyJsonInterface,
 import {TransformerDef} from "./TransformerDef";
 import {ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
 import {AsObservable} from "../interfaces/interfaces";
-import {List, Map} from "immutable";
+import {List, Map, OrderedMap} from "immutable";
 import {BehaviorSubject, Observable} from "rxjs";
 import {Row} from "./Row";
 import {Injectable} from "@angular/core";
@@ -15,6 +15,7 @@ import {
   TransformerChannelJsonInterface
 } from "./TransformerChannel";
 import {validate} from "validate.js";
+import {TransformerChannelDef} from "./TransformerChannelDef";
 
 export interface TransformerJsonInterface {
   name: string;
@@ -119,23 +120,83 @@ export class Transformer implements AbstractModel<TransformerJsonInterface, Tran
     return this.propertyValuesByDefName.getValue().get(name) || List();
   }
 
-  addPropertyValue(propertyName: string, propertyValue: Property) {
+  addPropertyValue(propertyName: string, propertyValue: Property): this {
     this.propertyValuesByDefName.next(
       this.propertyValuesByDefName.getValue()
         .update(
           propertyName,
           (propertyVals) => propertyVals ? propertyVals.push(propertyValue) : List.of(propertyValue)
         )
-    )
+    );
+    return this;
   }
 
-  removePropertyValue(propertyVal: Property) {
+  removePropertyValue(propertyVal: Property): this {
     this.propertyValuesByDefName.next(
       this.propertyValuesByDefName.getValue().update(
         propertyVal.definitionName,
         (propertyVals) => List<Property>(propertyVals.filter(p => p !== propertyVal))
       )
-    )
+    );
+    return this;
+  }
+
+  getInputChannels(name: string): List<TransformerChannel> {
+    return this.inputChannelsByDefName.getValue().get(name) || List()
+  }
+
+  addInputChannel(channel: TransformerChannel): this {
+    this.inputChannelsByDefName.next(
+      this.inputChannelsByDefName.getValue()
+        .update(
+          channel.name,
+          (channels) => channels ? channels.push(channel) : List.of(channel)
+        )
+    );
+    return this;
+  }
+
+  addInputChannelFromDef(channelDef: TransformerChannelDef) {
+    this.addInputChannel(TransformerChannelBuilder.fromTransformerChannelDef(channelDef).build())
+  }
+
+  removeInputChannel(channel: TransformerChannel) {
+    this.inputChannelsByDefName.next(
+      this.inputChannelsByDefName.getValue().update(
+        channel.name,
+        (channels) => List<TransformerChannel>(channels.filter(p => p !== channel))
+      )
+    );
+    return this;
+  }
+
+  getOutputChannels(name: string): List<TransformerChannel> {
+    return this.outputChannelsByDefName.getValue().get(name) || List()
+  }
+
+  addOutputChannel(channel: TransformerChannel): this {
+    this.outputChannelsByDefName.next(
+      this.outputChannelsByDefName.getValue()
+        .update(
+          channel.name,
+          (channels) => channels ? channels.push(channel) : List.of(channel)
+        )
+    );
+    return this;
+  }
+
+  addOutputChannelFromDef(channelDef: TransformerChannelDef) {
+    this.addOutputChannel(TransformerChannelBuilder.fromTransformerChannelDef(channelDef).build())
+  }
+
+  removeOutputChannel(channel: TransformerChannel) {
+    this.outputChannelsByDefName.next(
+      this.outputChannelsByDefName.getValue().update(
+        channel.name,
+        (channels) => List<TransformerChannel>(channels.filter(p => p !== channel))
+      )
+    );
+    return this;
   }
 }
 

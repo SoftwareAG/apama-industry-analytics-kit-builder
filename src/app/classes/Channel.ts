@@ -32,7 +32,7 @@ export class RowChannel extends AbstractModel<ChannelJsonInterface, never> imple
   }
 }
 
-export class ChannelBuilder extends ClassBuilder<RowChannel> implements ChannelInterface {
+export class RowChannelBuilder extends ClassBuilder<RowChannel> implements ChannelInterface {
   name: string;
 
   Name(name: string): this {
@@ -45,12 +45,12 @@ export class ChannelBuilder extends ClassBuilder<RowChannel> implements ChannelI
   }
 
   static fromJson(json: ChannelJsonInterface) {
-    return new ChannelBuilder()
+    return new RowChannelBuilder()
       .Name(json.name);
   }
 }
 
-export class NestedChannelBuilder<Parent> extends ChannelBuilder implements NestedClassBuilder<Parent> {
+export class NestedChannelBuilder<Parent> extends RowChannelBuilder implements NestedClassBuilder<Parent> {
   constructor(private callback: (channel: RowChannel) => Parent) {
     super();
   }

@@ -17,7 +17,7 @@ export class TransformerSelectorComponent implements OnInit {
   readonly transformers: Observable<List<TransformerDef>>;
   readonly dragService: AbstractDragService;
 
-  constructor(myElement: ElementRef, metadataService: AbstractMetadataService, dragService: AbstractDragService) {
+  constructor(myElement: ElementRef, private metadataService: AbstractMetadataService, dragService: AbstractDragService) {
     this.nativeElement = myElement.nativeElement;
     this.transformers = metadataService.metadata.map((metadata) => metadata.analytics);
     this.dragService = dragService;
@@ -43,7 +43,7 @@ export class TransformerSelectorComponent implements OnInit {
         .classed('unselectable', true)
         .attr('transform', (d, i) => `translate(${padding.left},${padding.top + i * (transformerHeight + padding.top)})`)
         .on('mousedown', function(d) {
-          component.dragService.startDrag({sourceElement: this as SVGGElement, object: d});
+          component.dragService.startDrag({sourceElement: this as SVGGElement, object: component.metadataService.createAnalytic(d.name)});
           d3.event.preventDefault();
         });
       const transformersUpdate = transformers.merge(transformersEnter);

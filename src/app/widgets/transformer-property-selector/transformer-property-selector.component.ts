@@ -26,10 +26,11 @@ export class TransformerPropertySelectorComponent implements OnInit {
       .switchMap((selectedTransformer) => selectedTransformer ? selectedTransformer.propertyValuesByDefName.mapTo(selectedTransformer) : Observable.of(undefined)) // Track additions/removals from the propertyValues Map
       .combineLatest(
         metadata,
-        (selectedTransformer, metadata) => selectedTransformer ? metadata.getAnalytic(selectedTransformer.name).properties.map((propertyDef: PropertyDef) => {
+        dataService.hierarchy,
+        (selectedTransformer, metadata, hierarchy) => selectedTransformer ? metadata.getAnalytic(selectedTransformer.name).properties.map((propertyDef: PropertyDef) => {
           return { definition: propertyDef, values: selectedTransformer.getPropertyValues(propertyDef.name) }
         }) : List()
-      )
+      );
   }
 
   addPropertyValue(propertyDef: PropertyDef) {
