@@ -146,7 +146,127 @@ describe('FileService', () => {
             "validator": "function(value) { return value.length > 0 | 'Must not be empty' }"
           }
         ]
-      }]
+      },
+        {
+          "description": "Generates a Data containing a moving average calculation for each input Data received.",
+          "group": "Streaming Calculations",
+          "inputChannels": [
+            {
+              "description": "The channel used to calculate a moving average",
+              "name": "Data",
+              "optional": true
+            }
+          ],
+          "name": "Average",
+          "outputChannels": [
+            {
+              "description": "The channel where moving average data is output",
+              "name": "Average"
+            }
+          ],
+          "properties": [
+            {
+              "defaultValue": "60.0d",
+              "description": "Defines the time window to calculate the moving average over",
+              "name": "timeWindow",
+              "type": "decimal",
+              "validator": "function(value) { return value > 0 || 'Value must be greater than 0.0' }"
+            }
+          ]
+        },{
+          "description": "The Spread Analytic calculates a new Data event from the spread between the values on the current Data and the value on previously received Data events.",
+          "group": "Streaming Calculations",
+          "inputChannels": [
+            {
+              "description": "The channel used to calculate the spread across the sourceIds",
+              "name": "Data",
+              "repeated": true
+            }
+          ],
+          "name": "Spread",
+          "outputChannels": [
+            {
+              "description": "The channel to output spread data",
+              "name": "Spread"
+            }
+          ],
+          "properties": [
+            {
+              "defaultValue": false,
+              "description": "Defines whether only anomalies should be output. Can only be specified if a spreadThreshold is defined",
+              "name": "anomaliesOnly",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "description": "The maximum nominal spread. A greater spread will trigger anomaly output Data events",
+              "name": "spreadThreshold",
+              "optional": true,
+              "type": "decimal"
+            }
+          ]
+        },{
+          "description": "Detect data above or below a threshold.",
+          "group": "Detectors",
+          "inputChannels": [
+            {
+              "description": "The channel to check for threshold breaches",
+              "name": "Data"
+            },
+            {
+              "description": "Channel recieving updates to the threshold value",
+              "name": "Threshold Updates",
+              "optional": true
+            }
+          ],
+          "name": "Threshold",
+          "outputChannels": [
+            {
+              "description": "The channel on which to output threshold breaches",
+              "name": "Breaches"
+            }
+          ],
+          "properties": [
+            {
+              "description": "The threshold value that is used to detect breaches",
+              "name": "threshold",
+              "type": "decimal"
+            },
+            {
+              "description": "Whether to check for crossing, falling or rising threshold breaches",
+              "name": "direction",
+              "type": "string",
+              "validValues": [
+                "crossing",
+                "falling",
+                "rising"
+              ]
+            },
+            {
+              "defaultValue": 0,
+              "description": "How long (in seconds) the threshold may be breached before an Anomaly Data is generated. If value=0.0d, then Anomaly Data is generated immediately.",
+              "name": "duration",
+              "optional": true,
+              "type": "decimal",
+              "validator": "function(value) { return value >= 0 || 'Value must be greater than or equal to 0' }"
+            },
+            {
+              "defaultValue": 1,
+              "description": "The maximum number of times an Anomaly Data is generated for the breach before stopping checking. A value of 0 indicates unlimited repeats.",
+              "name": "repeats",
+              "optional": true,
+              "type": "integer",
+              "validator": "function(value) { return value >= 0 || 'Value must be greater than or equal to 0' }"
+            },
+            {
+              "defaultValue": false,
+              "description": "Whether to check for threshold breaches when the threshold is updated. This has the potential to be an expensive operation as the check would need to be done for each sourceId being monitored. This parameter is ignored is only one inputData is provided.",
+              "name": "checkBreachesOnThresholdUpdate",
+              "optional": true,
+              "type": "boolean"
+            }
+          ]
+        }]
     });
   });
 
@@ -395,6 +515,26 @@ com.industry.analytics.Analytic("Corridor",["Row0:Channel1"],["Row0"],{"upperThr
     expect(config.rows.getValue().last().transformers.getValue().first().getPropertyValues("lowerThreshold").get(0).value.getValue()).toEqual(10);
     expect(config.rows.getValue().last().transformers.getValue().first().getPropertyValues("zone").get(0).value.getValue()).toEqual("outside");
     expect(config.rows.getValue().last().transformers.getValue().first().getPropertyValues("duration").get(0).value.getValue()).toEqual(5.0);
+  });
+
+  it('should create the row input and output channels based on the Analytics on the row', () => {
+    const apama = `\\\\ Name: Peer Analysis
+\\\\ Version: 0.0.0.0
+\\\\ Row: 0
+com.industry.analytics.Analytic("Average",["Orders"],["Moving Average"],{"timeWindow":"0.0d"})
+
+\\\\ Row: 1
+com.industry.analytics.Analytic("Spread",["Moving Average", "Orders"],["Row1:Channel1"],{"anomaliesOnly":"false","spreadThreshold":"0.0d"})
+com.industry.analytics.Analytic("Threshold",["Row1:Channel1","Row1:Channel1"],["Outliers"],{"threshold":"100.0d","direction":"crossing","duration":"10.0d"})`;
+    const config: Config = fileService.deserialize(apama);
+    expect(config.rows.getValue().size).toEqual(2);
+    expect( config.rows.getValue().first().transformers.getValue().size).toEqual(1);
+    expect( config.rows.getValue().first().inputChannelOverrides.getValue().get(0).name.getValue()).toEqual('Orders');
+    expect( config.rows.getValue().first().outputChannelOverrides.getValue().get(0).name.getValue()).toEqual('Moving Average');
+    expect( config.rows.getValue().last().transformers.getValue().size).toEqual(2);
+    expect( config.rows.getValue().last().inputChannelOverrides.getValue().get(0).name.getValue()).toEqual('Moving Average');
+    expect( config.rows.getValue().last().inputChannelOverrides.getValue().get(1).name.getValue()).toEqual('Orders');
+    expect( config.rows.getValue().last().outputChannelOverrides.getValue().get(0).name.getValue()).toEqual('Outliers');
   });
 
 });

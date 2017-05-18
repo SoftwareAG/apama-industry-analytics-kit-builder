@@ -250,11 +250,15 @@ export class ConfigSerializer {
     }
 
     function buildChannels(analyticInChannels: string, analyticOutChannels: string) : {inChannelNames : string[], outChannelNames : string[]} {
-      const channelsPattern = /([\w\s])+/g;
-      analyticInChannels = analyticInChannels.replace(/"/g, "");
-      const inChannelNames = Array.from(analyticInChannels.match(channelsPattern) || []);
-      analyticOutChannels = analyticOutChannels.replace(/"/g, "");
-      const outChannelNames = Array.from(analyticOutChannels.match(channelsPattern) || []);
+      const channelsPattern = /"([^"]*)"/g;
+      const inChannelNames = Array.from(analyticInChannels.match(channelsPattern) || [])
+        .map(c => {
+          return c.replace(/"/g, "");
+      });
+      const outChannelNames = Array.from(analyticOutChannels.match(channelsPattern) || [])
+        .map(c => {
+          return c.replace(/"/g, "");
+      });
       return {inChannelNames : inChannelNames, outChannelNames : outChannelNames};
     }
 
