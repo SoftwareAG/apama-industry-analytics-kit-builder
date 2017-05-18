@@ -26,3 +26,24 @@
   margin-top: -.3em;
   margin-right: 0.3em;
 }
+
+.configurationTitle {
+  color: $white;
+  white-space: nowrap;
+  margin-top: .7rem;
+  max-width: 30vw;
+  position:absolute;
+  margin-left: 40vw;
+  @media screen and (min-width: $lg) {
+    max-width: 17vw;
+    margin-top: 0;
+    margin-left: 39rem;
+  }
+  @media screen and (min-width: $xl) {
+    max-width: 30vw;
+  }
+  @media screen and (min-width: $xl+300) {
+    max-width: 40vw;
+  }
+}
+

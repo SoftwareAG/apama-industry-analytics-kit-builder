@@ -10,25 +10,27 @@
            [class.has-danger]="name.invalid && (name.dirty || name.touched)">
         <label for="name" class="col-2 col-form-label" focus>Name</label>
         <div class="col-10">
-          <input [ngModel]="dataService.hierarchy.getValue().name.getValue()"
+          <input [ngModel]="(dataService.hierarchy | async).name | async"
                  (ngModelChange)="dataService.hierarchy.getValue().name.next($event)"
                  name="name"
                  type="text"
                  id="name"
                  class="form-control"
-                 required minlength="1" maxlength="500"
+                 required
                  #name="ngModel"
-                 [class.form-control-danger]="name.invalid && (name.dirty || name.touched)">
-          <div class="form-control-feedback"
-                *ngIf="name.errors && (name.dirty || name.touched)">
-                <p *ngIf="name.errors.required">Please enter a configuration name</p>
+                 [class.form-control-danger]="name.invalid && (name.dirty || name.touched)"
+                 placeholder="Enter a name for the configuration">
+          <div class="form-control-feedback" *ngIf="(name.dirty || name.touched) && name.errors">
+            <div *ngIf="name.errors.required">
+              <p>Please enter a configuration name</p>
+            </div>
           </div>
         </div>
       </div>
       <div class="form-group row">
         <label for="description" class="col-2 col-form-label">Description</label>
         <div class="col-10">
-          <textarea [ngModel]="dataService.hierarchy.getValue().description.getValue()"
+          <textarea [ngModel]="(dataService.hierarchy | async).description | async"
                   (ngModelChange)="dataService.hierarchy.getValue().description.next($event)"
                   name="description"
                   id="description"

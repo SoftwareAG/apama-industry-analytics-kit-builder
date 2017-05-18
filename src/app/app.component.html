@@ -3,10 +3,17 @@
   <nav-bar></nav-bar>
   <div class="w-100 h-100 d-flex">
     <div class="col-2 d-flex flex-column p-0 left-panel" >
-      <channel-selector class="h-50 p-2 scroll" channel-selector></channel-selector>
+      <channel-selector class="h-50 p-2 scroll"></channel-selector>
       <transformer-selector class="h-100 p-2 scroll"></transformer-selector>
     </div>
-    <ladder-diagram class="col p-0 h-100 scroll"></ladder-diagram>
+    <div class="col p-2">
+      <div class="row h-75 p-2">
+        <ladder-diagram class="w-100 scroll"></ladder-diagram>
+      </div>
+      <div class="row h-25 p-2">
+        <information class="w-100 h-100 p-2 scroll information-panel"></information>
+      </div>
+    </div>
     <transformer-property-selector class="col-2 p-2 scroll"></transformer-property-selector>
   </div>
 </div>

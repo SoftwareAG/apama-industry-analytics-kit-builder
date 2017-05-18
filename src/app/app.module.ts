@@ -23,6 +23,7 @@ import {FileService} from "./services/FileService";
 import {AbstractMetadataService, MetadataService} from "./services/MetadataService";
 import {SaveConfigurationComponent } from './widgets/save-configuration/save-configuration.component';
 import {FocusDirective} from "./directives/focus.directive";
+import { InformationComponent } from './widgets/information/information.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import {FocusDirective} from "./directives/focus.directive";
     NavBarComponent,
     DragOverlayComponent,
     SaveConfigurationComponent,
-    FocusDirective
+    FocusDirective,
+    InformationComponent
   ],
   imports: [
     BrowserModule,

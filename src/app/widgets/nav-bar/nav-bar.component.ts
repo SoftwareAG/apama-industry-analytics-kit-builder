@@ -38,8 +38,6 @@ export class NavBarComponent implements OnInit {
 
   newConfig() {
     const config = new ConfigBuilder()
-      .Name('New Configuration')
-      .withRow().endWith()
       .build();
     this.dataService.hierarchy.next(config);
   }
