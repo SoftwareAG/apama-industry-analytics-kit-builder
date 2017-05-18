@@ -16,7 +16,7 @@ import {BaseType, Selection} from "d3-selection";
 
 @Component({
   selector: 'ladder-diagram',
-  template: '<svg></svg>',
+  templateUrl: './ladder-diagram.component.html',
   styleUrls: ['./ladder-diagram.component.scss']
 })
 export class LadderDiagramComponent implements OnInit {
@@ -206,6 +206,7 @@ export class LadderDiagramComponent implements OnInit {
         const transformerEnter = transformer.enter().append('g')
           .classed('transformer', true)
           .classed('grabbable', true)
+          .attr('filter', 'url(#dropshadow)')
           .on('mouseup', function(d) {
             d3.event.stopPropagation();
             component.dragService.stopDrag();
@@ -251,14 +252,10 @@ export class LadderDiagramComponent implements OnInit {
         const transformerUpdate = transformer.merge(transformerEnter)
           .attr('transform', (d, i, transformersSelection) => `translate(${transformerLocation(i, transformersSelection.length, d.channelWidth)},0)`);
 
-        const transformerBgEnter = transformerEnter.append('rect')
-          .classed('transformer-background', true)
-          .attr('fill', 'steelblue')
-          .attr('stroke', 'black')
-          .attr('stroke-width', 2);
-        const transformerBgUpdate = transformerUpdate.select('.transformer-background')
-          .attr('height', d => transformerHeight(d.transformer))
-          .attr('width', transformerWidth);
+        const transformerBgEnter = transformerEnter.append('path')
+          .classed('transformer-bg', true);
+        const transformerBgUpdate = transformerUpdate.select('.transformer-bg')
+          .attr('d', d => roundedRectangle(transformerWidth, transformerHeight(d.transformer), 8));
 
         const transformerInChannelsEnter = transformerEnter.append('g')
           .classed('transformer-inchannels', true);
@@ -286,9 +283,6 @@ export class LadderDiagramComponent implements OnInit {
           transformerChannelEnter.append('circle')
             .classed('channel-circle', true)
             .attr('r', 3)
-            .attr('fill', 'steelblue')
-            .attr('stroke', 'black')
-            .attr('stroke-width', '2')
             .on('mouseup', function(d) {
               // Cancel the drag timeout before adding/removing the channel, otherwise the diagram is redrawn and the event doesn't bubble
               const transformerDatum = d3.select(findParentNodeWithClass(this as Element, 'transformer')).datum() as any;
@@ -338,7 +332,7 @@ export class LadderDiagramComponent implements OnInit {
             .text(d => d.channel.name);
 
           transformerChannelUpdate.select('.channel-circle')
-            .attr('fill', d => d.channel instanceof TransformerChannelDef ? 'white' : 'steelblue');
+            .classed('placeholder', d => d.channel instanceof TransformerChannelDef);
 
           transformerChannelUpdate.select('.channel-add-remove')
             .text(d => {
@@ -367,12 +361,9 @@ export class LadderDiagramComponent implements OnInit {
 
         const dropTarget = dropTargetsUpdate.selectAll('.drop-target').data(d => getDropTargetLocations(d.row, d.channelWidth).map(x => { return { row: d.row, x: x, channelWidth: d.channelWidth } }));
         dropTarget.exit().remove();
-        const dropTargetEnter = dropTarget.enter().append('rect')
+        const dropTargetEnter = dropTarget.enter().append('path')
           .classed('drop-target', true)
-          .attr('fill', 'lightgrey')
-          .attr('stroke', 'black')
-          .attr('stroke-width', '2')
-          .attr('stroke-dasharray', '5,5')
+          .attr('fill', 'rgba(0,0,0,.3)')
           .on('mouseup', (d, i) => {
             const dragging = component.dragService.dragging.getValue();
             if (dragging) {
@@ -384,10 +375,8 @@ export class LadderDiagramComponent implements OnInit {
             }
           });
         const dropTargetUpdate = dropTarget.merge(dropTargetEnter)
-          .attr('x', d => d.x + d.channelWidth/2)
-          .attr('width', dropTargetWidth)
-          .attr('height', channelSpacing * 2)
-          .attr('transform', `translate(${-dropTargetWidth/2},0)`);
+          .attr('d', roundedRectangle(dropTargetWidth, channelSpacing * 2, 8))
+          .attr('transform', d => `translate(${d.x + d.channelWidth/2 -dropTargetWidth/2},0)`);
 
         // Stack the rows below each other
         rowUpdate
@@ -549,4 +538,8 @@ function findParentNodeWithClass(el: Element, className: string): Element | null
     parent = parent.parentNode;
   }
   return parent;
+}
+
+function roundedRectangle(width: number, height: number, cornerRadius: number) {
+  return `M${cornerRadius} 0 L${width} 0 L${width} ${height-cornerRadius} Q${width} ${height} ${width-cornerRadius} ${height} L0 ${height} L0 ${cornerRadius} Q0 0 ${cornerRadius} 0z`;
 }

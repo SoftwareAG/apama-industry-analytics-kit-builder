@@ -12,3 +12,22 @@ html,body {
 .scroll {
   overflow: auto;
 }
+
+.unselectable {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none;  /* Non-prefixed version, currently supported by Chrome and Opera */
+}
+
+.no-pointer {
+  pointer-events: none;
+}
+
+.grabbable {
+  cursor: move;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+  cursor: grab;
+}

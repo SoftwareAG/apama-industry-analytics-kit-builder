@@ -1,10 +1,23 @@
-* >>> .no-pointer {
-  pointer-events: none;
-}
+@import '../../../_theme.scss';
 
-* >>> .grabbable {
-  cursor: move;
-  cursor: -moz-grab;
-  cursor: -webkit-grab;
-  cursor: grab;
+$transformer-color: saturate($brand-primary, 20%);
+
+* /deep/ {
+  .transformer {
+    fill: $transformer-color;
+    //filter: url('#dropshadow');
+
+    .channel-circle {
+      stroke: $black;
+      stroke-width: 2;
+
+      &.placeholder {
+        fill: $white;
+      }
+    }
+
+    text {
+      fill: black;
+    }
+  }
 }

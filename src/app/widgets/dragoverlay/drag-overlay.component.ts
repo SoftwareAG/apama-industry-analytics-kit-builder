@@ -3,7 +3,7 @@ import {AbstractDragService, Dragged} from "../../services/AbstractDragService";
 import * as d3 from "d3";
 
 @Component({
-  template: '',
+  templateUrl: './drag-overlay.component.html',
   selector: 'drag-overlay'
 })
 export class DragOverlayComponent implements OnInit {
@@ -19,7 +19,7 @@ export class DragOverlayComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const overlay = this.overlay = d3.select(this.nativeElement).append('svg');
+    const overlay = this.overlay = d3.select(this.nativeElement).select('svg');
     this.overlayNode = overlay.node() as SVGSVGElement;
     overlay
       .classed('drag-overlay', true)
