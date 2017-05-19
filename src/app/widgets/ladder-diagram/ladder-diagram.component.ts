@@ -206,7 +206,6 @@ export class LadderDiagramComponent implements OnInit {
         const transformerEnter = transformer.enter().append('g')
           .classed('transformer', true)
           .classed('grabbable', true)
-          .attr('filter', 'url(#dropshadow)')
           .on('mouseup', function(d) {
             d3.event.stopPropagation();
             component.dragService.stopDrag();
@@ -540,6 +539,6 @@ function findParentNodeWithClass(el: Element, className: string): Element | null
   return parent;
 }
 
-function roundedRectangle(width: number, height: number, cornerRadius: number) {
+export function roundedRectangle(width: number, height: number, cornerRadius: number) {
   return `M${cornerRadius} 0 L${width} 0 L${width} ${height-cornerRadius} Q${width} ${height} ${width-cornerRadius} ${height} L0 ${height} L0 ${cornerRadius} Q0 0 ${cornerRadius} 0z`;
 }

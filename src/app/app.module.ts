@@ -9,7 +9,7 @@ import {TransformerSelectorComponent} from "./widgets/transformer-selector/trans
 import {LadderDiagramComponent} from "./widgets/ladder-diagram/ladder-diagram.component";
 import {AbstractDataService} from "./services/AbstractDataService";
 import {DataService} from "app/services/DataService";
-import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
+import {NgbAccordion, NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {TransformerPropertySelectorComponent} from "./widgets/transformer-property-selector/transformer-property-selector.component";
 import {NavBarComponent} from "./widgets/nav-bar/nav-bar.component";
 import {AbstractDragService} from "app/services/AbstractDragService";
@@ -24,6 +24,7 @@ import {AbstractMetadataService, MetadataService} from "./services/MetadataServi
 import {SaveConfigurationComponent } from './widgets/save-configuration/save-configuration.component';
 import {FocusDirective} from "./directives/focus.directive";
 import { InformationComponent } from './widgets/information/information.component';
+import {TransformerDefinitionComponent} from "./widgets/transformer-definition/transformer-definition.component";
 import {ResizableModule} from "angular-resizable-element";
 
 @NgModule({
@@ -38,7 +39,8 @@ import {ResizableModule} from "angular-resizable-element";
     DragOverlayComponent,
     SaveConfigurationComponent,
     FocusDirective,
-    InformationComponent
+    InformationComponent,
+    TransformerDefinitionComponent
   ],
   imports: [
     BrowserModule,

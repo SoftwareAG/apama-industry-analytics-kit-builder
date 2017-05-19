@@ -21,3 +21,21 @@ $transformer-color: saturate($brand-primary, 20%);
     }
   }
 }
+
+.card-img-top {
+  background-color: $gray-lighter;
+  overflow: hidden;
+  > * {
+    margin-left: 50%;
+    transform: translate(-50%);
+  }
+}
+
+.popup-description {
+  position: absolute;
+  top: 100%;
+  z-index: 999;
+  width: 100%;
+  background-color: white;
+  pointer-events: none;
+}

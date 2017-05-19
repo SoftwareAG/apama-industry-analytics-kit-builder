@@ -1,9 +1,11 @@
 import {Component, ElementRef, HostListener, OnInit} from "@angular/core";
 import {AbstractDragService, Dragged} from "../../services/AbstractDragService";
 import * as d3 from "d3";
+import {AbstractDataService} from "../../services/AbstractDataService";
 
 @Component({
   templateUrl: './drag-overlay.component.html',
+  styleUrls: ['./drag-overlay.component.scss'],
   selector: 'drag-overlay'
 })
 export class DragOverlayComponent implements OnInit {
@@ -14,7 +16,7 @@ export class DragOverlayComponent implements OnInit {
 
   private currentTransition = null;
 
-  constructor(myElement: ElementRef, private readonly dragService: AbstractDragService) {
+  constructor(myElement: ElementRef, private readonly dragService: AbstractDragService, private dataService: AbstractDataService) {
     this.nativeElement = myElement.nativeElement;
   }
 
@@ -77,5 +79,6 @@ export class DragOverlayComponent implements OnInit {
         .attr('transform', (d: Dragged) => `translate(${d.getStartLocation().x},${d.getStartLocation().y})`)
         .attr('opacity', 0);
     this.dragService.stopDrag();
+    this.dataService.selectedTransformer.next(undefined);
   }
 }

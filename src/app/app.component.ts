@@ -33,6 +33,7 @@ export class AppComponent {
       .Version("1.0.0")
       .withAnalytic()
         .Name("Sorter")
+        .Group("Group1")
         .withInputChannel().Name("In1").Description("").endWith()
         .withOutputChannel().Name("Out1").Description("").endWith()
       .endWith()

@@ -1,9 +1,7 @@
-import {Component, ElementRef, OnInit} from "@angular/core";
-import * as d3 from "d3";
-import * as deepFreeze from "deep-freeze";
+import {Component, ElementRef} from "@angular/core";
 import {TransformerDef} from "../../classes/TransformerDef";
 import {Observable} from "rxjs";
-import {List} from "immutable";
+import {List, OrderedMap} from "immutable";
 import {AbstractDragService} from "../../services/AbstractDragService";
 import {AbstractMetadataService} from "../../services/MetadataService";
 
@@ -12,57 +10,22 @@ import {AbstractMetadataService} from "../../services/MetadataService";
   templateUrl: './transformer-selector.component.html',
   styleUrls: ['./transformer-selector.component.scss']
 })
-export class TransformerSelectorComponent implements OnInit {
-  readonly nativeElement;
-  readonly transformers: Observable<List<TransformerDef>>;
+export class TransformerSelectorComponent {
+  readonly analyticsByGroup: Observable<List<List<TransformerDef>>>;
   readonly dragService: AbstractDragService;
 
-  constructor(myElement: ElementRef, private metadataService: AbstractMetadataService, dragService: AbstractDragService) {
-    this.nativeElement = myElement.nativeElement;
-    this.transformers = metadataService.metadata.map((metadata) => metadata.analytics);
+  constructor( private metadataService: AbstractMetadataService, dragService: AbstractDragService) {
+    this.analyticsByGroup = metadataService.metadata
+        .map(metadata => {
+          return List(metadata.analytics
+            .reduce((result: OrderedMap<string, List<TransformerDef>>, analytic: TransformerDef) => {
+              return result.update(analytic.group, List<TransformerDef>(), (list: List<TransformerDef>) => list.push(analytic));
+            }, OrderedMap<string, List<TransformerDef>>())
+          .entrySeq()
+          .map(([groupName, analytics]: [string, List<TransformerDef>]) => {
+            return {groupName: groupName, analytics: analytics};
+          }));
+        });
     this.dragService = dragService;
   }
-
-  ngOnInit() {
-    const component = this;
-
-    const padding = deepFreeze({top: 10, right: 10, bottom: 10, left: 10});
-    const width = 200 - padding.left - padding.right;
-    const height = 1000 - padding.top - padding.bottom;
-    const transformerHeight = 50;
-
-    const svg = d3.select(this.nativeElement).select('svg')
-      .attr('width', width + padding.left + padding.right)
-      .attr('height', height + padding.top + padding.bottom);
-
-    this.transformers.subscribe(transformerDefs => {
-      const transformers = svg.selectAll('g').data(transformerDefs.toArray());
-      transformers.exit().remove();
-      const transformersEnter = transformers.enter().append('g')
-        .classed('transformer', true)
-        .classed('unselectable', true)
-        .attr('transform', (d, i) => `translate(${padding.left},${padding.top + i * (transformerHeight + padding.top)})`)
-        .on('mousedown', function(d) {
-          component.dragService.startDrag({sourceElement: this as SVGGElement, object: component.metadataService.createAnalytic(d.name)});
-          d3.event.preventDefault();
-        });
-      const transformersUpdate = transformers.merge(transformersEnter);
-
-      transformersEnter.append('rect')
-        .attr('fill', 'steelblue')
-        .attr('stroke', 'black')
-        .attr('stroke-width', 2)
-        .attr('width', width)
-        .attr('height', transformerHeight);
-      transformersEnter.append('text')
-        .classed('unselectable', true)
-        .attr('dy', '.3em')
-        .attr('text-anchor', 'middle')
-        .attr('y', transformerHeight / 2)
-        .attr('x', width / 2);
-      transformersUpdate.select('text')
-        .text((d: TransformerDef) =>  d.name)
-    });
-  }
-
 }
