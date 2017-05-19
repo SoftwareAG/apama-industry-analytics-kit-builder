@@ -6,12 +6,19 @@
       <channel-selector class="h-50 p-2 scroll"></channel-selector>
       <transformer-selector class="h-100 p-2 scroll"></transformer-selector>
     </div>
-    <div class="col p-2">
-      <div class="row h-75 p-2">
-        <ladder-diagram class="w-100 scroll"></ladder-diagram>
+    <div class="col p-0 h-100">
+      <div class="scroll" [style.height]="ladderDiagramHeightPercentString">
+        <ladder-diagram class="w-100" ></ladder-diagram>
       </div>
-      <div class="row h-25 p-2">
-        <information class="w-100 h-100 p-2 scroll information-panel"></information>
+      <div class="scroll information-panel p-2" mwlResizable
+           [enableGhostResize]="true"
+           ghostElementPositioning="absolute"
+           [resizeEdges]="{top: true}"
+           (resizeEnd)="onResizeEnd($event)"
+           (resizeStart)="onResizeStart($event)"
+           [validateResize]="onValidateResize"
+           [style.height]="informationHeightPercentString">
+        <information class="w-100 p-2 scroll"></information>
       </div>
     </div>
     <transformer-property-selector class="col-2 p-2 scroll"></transformer-property-selector>

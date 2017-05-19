@@ -8,5 +8,5 @@ export abstract class AbstractDataService {
   readonly hierarchy: BehaviorSubject<Config> = new BehaviorSubject(new ConfigBuilder().build());
   readonly channels: BehaviorSubject<List<RowChannel>> = new BehaviorSubject(List<RowChannel>());
   readonly selectedTransformer: BehaviorSubject<Transformer|undefined> = new BehaviorSubject(undefined);
-  readonly configurations: BehaviorSubject<List<Config>> = new BehaviorSubject(List<Config>());
+  readonly configurations: BehaviorSubject<List<() => Config>> = new BehaviorSubject(List<() => Config>());
 }

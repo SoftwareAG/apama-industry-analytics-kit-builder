@@ -15,7 +15,7 @@ import {ModalDismissReasons, NgbModal} from "@ng-bootstrap/ng-bootstrap";
   styleUrls: ['./nav-bar.component.scss']
 })
 export class NavBarComponent implements OnInit {
-  readonly configurations: Observable<List<Config>>;
+  readonly configurations: Observable<List<() => Config>>;
   readonly dataService: AbstractDataService;
   readonly metadataVersions: BehaviorSubject<Set<string>>;
   readonly currentMetaVersion: Observable<string>;
@@ -32,8 +32,8 @@ export class NavBarComponent implements OnInit {
   ngOnInit() {
   }
 
-  onConfigurationClick(config: Config) {
-    this.dataService.hierarchy.next(config);
+  onConfigurationClick(config: () => Config) {
+    this.dataService.hierarchy.next(config());
   }
 
   newConfig() {

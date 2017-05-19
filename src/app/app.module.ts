@@ -24,6 +24,7 @@ import {AbstractMetadataService, MetadataService} from "./services/MetadataServi
 import {SaveConfigurationComponent } from './widgets/save-configuration/save-configuration.component';
 import {FocusDirective} from "./directives/focus.directive";
 import { InformationComponent } from './widgets/information/information.component';
+import {ResizableModule} from "angular-resizable-element";
 
 @NgModule({
   declarations: [
@@ -43,6 +44,7 @@ import { InformationComponent } from './widgets/information/information.componen
     BrowserModule,
     FormsModule,
     HttpModule,
+    ResizableModule,
     NgbModule.forRoot()
   ],
   providers: [
