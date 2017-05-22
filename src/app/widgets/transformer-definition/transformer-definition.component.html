@@ -1,19 +1,18 @@
-<div class="card  mb-2">
-  <div class="card-img-top">
-    <svg>
-      <defs>
-        <filter id="dropshadow">
-          <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
-          <feOffset dx="2" dy="2"/>
-          <feComponentTransfer>
-            <feFuncA type="linear" slope="0.3"/>
-          </feComponentTransfer>
-          <feBlend mode="normal" in="SourceGraphic" />
-        </filter>
-      </defs>
-    </svg>
-  </div>
-  <div *ngIf="analytic.description" class="card-block p-1">
+<div class="row">
+  <svg class="col p-0">
+    <defs>
+      <filter id="dropshadow">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+        <feOffset dx="2" dy="2"/>
+        <feComponentTransfer>
+          <feFuncA type="linear" slope="0.3"/>
+        </feComponentTransfer>
+        <feBlend mode="normal" in="SourceGraphic" />
+      </filter>
+    </defs>
+  </svg>
+  <div *ngIf="analytic.description" class="col p-1">
     <p class="card-text"><small>{{analytic.description}}</small></p>
   </div>
 </div>
+
