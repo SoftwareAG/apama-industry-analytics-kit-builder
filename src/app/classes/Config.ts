@@ -234,6 +234,14 @@ export class ConfigSerializer {
           inChannelNames = buildChannelResult.inChannelNames;
           outChannelNames = buildChannelResult.outChannelNames;
 
+          // TODO: fix up and test, needs complicated logic
+          inChannelNames.forEach(name => {
+            transformerBuilder.withInputChannel().Name(name).endWith();
+          });
+          outChannelNames.forEach(name => {
+            transformerBuilder.withOutputChannel().Name(name).endWith();
+          });
+
           // Properties
           buildProperties(analyticProperties, transformerBuilder);
           analytic = transformerBuilder.build();

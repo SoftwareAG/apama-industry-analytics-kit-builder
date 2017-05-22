@@ -305,10 +305,10 @@ export class TransformerSerializer {
     return `${namespace}.Analytic(` +
       `"${transformer.name}",` +
       "[" +
-        TransformerSerializer.getInChannels(transformerDef, transformerIndex, row, rowIndex) +
+        TransformerSerializer.getInChannels(transformer, transformerIndex, row, rowIndex) +
       "]," +
       "[" +
-        TransformerSerializer.getOutChannels(transformerDef, transformerIndex, row, rowIndex) +
+        TransformerSerializer.getOutChannels(transformer, transformerIndex, row, rowIndex) +
       "]," +
       "{" +
         transformer.propertyValues.map((propertyVal: Property) => this.propertySerializer.toApama(propertyVal, transformerDef.getProperty(propertyVal.definitionName))).join(",") +
@@ -316,11 +316,11 @@ export class TransformerSerializer {
     ")";
   }
 
-  private static getInChannels(transformerDef: TransformerDef, transformerIndex: number, row: Row, rowIndex: number) : string {
-    if (!transformerDef.inputChannels.size) {
+  private static getInChannels(transformer: Transformer, transformerIndex: number, row: Row, rowIndex: number) : string {
+    if (!transformer.inputChannels.size) {
       return "";
     }
-    return "\"" + transformerDef.inputChannels.map((channel, channelIndex: number) => {
+    return "\"" + transformer.inputChannels.map((channel, channelIndex: number) => {
       if (transformerIndex === 0) {
         if (row.inputChannelOverrides.getValue().has(channelIndex)) {
           return row.inputChannelOverrides.getValue().get(channelIndex).name.getValue();
@@ -333,11 +333,11 @@ export class TransformerSerializer {
     }).join("\",\"") + "\""
   }
 
-  private static getOutChannels(transformerDef: TransformerDef, transformerIndex: number, row: Row, rowIndex: number) : string {
-    if (!transformerDef.outputChannels.size) {
+  private static getOutChannels(transformer: Transformer, transformerIndex: number, row: Row, rowIndex: number) : string {
+    if (!transformer.outputChannels.size) {
       return "";
     }
-    return "\"" + transformerDef.outputChannels.map((channel, channelIndex: number) => {
+    return "\"" + transformer.outputChannels.map((channel, channelIndex: number) => {
       if (transformerIndex === row.transformers.getValue().size-1) {
         if (row.outputChannelOverrides.getValue().has(channelIndex)) {
           return row.outputChannelOverrides.getValue().get(channelIndex).name.getValue();
