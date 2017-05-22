@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import * as deepFreeze from "deep-freeze";
 import {AbstractDataService} from "../../services/AbstractDataService";
 import {Config} from "../../classes/Config";
-import {Row} from "../../classes/Row";
+import {Row, RowBuilder} from "../../classes/Row";
 import {TransformerChannel} from "../../classes/TransformerChannel";
 import {RowChannel} from "../../classes/Channel";
 import {AbstractDragService} from "../../services/AbstractDragService";
@@ -12,7 +12,7 @@ import {AbstractMetadataService} from "../../services/MetadataService";
 import {TransformerChannelDef} from "../../classes/TransformerChannelDef";
 import {List} from "immutable";
 import {Path} from "d3-path";
-import {BaseType, Selection} from "d3-selection";
+import {Selection} from "d3-selection";
 
 @Component({
   selector: 'ladder-diagram',
@@ -37,6 +37,7 @@ export class LadderDiagramComponent implements OnInit {
     const dropTargetWidth = 40;
     const transformerSpacing = dropTargetWidth + 20;
     const rowSpacing = 10;
+    const channelSpacing = 40;
 
     const svg = d3.select(this.nativeElement).select('svg');
 
@@ -58,15 +59,45 @@ export class LadderDiagramComponent implements OnInit {
       .attr('transform', `translate(${padding.left},${padding.top})`);
 
     const inputLine = container.append('line')
-      .attr('stroke', 'black')
-      .attr('stroke-width', 2);
+      .attr('stroke', 'rgba(0,0,0,0.3)')
+      .attr('stroke-width', 2)
+      .attr('stroke-dasharray', '2,2');
 
     const outputLine = container.append('line')
-      .attr('stroke', 'black')
-      .attr('stroke-width', 2);
+      .attr('stroke', 'rgba(0,0,0,0.3)')
+      .attr('stroke-width', 2)
+      .attr('stroke-dasharray', '2,2');
 
     const rows = container.append('g')
       .classed('rows', true);
+
+    const rowPlaceholder = rows.append('g')
+      .classed('row-placeholder', true);
+
+    rowPlaceholder.append('line')
+      .attr('x1', 0)
+      .attr('y1', 0)
+      .attr('x2', width)
+      .attr('y2', 0)
+      .attr('transform', `translate(0, ${channelSpacing})`)
+      .attr('stroke-width', 2)
+      .attr('stroke', 'black');
+
+    rowPlaceholder.append('path')
+      .classed('drop-target', true)
+      .attr('transform', `translate(${(width - transformerWidth)/2}, 0)`)
+      .attr('d', roundedRectangle(transformerWidth, 2 * channelSpacing, 8))
+      .on('mouseup', (d, i) => {
+        const dragging = component.dragService.dragging.getValue();
+        if (dragging) {
+          if (dragging.object instanceof Transformer) {
+            const rows = this.dataService.hierarchy.getValue().rows;
+            rows.next(rows.getValue().push(new RowBuilder().pushTransformer(dragging.object).build()));
+            this.dragService.stopDrag();
+            d3.event.stopPropagation();
+          }
+        }
+      });
 
     this.dataService.hierarchy
       .switchMap(hierarchy => hierarchy.asObservable()) // subscribe to all of the sub-tree changes too
@@ -191,9 +222,8 @@ export class LadderDiagramComponent implements OnInit {
             .text(d => d.channel.toJson().name);
 
           rowChannelUpdate.select('.channel-circle')
-            .attr('fill', d => d.channel instanceof TransformerChannel ? 'white' : 'steelblue')
+            .attr('classed', d => d.channel instanceof TransformerChannel ? 'placeholder' : null)
             .classed('grabbable', d => d.channel instanceof RowChannel)
-            .attr('stroke-dasharray', d => d.channel instanceof TransformerChannel ? "2,2" : null)
         }
 
         const transformersEnter = rowEnter.append('g')
@@ -235,6 +265,9 @@ export class LadderDiagramComponent implements OnInit {
             const dragging = component.dragService.dragging.getValue();
             if (dragging && d.transformer === dragging.object) {
               d.row.removeTransformer(d.transformer);
+              if (d.row.transformers.getValue().size === 0) {
+                component.dataService.hierarchy.getValue().removeRow(d.row);
+              }
             }
           })
           .on('mousedown', function(d) {
@@ -362,7 +395,6 @@ export class LadderDiagramComponent implements OnInit {
         dropTarget.exit().remove();
         const dropTargetEnter = dropTarget.enter().append('path')
           .classed('drop-target', true)
-          .attr('fill', 'rgba(0,0,0,.3)')
           .on('mouseup', (d, i) => {
             const dragging = component.dragService.dragging.getValue();
             if (dragging) {
@@ -377,6 +409,8 @@ export class LadderDiagramComponent implements OnInit {
           .attr('d', roundedRectangle(dropTargetWidth, channelSpacing * 2, 8))
           .attr('transform', d => `translate(${d.x + d.channelWidth/2 -dropTargetWidth/2},0)`);
 
+        (rows.node() as SVGGElement).appendChild((rows.node() as SVGGElement).removeChild(rowPlaceholder.node() as SVGGElement));
+
         // Stack the rows below each other
         rowUpdate
           .attr('transform', function(d, i) {
@@ -388,6 +422,17 @@ export class LadderDiagramComponent implements OnInit {
               return 'translate(0,0)';
             }
           });
+
+        rowPlaceholder.attr('transform', () => {
+          const rowNodes = rowUpdate.nodes() as SVGGraphicsElement[];
+          const lastRowNode = rowNodes[rowNodes.length - 1];
+          if (lastRowNode) {
+            const sizeAndPos = getSizeAndPos(lastRowNode);
+            return `translate(0, ${sizeAndPos.y + sizeAndPos.height + rowSpacing})`;
+          } else {
+            return 'translate(0,0)';
+          }
+        });
 
         // Get the full size
         const rowsBB = getSizeAndPos(rows.node() as SVGGraphicsElement);
@@ -443,7 +488,6 @@ export class LadderDiagramComponent implements OnInit {
       return context;
     }
 
-    const channelSpacing = 40;
     function createChannelConnections(row: Row): {startY:number, endY: number}[][] {
       return row.transformers.getValue().toArray().reduce((channelGroups, transformer, transformerIndex, transformers) => {
         if (transformerIndex === 0) {

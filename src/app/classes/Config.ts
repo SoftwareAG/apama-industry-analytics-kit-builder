@@ -61,6 +61,10 @@ export class Config extends AbstractModel<ConfigJsonInterface, never> implements
     if (this.rows.getValue().size === 0) {throw new Error('Configuration must contain at least one row'); }
     return this;
   }
+
+  removeRow(row: Row) {
+    this.rows.next(List<Row>(this.rows.getValue().filter(_row => _row !== row)));
+  }
 }
 
 export class ConfigBuilder extends ClassBuilder<Config> implements ConfigInterface {

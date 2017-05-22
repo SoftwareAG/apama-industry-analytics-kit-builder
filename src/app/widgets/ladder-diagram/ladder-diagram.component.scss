@@ -20,4 +20,27 @@ $transformer-color: saturate($brand-primary, 20%);
       fill: black;
     }
   }
+
+  .row-channel {
+    &.placeholder-channel {
+      .channel-circle {
+        stroke: $black;
+        stroke-dasharray: 2,2;
+        fill: $white;
+      }
+    }
+
+    .channel-circle {
+      stroke: $black;
+      fill: $transformer-color;
+    }
+
+    text {
+      fill: $black;
+    }
+  }
+
+  .drop-target {
+    fill: rgba($black, 0.3)
+  }
 }
