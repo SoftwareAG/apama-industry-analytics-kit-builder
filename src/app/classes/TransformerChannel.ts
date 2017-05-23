@@ -1,6 +1,7 @@
 import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
 import {AbstractModel} from "./AbstractModel";
 import {TransformerChannelDef} from "./TransformerChannelDef";
+import {List} from "immutable";
 
 export interface TransformerChannelJsonInterface {
   name: string;
@@ -44,10 +45,10 @@ export class TransformerChannelBuilder extends ClassBuilder<TransformerChannel> 
 }
 
 export class TransformerChannelDeserializer {
-  buildChannels(analyticChannels: string) : string[] {
+  buildChannels(analyticChannels: string) : List<string> {
     const channelsPattern = /"([^"]*)"/g;
-    return Array.from(analyticChannels.match(channelsPattern) || [])
-      .map(c => c.replace(/"/g, ''));
+    return List(Array.from(analyticChannels.match(channelsPattern) || [])
+      .map(c => c.replace(/"/g, '')))
   }
 }
 

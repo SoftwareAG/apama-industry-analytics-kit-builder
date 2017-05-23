@@ -180,11 +180,11 @@ export class RowDeserializer {
 
   constructor(private readonly transformerDeserializer: TransformerDeserializer) {}
 
-  buildRow(analyticLines: string[]): Row {
-    const analytics = analyticLines.map(analyticLine => this.transformerDeserializer.buildAnalytic(analyticLine))
-    if (analytics.length > 0) {
+  buildRow(analyticLines: List<string>): Row {
+    const analytics = analyticLines.map((analyticLine:string) => this.transformerDeserializer.buildAnalytic(analyticLine)) as List<{analytic: Transformer, inChannels: Map<number, string>, outChannels: Map<number, string>}>;
+    if (analytics.size > 0) {
       const rowBuilder = new RowBuilder()
-        .pushTransformer(...analytics.map(a => a.analytic));
+        .pushTransformer(...analytics.toArray().map(a => a.analytic));
       this.addRowChannels(rowBuilder, analytics);
       return rowBuilder.build().validate();
     } else {
@@ -192,14 +192,12 @@ export class RowDeserializer {
     }
   }
 
-  private addRowChannels(rowBuilder: RowBuilder, rowChannels: {analytic: Transformer, inChannels: {[i:number]:string}, outChannels: {[i:number]:string}}[]) {
-    const firstRowChannels = rowChannels[0];
-    const lastRowChannels = rowChannels[rowChannels.length - 1];
-    _.forEach(firstRowChannels.inChannels, (inChannelName: string, i: string) => {
-      rowBuilder.withInputChannel(Math.round(parseFloat(i))).Name(inChannelName).endWith();
+  private addRowChannels(rowBuilder: RowBuilder, rowChannels: List<{analytic: Transformer, inChannels: Map<number, string>, outChannels: Map<number, string>}>) {
+    rowChannels.first().inChannels.forEach((chanName: string, i: number) => {
+      rowBuilder.withInputChannel(i).Name(chanName).endWith();
     });
-    _.forEach(lastRowChannels.outChannels, (outChannelName: string, i: string) => {
-      rowBuilder.withOutputChannel(Math.round(parseFloat(i))).Name(outChannelName).endWith();
+    rowChannels.last().outChannels.forEach((chanName: string, i: number) => {
+      rowBuilder.withOutputChannel(i).Name(chanName).endWith();
     });
   }
 
