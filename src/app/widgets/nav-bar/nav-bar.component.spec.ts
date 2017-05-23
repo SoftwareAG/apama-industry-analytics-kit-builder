@@ -1,18 +1,19 @@
 import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 import {NavBarComponent} from "./nav-bar.component";
 import {AbstractDataService} from "../../services/AbstractDataService";
-import {Config, ConfigArrayBuilder, ConfigSerializer} from "../../classes/Config";
+import {Config, ConfigArrayBuilder, ConfigDeserializer, ConfigSerializer} from "../../classes/Config";
 import {BehaviorSubject} from "rxjs";
 import {List} from "immutable";
 import {Injectable} from "@angular/core";
-import {TransformerSerializer} from "../../classes/Transformer";
+import {TransformerDeserializer, TransformerSerializer} from "../../classes/Transformer";
 import {FileService} from "../../services/FileService";
-import {RowSerializer} from "../../classes/Row";
-import {PropertySerializer} from "../../classes/Property";
+import {RowDeserializer, RowSerializer} from "../../classes/Row";
+import {PropertyDeserializer, PropertySerializer} from "../../classes/Property";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {AbstractMetadataService, MetadataService} from "../../services/MetadataService";
 import {FormsModule} from "@angular/forms";
 import {BrowserModule} from "@angular/platform-browser";
+import {TransformerChannelDeserializer} from "../../classes/TransformerChannel";
 
 @Injectable()
 class DataServiceMock extends AbstractDataService {
@@ -55,7 +56,12 @@ describe('NavBarComponent', () => {
         ConfigSerializer,
         RowSerializer,
         TransformerSerializer,
-        PropertySerializer
+        PropertySerializer,
+        ConfigDeserializer,
+        RowDeserializer,
+        TransformerDeserializer,
+        TransformerChannelDeserializer,
+        PropertyDeserializer
       ],
       imports: [
         BrowserModule,

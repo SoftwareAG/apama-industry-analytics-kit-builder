@@ -41,11 +41,12 @@ describe('FileService', () => {
         description: "Suppress events after a triggering event.",
         group: "Flow Manipulation",
         name: "Suppressor",
+        inputChannels: [
+          { name: "Data", description: "" }
+        ],
         outputChannels: [
-          {
-            description: "Suppressed data channel",
-            name: "Suppressed Data"
-          }],
+          { name: "Suppressed Data", description: "Suppressed data channel" }
+        ],
         properties: [
           {
             description: "How long to suppress events for.",
@@ -88,6 +89,12 @@ describe('FileService', () => {
         description: "Generate a set of 'X' new Data events for each incoming event, at 'Y' seconds apart and with value 'Z'.",
         group: "Flow Manipulation",
         name: "Slicer",
+        inputChannels: [
+          { name: "Data", description: "" }
+        ],
+        outputChannels: [
+          { name: "Slices", description: "" }
+        ],
         properties: [{
             description: "The dValue for each slice.",
             name: "byValue",
@@ -111,6 +118,18 @@ describe('FileService', () => {
         "description": "Detect data outside a corridor.",
         "group": "Detectors",
         "name": "Corridor",
+        "inputChannels": [
+          {
+            "description": "The channel to check",
+            "name": "Data"
+          }
+        ],
+        "outputChannels": [
+          {
+            "description": "The channel on which to output anomalies",
+            "name": "Breach"
+          }
+        ],
         "properties": [
           {
             "description": "Defines the upper threshold value that is used to detect breaches",
@@ -152,7 +171,20 @@ describe('FileService', () => {
             "type": "string",
             "validator": "function(value) { return value.length > 0 | 'Must not be empty' }"
           }
-        ]
+        ],
+        "inputChannels": [
+          {
+            "description": "The channels to combine",
+            "name": "Data",
+            "repeated": true
+          }
+        ],
+        "outputChannels": [
+          {
+            "description": "The combined data channel",
+            "name": "Combined"
+          }
+        ],
       },
         {
           "description": "Generates a Data containing a moving average calculation for each input Data received.",
@@ -529,7 +561,7 @@ com.industry.analytics.Analytic("Corridor",["Row0:Channel1"],["Row0"],{"upperThr
     expect(config.rows.getValue().last().transformers.getValue().first().getPropertyValues("duration").get(0).value.getValue()).toEqual(5.0);
   });
 
-  it('should create the row input and output channels based on the Analytics on the row', () => {
+  xit('should create the row input and output channels based on the Analytics on the row', () => {
     const apama = `\\\\ Name: Peer Analysis
 \\\\ Version: 0.0.0.0
 \\\\ Row: 0

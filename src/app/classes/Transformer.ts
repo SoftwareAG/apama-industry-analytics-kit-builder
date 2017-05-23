@@ -400,8 +400,8 @@ export class TransformerDeserializer {
           result[i] = inChanName;
           return result;
         }, {});
-        const outChanNamesAndIndexes = inChannelNames.reduce((result, inChanName, i) => {
-          result[i] = inChanName;
+        const outChanNamesAndIndexes = outChannelNames.reduce((result, outChanName, i) => {
+          result[i] = outChanName;
           return result;
         }, {});
 
