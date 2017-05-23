@@ -61,7 +61,7 @@ describe('RowSerializer', () => {
       testMetadata,
       new RowBuilder()
         .MaxTransformerCount(3)
-        .withTransformer().Name("Analytic1").endWith()
+        .pushTransformer(testMetadata.createAnalytic("Analytic1"))
         .build(),
       0);
 
@@ -77,8 +77,8 @@ describe('RowSerializer', () => {
       testMetadata,
       new RowBuilder()
         .MaxTransformerCount(3)
-        .withTransformer().Name("Analytic1").endWith()
-        .withTransformer().Name("Analytic2").endWith()
+        .pushTransformer(testMetadata.createAnalytic("Analytic1"))
+        .pushTransformer(testMetadata.createAnalytic("Analytic2"))
         .build(),
       0);
 
@@ -99,7 +99,7 @@ describe('RowSerializer', () => {
         .MaxTransformerCount(3)
         .withInputChannel(0).Name("OverriddenInput").endWith()
         .withOutputChannel(0).Name("OverriddenOutput").endWith()
-        .withTransformer().Name("Analytic1").endWith()
+        .pushTransformer(testMetadata.createAnalytic("Analytic1"))
         .build(),
       0);
 
@@ -117,8 +117,8 @@ describe('RowSerializer', () => {
         .MaxTransformerCount(3)
         .withInputChannel(0).Name("OverriddenInput").endWith()
         .withOutputChannel(0).Name("OverriddenOutput").endWith()
-        .withTransformer().Name("Analytic1").endWith()
-        .withTransformer().Name("Analytic2").endWith()
+        .pushTransformer(testMetadata.createAnalytic("Analytic1"))
+        .pushTransformer(testMetadata.createAnalytic("Analytic2"))
         .build(),
       0);
 
@@ -141,7 +141,7 @@ describe('RowSerializer', () => {
             .MaxTransformerCount(3)
             .withInputChannel(i).Name("OverriddenInput").endWith()
             .withOutputChannel(i).Name("OverriddenOutput").endWith()
-            .withTransformer().Name("Analytic3").endWith()
+            .pushTransformer(testMetadata.createAnalytic("Analytic3"))
             .build(),
           0);
 

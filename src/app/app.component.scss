@@ -1,19 +1,24 @@
 @import '../_theme.scss';
 
 .left-panel {
-  width: 400px;
+  flex: 0 0 400px;
   border-right: 1px solid $gray-lighter;
+}
+
+.middle-panel {
+  min-width: 0;
+}
+
+.right-panel {
+  flex: 0 0 400px;
+  background-color: $gray-lightest;
+  border-left: 1px solid $gray-lighter;
 }
 
 .information-panel {
   border-top: 1px solid $gray-lighter;
   background-color: $white;
   z-index:999;
-}
-
-transformer-property-selector {
-  background-color: $gray-lightest;
-  border-left: 1px solid $gray-lighter;
 }
 
 transformer-selector {

@@ -4,6 +4,8 @@ import {AbstractDragService, Draggable, Dragged, Point} from "../../services/Abs
 import {DragOverlayComponent} from "./drag-overlay.component";
 import * as d3 from "d3";
 import {TestUtils} from "../../services/TestUtil.spec";
+import {DataService} from "../../services/DataService";
+import {AbstractDataService} from "../../services/AbstractDataService";
 
 @Injectable()
 class DragServiceMock extends AbstractDragService {
@@ -33,6 +35,7 @@ describe('DragOverlayComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ DragOverlayComponent ],
       providers: [
+        {provide: AbstractDataService, useClass: DataService},
         {provide: AbstractDragService, useClass: DragServiceMock}
       ]
     }).compileComponents();

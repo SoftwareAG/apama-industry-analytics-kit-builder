@@ -4,6 +4,8 @@ import {Injectable} from "@angular/core";
 import {AbstractDragService, Draggable, Dragged, Point} from "../../services/AbstractDragService";
 import {AbstractMetadataService} from "../../services/MetadataService";
 import {MetadataBuilder, MetadataJsonInterface} from "../../classes/Metadata";
+import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
+import {TransformerDefinitionComponent} from "../transformer-definition/transformer-definition.component";
 
 @Injectable()
 class MetadataServiceMock extends AbstractMetadataService {
@@ -27,7 +29,13 @@ describe('TransformerSelectorComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TransformerSelectorComponent ],
+      declarations: [
+        TransformerSelectorComponent,
+        TransformerDefinitionComponent
+      ],
+      imports: [
+        NgbModule.forRoot()
+      ],
       providers: [
         {provide: AbstractMetadataService, useClass: MetadataServiceMock},
         {provide: AbstractDragService, useClass: DragServiceMock}
@@ -44,19 +52,14 @@ describe('TransformerSelectorComponent', () => {
     el = fixture.debugElement.nativeElement;
   });
 
-  it('should have an svg child element', () => {
-    expect(el.children[2].nodeName).toEqual('svg');
-  });
-
-  it('should create transformer elements', () => {
+  it('should create groups elements', () => {
     const metadata = new MetadataBuilder()
-      .withAnalytic().Name("MyFirstAnalytic").endWith()
-      .withAnalytic().Name("MySecondAnalytic").endWith()
+      .withAnalytic().Group("Group1").Name("MyFirstAnalytic").endWith()
+      .withAnalytic().Group("Group2").Name("MySecondAnalytic").endWith()
       .build();
     metadataService.metadata.next(metadata);
-    const textContents = Array.from(el.querySelectorAll('.transformer')).map((transformerEl) => {
-      return (transformerEl.querySelector('text') as Element).textContent;
-    });
-    expect(textContents).toEqual(['MyFirstAnalytic', 'MySecondAnalytic'])
+    fixture.detectChanges();
+    const textContents = Array.from(el.querySelectorAll('a')).map((aEl) => (aEl as any).textContent.trim());
+    expect(textContents).toEqual(['Group1', 'Group2'])
   });
 });

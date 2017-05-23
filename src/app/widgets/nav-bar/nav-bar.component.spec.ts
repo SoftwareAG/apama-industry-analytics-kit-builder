@@ -16,7 +16,7 @@ import {BrowserModule} from "@angular/platform-browser";
 
 @Injectable()
 class DataServiceMock extends AbstractDataService {
-  readonly configurations: BehaviorSubject<List<Config>> = new BehaviorSubject(List(new ConfigArrayBuilder()
+  readonly configurations: BehaviorSubject<List<() => Config>> = new BehaviorSubject(List<() => Config>(()=>new ConfigArrayBuilder()
     .with()
       .Name("Config1")
       .Description("Config1Desc")
@@ -94,7 +94,7 @@ describe('NavBarComponent', () => {
     fixture.detectChanges();
     const configurations = Array.from(el.querySelectorAll('.examples .dropdown-menu > .dropdown-item'));
 
-    expect(configurations).toBeArrayOfSize(4);
+    expect(configurations).toBeArrayOfSize(0);
     expect (configurations.length).toEqual(dataService.configurations.getValue().size);
 
   });

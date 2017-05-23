@@ -1,6 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { InformationComponent } from './information.component';
+import {AbstractDataService} from "../../services/AbstractDataService";
+import {DataService} from "../../services/DataService";
+import {AbstractMetadataService, MetadataService} from "../../services/MetadataService";
 
 describe('InformationComponent', () => {
   let component: InformationComponent;
@@ -8,7 +11,11 @@ describe('InformationComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ InformationComponent ]
+      declarations: [ InformationComponent ],
+      providers:  [
+        {provide: AbstractDataService, useClass: DataService},
+        {provide: AbstractMetadataService, useClass: MetadataService}
+      ]
     })
     .compileComponents();
   }));

@@ -1,14 +1,12 @@
 <div class="d-flex flex-column h-100">
   <drag-overlay></drag-overlay>
   <nav-bar></nav-bar>
-  <div class="w-100 h-100 d-flex">
-    <div class="left-panel h-100"> <!-- added a div to fix chrome bug where fixed width is sometimes ignored if d-flex is set on element -->
-      <div class="d-flex flex-column p-0 h-100">
-        <channel-selector class="h-50 p-2 scroll"></channel-selector>
-        <transformer-selector class="h-100 p-2 scroll"></transformer-selector>
-      </div>
+  <div class="w-100 h-100 d-flex justify-content-around">
+    <div class="d-flex flex-column left-panel p-0 h-100">
+      <channel-selector class="h-50 p-2 scroll"></channel-selector>
+      <transformer-selector class="h-100 p-2 scroll"></transformer-selector>
     </div>
-    <div class="col p-0 h-100">
+    <div class="p-0 h-100 middle-panel w-100">
       <div class="scroll" [style.height]="ladderDiagramHeightPercentString">
         <ladder-diagram class="w-100" ></ladder-diagram>
       </div>
@@ -23,6 +21,6 @@
         <information class="w-100 p-2 scroll"></information>
       </div>
     </div>
-    <transformer-property-selector class="col-2 p-2 scroll"></transformer-property-selector>
+    <transformer-property-selector class="p-2 scroll right-panel"></transformer-property-selector>
   </div>
 </div>

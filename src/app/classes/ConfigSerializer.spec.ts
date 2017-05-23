@@ -7,6 +7,7 @@ import {TestUtils} from "../services/TestUtil.spec";
 import {Metadata, MetadataBuilder} from "./Metadata";
 import * as _ from "lodash";
 import {AbstractMetadataService, MetadataService} from "../services/MetadataService";
+import {TransformerDefBuilder} from "./TransformerDef";
 
 describe('ConfigSerializer', () => {
 
@@ -77,8 +78,8 @@ describe('ConfigSerializer', () => {
             .MaxTransformerCount(3)
               .withInputChannel(0).Name("Input Channel 1").endWith()
               .withOutputChannel(0).Name("Output Channel 1").endWith()
-              .withTransformer().Name("Analytic1").endWith()
-              .withTransformer().Name("Analytic2").endWith()
+              .pushTransformer(testMetadata.createAnalytic("Analytic1"))
+              .pushTransformer(testMetadata.createAnalytic("Analytic2"))
             .endWith()
         }
 

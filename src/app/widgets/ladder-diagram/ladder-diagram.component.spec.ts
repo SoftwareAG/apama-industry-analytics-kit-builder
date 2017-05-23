@@ -428,7 +428,7 @@ describe('LadderDiagramComponent', () => {
 
         fixture.detectChanges();
 
-        const dropTargets = Array.from(el.querySelectorAll('.drop-target'));
+        const dropTargets = Array.from(el.querySelectorAll('.row .drop-target'));
         expect(dropTargets).toBeArrayOfSize(3);
         expect(dragService.dragging.getValue()).toBeDefined();
 
@@ -488,8 +488,8 @@ describe('LadderDiagramComponent', () => {
 
     expect((dragService.dragging.getValue() as Dragged).object).toBe(transformers[0]);
     expect(Array.from(el.querySelectorAll('.transformer'))).toBeArrayOfSize(3); // Still present until mouse leaves
-    expect(Array.from(el.querySelectorAll('.drop-target'))).toBeArrayOfSize(4);
-    expect(d3.select(el).select('.drop-targets').attr('display')).toEqual(null);
+    expect(Array.from(el.querySelectorAll('.row .drop-target'))).toBeArrayOfSize(4);
+    expect(d3.select(el).select('.row .drop-targets').attr('display')).toEqual(null);
 
     transEl.dispatchEvent(new MouseEvent("mouseleave", {
       bubbles: true,
@@ -503,7 +503,7 @@ describe('LadderDiagramComponent', () => {
     expect((dragService.dragging.getValue() as Dragged).object).toBe(transformers[0]);
     expect(Array.from(el.querySelectorAll('.transformer'))).toBeArrayOfSize(2);
     expect(d3.select(el).select('.drop-targets').attr('display')).toEqual(null);
-    const dropTargets = Array.from(el.querySelectorAll('.drop-target'));
+    const dropTargets = Array.from(el.querySelectorAll('.row .drop-target'));
     expect(dropTargets).toBeArrayOfSize(3);
 
     dropTargets[2].dispatchEvent(new MouseEvent("mouseup", {

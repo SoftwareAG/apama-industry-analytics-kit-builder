@@ -1,4 +1,4 @@
-import {TransformerSerializer} from "app/classes/Transformer";
+import {TransformerBuilder, TransformerSerializer} from "app/classes/Transformer";
 import {PropertySerializer} from "./Property";
 import {TestBed} from "@angular/core/testing";
 import {RowBuilder} from "./Row";
@@ -25,16 +25,17 @@ describe('TransformerSerializer', () => {
         const transformerDefBuilder = new TransformerDefBuilder()
           .Name("Analytic1");
 
-        const row = new RowBuilder()
-          .withTransformer().Name("Analytic1").endWith()
-          .build();
-
         for (let j = 1; j <= i; j++) {
           transformerDefBuilder.withInputChannel().Name(`InChannel${j}`).endWith();
           transformerDefBuilder.withOutputChannel().Name(`OutChannel${j}`).endWith();
         }
 
         const transformerDef = transformerDefBuilder.build();
+
+        const row = new RowBuilder()
+          .pushTransformer(TransformerBuilder.fromTransformerDef(transformerDef).build())
+          .build();
+
         const result = transformerSerializer.toApama(row.transformers.getValue().toArray()[0], transformerDef, 0, row, 0);
         const inputChannels = TestUtils.findAll(/[\.\w]*Analytic\(.*?\[(.*?)\]/g, result).map(match => match[0])[0].split(",");
         const outputChannels = TestUtils.findAll(/[\.\w]*Analytic\(.*?\[.*?\[(.*?)\]/g, result).map(match => match[0])[0].split(",");

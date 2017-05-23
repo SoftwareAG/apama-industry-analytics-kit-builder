@@ -20,6 +20,11 @@ import {TransformerSerializer} from "./classes/Transformer";
 import {FileService} from "./services/FileService";
 import {AbstractMetadataService, MetadataService} from "./services/MetadataService";
 import {SaveConfigurationComponent} from "./widgets/save-configuration/save-configuration.component";
+import {ResizableModule} from "angular-resizable-element";
+import {BrowserModule} from "@angular/platform-browser";
+import {InformationComponent} from "./widgets/information/information.component";
+import {TransformerDefinitionComponent} from "./widgets/transformer-definition/transformer-definition.component";
+import {FocusDirective} from "./directives/focus.directive";
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
@@ -33,10 +38,15 @@ describe('AppComponent', () => {
         TransformerPropertySelectorComponent,
         NavBarComponent,
         DragOverlayComponent,
-        SaveConfigurationComponent
+        SaveConfigurationComponent,
+        FocusDirective,
+        InformationComponent,
+        TransformerDefinitionComponent
       ],
       imports: [
+        BrowserModule,
         FormsModule,
+        ResizableModule,
         NgbModule.forRoot()
       ],
       providers: [
@@ -60,12 +70,6 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;
     expect(app).toBeTruthy();
-  });
-
-  it(`should have as title 'Analytics Builder'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('Analytics Builder');
   });
 
 });
