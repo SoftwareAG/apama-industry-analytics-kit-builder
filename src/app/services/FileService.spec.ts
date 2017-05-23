@@ -1,11 +1,12 @@
 
 import {FileService} from "./FileService";
 import {TestBed} from "@angular/core/testing";
-import {Config, ConfigSerializer} from "../classes/Config";
-import {TransformerSerializer} from "app/classes/Transformer";
-import {RowSerializer} from "../classes/Row";
-import {PropertySerializer} from "../classes/Property";
+import {Config, ConfigDeserializer, ConfigSerializer} from "../classes/Config";
+import {TransformerDeserializer, TransformerSerializer} from "app/classes/Transformer";
+import {RowDeserializer, RowSerializer} from "../classes/Row";
+import {PropertyDeserializer, PropertySerializer} from "../classes/Property";
 import {AbstractMetadataService, MetadataService} from "./MetadataService";
+import {TransformerChannelDeserializer} from "../classes/TransformerChannel";
 
 
 describe('FileService', () => {
@@ -21,7 +22,13 @@ describe('FileService', () => {
         RowSerializer,
         TransformerSerializer,
         PropertySerializer,
-        {provide: AbstractMetadataService, useClass: MetadataService}
+        {provide: AbstractMetadataService, useClass: MetadataService},
+        PropertySerializer,
+        ConfigDeserializer,
+        RowDeserializer,
+        TransformerDeserializer,
+        TransformerChannelDeserializer,
+        PropertyDeserializer
       ]
     });
     fileService = TestBed.get(FileService) as FileService;
@@ -287,21 +294,23 @@ describe('FileService', () => {
     expect( () => { fileService.deserialize(apama); }).toThrowError();
   });
 
-  it('should error if no rows exist in the .evt file', () => {
+  it('should parse if no rows exist in the .evt file', () => {
     const apama = `\\\\ Name: No Rows 
 \\\\ Description: Sample configuration description
 \\\\ Version: 0.0.0.0`;
-    expect( () => { fileService.deserialize(apama); }).toThrowError();
+    const config: Config = fileService.deserialize(apama);
+    expect(config.rows.getValue().size).toEqual(0);
   });
 
-  it('should parse correctly if provided with a row with no analytics', () => {
+  it('should parse correctly if provided with rows with no analytics (ignores the rows)', () => {
     const apama = `\\\\ Name: One row with no analytics
 \\\\ Description: Sample configuration description
 \\\\ Version: 0.0.0.0
-\\\\ Row: 0`;
+\\\\ Row: 0
+\\\\ Row: 1
+\\\\ Row: 2`;
     const config: Config = fileService.deserialize(apama);
-    expect(config.rows.getValue().size).toEqual(1);
-    expect(config.rows.getValue().first().transformers.getValue().size).toEqual(0);
+    expect(config.rows.getValue().size).toEqual(0);
   });
 
   it('should parse correctly if no Description is provided', () => {
@@ -309,8 +318,7 @@ describe('FileService', () => {
 \\\\ Version: 0.0.0.0
 \\\\ Row: 0`;
     const config: Config = fileService.deserialize(apama);
-    expect(config.rows.getValue().size).toEqual(1);
-    expect(config.rows.getValue().first().transformers.getValue().size).toEqual(0);
+    expect(config.description.getValue()).toEqual("");
   });
 
   it('should parse correctly if provided with a row with analytics', () => {
@@ -417,32 +425,34 @@ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1
 \\\\ Version: 0.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
-// com.industry.analytics.Analytic("Sorter",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
-// com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
+\\\\ com.industry.analytics.Analytic("Sorter",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
+\\\\ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
 
 \\\\ Row: 1
-//com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
+\\\\com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
 com.industry.analytics.Analytic("Sorter",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
 com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
 
-//\\\\ Row: 2
-// com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
-//com.industry.analytics.Analytic("Sorter",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
-//com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})`;
+\\\\\\\\ Row: 2
+\\\\ com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
+\\\\com.industry.analytics.Analytic("Sorter",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
+\\\\com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})`;
     const config: Config = fileService.deserialize(apama);
     expect(config.rows.getValue().size).toEqual(2);
     expect(config.rows.getValue().first().transformers.getValue().size).toEqual(1);
     expect(config.rows.getValue().last().transformers.getValue().size).toEqual(2);
   });
 
-  it('should error if an "Analytic line" is read before a "Row" line in the .evt file', () => {
+  it('should assume row 0 if an "Analytic line" is read before a "Row" line in the .evt file', () => {
     const apama = `\\\\ Name: Analytic before a Row
 \\\\ Description: Analytic before a Row
 \\\\ Version: 0.0.0.0
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
-// com.industry.analytics.Analytic("Sorter",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
-// com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})`;
-  expect( () => { fileService.deserialize(apama); }).toThrowError('Analytic cannot be processed outside of a Row');
+\\\\ com.industry.analytics.Analytic("Sorter",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
+\\\\ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})`;
+    const config: Config = fileService.deserialize(apama);
+    expect(config.rows.getValue().size).toEqual(1);
+    expect(config.rows.getValue().first().transformers.getValue().size).toEqual(1);
   });
 
   it('should error if an invalid Analytic name is provided', () => {
@@ -460,7 +470,9 @@ com.industry.analytics.Analytic("InvalidAnalyticName",["Input Channel 1"],["Row0
 \\\\ Version: 0.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"invalidPropertyName":"10.0d"})`;
-  expect( () => { fileService.deserialize(apama); }).toThrowError("Analytic 'Slicer' does not contain property 'invalidPropertyName'");
+    const config: Config = fileService.deserialize(apama);
+    expect(config.rows.getValue().size).toEqual(1);
+    expect(config.rows.getValue().first().transformers.getValue().size).toEqual(1);
   });
 
   it('should error if an Analytic is provided with an invalid property', () => {

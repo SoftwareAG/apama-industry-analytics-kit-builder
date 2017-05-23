@@ -5,6 +5,9 @@ import {BehaviorSubject, Observable} from "rxjs";
 import {AbstractModel} from "./AbstractModel";
 import {Injectable} from "@angular/core";
 import {validate} from "validate.js";
+import {TransformerDef} from "./TransformerDef";
+import * as _ from "lodash";
+import {IgnoreableDeserializationError} from "./Errors";
 
 export interface PropertyJsonInterface {
   name: string;
@@ -225,7 +228,61 @@ export class PropertySerializer {
     }
   }
 
-  public static parseStringWithPropertyDef(stringValue: string, propertyDef: PropertyDef) {
+  private static numberToFloatOrDecimal(value: number) {
+    const string = value.toString();
+    if (-1 === string.indexOf('.')){
+      return string + '.0';
+    } else {
+      return string;
+    }
+  }
+}
+
+@Injectable()
+export class PropertyDeserializer {
+  readonly validatePropertiesPattern = /^{\s*(("[^"]*"\s*:\s*"[^"]*")(\s*,\s*("[^"]*"\s*:\s*"[^"]*"))*\s*)?}$/;
+  readonly propertiesPattern = /("[^"]*"\s*:\s*"[^"]*")/g;
+  readonly propertyPattern = /"([^"]*)"/g;
+
+  /**
+   *
+   * @param transformerDef
+   * @param analyticProperties eg {"a":"2.0d"}
+   */
+  buildProperties(transformerDef: TransformerDef, analyticProperties: string): Property[] {
+    if (!analyticProperties.match(this.validatePropertiesPattern)) {
+      throw new Error(`Properties in ${transformerDef.name} is not valid : ${analyticProperties}`);
+    }
+
+    const properties = analyticProperties.match(this.propertiesPattern);
+    if (properties && properties.length) {
+      return _.flatMap(properties, property => {
+        const data = property.match(this.propertyPattern);
+        if (data && data.length == 2) {
+          const [name, value] = data.map(d => d.replace(/"/g, ''));
+
+          const propertyDef = transformerDef.getProperty(name);
+          if (propertyDef) {
+            // Set the property value
+            return [new PropertyBuilder()
+              .NameAndDef(name)
+              .Value(this.parseStringWithPropertyDef(value, propertyDef))
+              .build()
+              .validate(propertyDef)];
+          } else {
+            console.error(new IgnoreableDeserializationError(`Analytic '${transformerDef.name}' does not contain property '${name}'`));
+          }
+        } else {
+          throw new IgnoreableDeserializationError(`Property must contain name and value pair e.g. "offset":"2.0d" (invalid property data is ${data})`);
+        }
+        return [];
+      });
+    }
+    return [];
+  }
+
+  // TODO: Test ME separately!!!!
+  private parseStringWithPropertyDef(stringValue: string, propertyDef: PropertyDef) {
     switch(propertyDef.type) {
       case "integer":
       case "decimal":
@@ -252,15 +309,6 @@ export class PropertySerializer {
         }
       default:
         throw new Error(`Unhandled PropertyDef Type: ${propertyDef.type}`);
-    }
-  }
-
-  private static numberToFloatOrDecimal(value: number) {
-    const string = value.toString();
-    if (-1 === string.indexOf('.')){
-      return string + '.0';
-    } else {
-      return string;
     }
   }
 }

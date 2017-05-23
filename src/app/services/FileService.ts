@@ -1,4 +1,4 @@
-import {Config, ConfigSerializer} from "../classes/Config";
+import {Config, ConfigDeserializer, ConfigSerializer} from "../classes/Config";
 import {Injectable} from "@angular/core";
 import {AbstractMetadataService} from "./MetadataService";
 import {validate} from "validate.js";
@@ -13,7 +13,7 @@ export abstract class AbstractFileService {
 @Injectable()
 export class FileService extends AbstractFileService {
 
-  constructor(private readonly configSerializer: ConfigSerializer, readonly metadataService: AbstractMetadataService) {
+  constructor(private readonly configSerializer: ConfigSerializer, private readonly configDeserializer: ConfigDeserializer, readonly metadataService: AbstractMetadataService) {
     super()
   }
 
@@ -23,7 +23,7 @@ export class FileService extends AbstractFileService {
 
   deserialize(epl: string) : Config {
     if (validate.isEmpty(epl)) { throw new Error('EPL string cannot be empty'); }
-    return this.configSerializer.fromApama(epl);
+    return this.configDeserializer.fromApama(epl);
   }
 
   getFileData(fileType:string) : Promise<{file: File, fileContent: string}> {

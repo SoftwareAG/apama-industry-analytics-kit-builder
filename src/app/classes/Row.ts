@@ -1,7 +1,7 @@
 import {
   NestedTransformerBuilder,
   Transformer,
-  TransformerBuilder,
+  TransformerBuilder, TransformerDeserializer,
   TransformerJsonInterface,
   TransformerSerializer
 } from "./Transformer";
@@ -16,6 +16,7 @@ import {Metadata} from "./Metadata";
 import * as _ from "lodash";
 import {TransformerChannel} from "app/classes/TransformerChannel";
 import {TransformerChannelDef} from "./TransformerChannelDef";
+import {IgnoreableDeserializationError} from "./Errors";
 
 export interface RowJsonInterface {
   maxTransformerCount: number;
@@ -172,4 +173,34 @@ export class RowSerializer {
       row.transformers.getValue().map((transformer: Transformer, transformerIndex: number) => this.transformerSerializer.toApama(transformer, metadata.getAnalytic(transformer.name), transformerIndex, row, rowIndex))
         .join('\n');
   }
+}
+
+@Injectable()
+export class RowDeserializer {
+
+  constructor(private readonly transformerDeserializer: TransformerDeserializer) {}
+
+  buildRow(analyticLines: string[]): Row {
+    const analytics = analyticLines.map(analyticLine => this.transformerDeserializer.buildAnalytic(analyticLine))
+    if (analytics.length > 0) {
+      const rowBuilder = new RowBuilder()
+        .pushTransformer(...analytics.map(a => a.analytic));
+      this.addRowChannels(rowBuilder, analytics);
+      return rowBuilder.build().validate();
+    } else {
+      throw new IgnoreableDeserializationError("Row must have an Analytic in it")
+    }
+  }
+
+  private addRowChannels(rowBuilder: RowBuilder, rowChannels: {analytic: Transformer, inChannels: {[i:number]:string}, outChannels: {[i:number]:string}}[]) {
+    const firstRowChannels = rowChannels[0];
+    const lastRowChannels = rowChannels[rowChannels.length - 1];
+    _.forEach(firstRowChannels.inChannels, (inChannelName: string, i: string) => {
+      rowBuilder.withInputChannel(Math.round(parseFloat(i))).Name(inChannelName).endWith();
+    });
+    _.forEach(lastRowChannels.outChannels, (outChannelName: string, i: string) => {
+      rowBuilder.withOutputChannel(Math.round(parseFloat(i))).Name(outChannelName).endWith();
+    });
+  }
+
 }

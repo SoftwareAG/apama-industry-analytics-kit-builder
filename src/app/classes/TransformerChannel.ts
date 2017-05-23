@@ -43,6 +43,14 @@ export class TransformerChannelBuilder extends ClassBuilder<TransformerChannel> 
   }
 }
 
+export class TransformerChannelDeserializer {
+  buildChannels(analyticChannels: string) : string[] {
+    const channelsPattern = /"([^"]*)"/g;
+    return Array.from(analyticChannels.match(channelsPattern) || [])
+      .map(c => c.replace(/"/g, ''));
+  }
+}
+
 export class NestedTransformerChannelBuilder<Parent> extends TransformerChannelBuilder implements NestedClassBuilder<Parent> {
   constructor(private callback: (Channel: TransformerChannel) => Parent) {
     super();

@@ -15,10 +15,10 @@ import {NavBarComponent} from "./widgets/nav-bar/nav-bar.component";
 import {AbstractDragService} from "app/services/AbstractDragService";
 import {DragService} from "./services/DragService";
 import {DragOverlayComponent} from "./widgets/dragoverlay/drag-overlay.component";
-import {ConfigSerializer} from "./classes/Config";
-import {RowSerializer} from "./classes/Row";
-import {TransformerSerializer} from "./classes/Transformer";
-import {PropertySerializer} from "./classes/Property";
+import {ConfigDeserializer, ConfigSerializer} from "./classes/Config";
+import {RowDeserializer, RowSerializer} from "./classes/Row";
+import {TransformerDeserializer, TransformerSerializer} from "./classes/Transformer";
+import {PropertyDeserializer, PropertySerializer} from "./classes/Property";
 import {FileService} from "./services/FileService";
 import {AbstractMetadataService, MetadataService} from "./services/MetadataService";
 import {SaveConfigurationComponent} from "./widgets/save-configuration/save-configuration.component";
@@ -26,6 +26,7 @@ import {FocusDirective} from "./directives/focus.directive";
 import {InformationComponent} from "./widgets/information/information.component";
 import {TransformerDefinitionComponent} from "./widgets/transformer-definition/transformer-definition.component";
 import {ResizableModule} from "angular-resizable-element";
+import {TransformerChannelDeserializer} from "./classes/TransformerChannel";
 
 @NgModule({
   declarations: [
@@ -57,7 +58,12 @@ import {ResizableModule} from "angular-resizable-element";
     ConfigSerializer,
     RowSerializer,
     TransformerSerializer,
-    PropertySerializer
+    PropertySerializer,
+    ConfigDeserializer,
+    RowDeserializer,
+    TransformerDeserializer,
+    TransformerChannelDeserializer,
+    PropertyDeserializer
   ],
   entryComponents: [
     SaveConfigurationComponent

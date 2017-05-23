@@ -1,8 +1,15 @@
-import {NestedPropertyBuilder, Property, PropertyBuilder, PropertyJsonInterface, PropertySerializer} from "./Property";
+import {
+  NestedPropertyBuilder,
+  Property,
+  PropertyBuilder,
+  PropertyDeserializer,
+  PropertyJsonInterface,
+  PropertySerializer
+} from "./Property";
 import {TransformerDef} from "./TransformerDef";
 import {ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
 import {AsObservable} from "../interfaces/interfaces";
-import {List, Map, OrderedMap} from "immutable";
+import {List, Map} from "immutable";
 import {BehaviorSubject, Observable} from "rxjs";
 import {Row} from "./Row";
 import {Injectable} from "@angular/core";
@@ -12,10 +19,12 @@ import {
   NestedTransformerChannelBuilder,
   TransformerChannel,
   TransformerChannelBuilder,
+  TransformerChannelDeserializer,
   TransformerChannelJsonInterface
 } from "./TransformerChannel";
 import {validate} from "validate.js";
 import {TransformerChannelDef} from "./TransformerChannelDef";
+import {AbstractMetadataService} from "../services/MetadataService";
 
 export interface TransformerJsonInterface {
   name: string;
@@ -220,13 +229,13 @@ export class TransformerBuilder implements TransformerInterface, ClassBuilder<Tr
       if (idx >=0) {
         this.propertyValues[idx] = property;
       } else {
-        this.propertyValues.push(...properties);
+        this.propertyValues.push(property);
       }
     });
     return this;
   }
   withPropertyValue(): NestedPropertyBuilder<this> {
-    return new NestedPropertyBuilder(property => { this.propertyValues.push(property); return this; })
+    return new NestedPropertyBuilder(property => { this.pushPropertyValue(property); return this; })
   }
   InputChannels(channels: TransformerChannel[]): this {
   this.inputChannels = channels;
@@ -237,7 +246,7 @@ export class TransformerBuilder implements TransformerInterface, ClassBuilder<Tr
     return this;
   }
   withInputChannel(): NestedTransformerChannelBuilder<this> {
-    return new NestedTransformerChannelBuilder(channel => { this.inputChannels.push(channel); return this; })
+    return new NestedTransformerChannelBuilder(channel => { this.pushInputChannel(channel); return this; })
   }
   OutputChannels(channels: TransformerChannel[]): this {
     this.outputChannels = channels;
@@ -248,7 +257,7 @@ export class TransformerBuilder implements TransformerInterface, ClassBuilder<Tr
     return this;
   }
   withOutputChannel(): NestedTransformerChannelBuilder<this> {
-    return new NestedTransformerChannelBuilder(channel => { this.outputChannels.push(channel); return this; })
+    return new NestedTransformerChannelBuilder(channel => { this.pushOutputChannel(channel); return this; })
   }
 
   build(): Transformer {
@@ -348,5 +357,62 @@ export class TransformerSerializer {
         return `Row${rowIndex}:Channel${transformerIndex+1}`
       }
     }).join("\",\"") + "\""
+  }
+}
+
+@Injectable()
+export class TransformerDeserializer {
+  readonly analyticPattern = /^\s*com.industry.analytics.Analytic\s*\(\s*"([^"]*)"\s*,\s*(\[[^\]]*])\s*,\s*(\[[^\]]*])\s*,\s*({[^}]*})\s*\)\s*$/;
+
+  constructor(private readonly metadataService: AbstractMetadataService, private readonly propertyDeserializer: PropertyDeserializer, private readonly channelDeserializer: TransformerChannelDeserializer) {}
+
+  buildAnalytic(analyticLine: string): {analytic: Transformer, inChannels: {[i:number]: string}, outChannels: {[i:number]: string}} {
+    const analyticMatch = analyticLine.match(this.analyticPattern);
+    if (analyticMatch && analyticMatch.length) {
+      const [, analyticName, analyticInChannels, analyticOutChannels, analyticProperties] = analyticMatch;
+      const transformerDef: TransformerDef = this.metadataService.getAnalytic(analyticName);
+
+      if (transformerDef) {
+        const transformerBuilder = new TransformerBuilder()
+          .Name(transformerDef.name)
+          .PropertyValues(
+            transformerDef.properties.toArray()
+              .filter(propertyDef => !propertyDef.optional && !propertyDef.repeated)
+              .map(propertyDef => PropertyBuilder.fromPropertyDef(propertyDef).build())
+          );
+
+        // Channels
+        const inChannelNames = this.channelDeserializer.buildChannels(analyticInChannels);
+        const outChannelNames = this.channelDeserializer.buildChannels(analyticOutChannels);
+
+
+        // TODO: fix up and test, needs complicated logic
+        inChannelNames.forEach((name, i) => {
+          transformerBuilder.withInputChannel().Name((transformerDef.inputChannels.get(i) || transformerDef.inputChannels.last()).name).endWith();
+        });
+        outChannelNames.forEach((name, i) => {
+          transformerBuilder.withOutputChannel().Name((transformerDef.outputChannels.get(i) || transformerDef.outputChannels.last()).name).endWith();
+        });
+
+        // Note: Do this later
+        // TODO: fix me so that I override the correct channel (need to take into account precedence of non-optionals, optionals, repeated and prefixed)
+        const inChanNamesAndIndexes = inChannelNames.reduce((result, inChanName, i) => {
+          result[i] = inChanName;
+          return result;
+        }, {});
+        const outChanNamesAndIndexes = inChannelNames.reduce((result, inChanName, i) => {
+          result[i] = inChanName;
+          return result;
+        }, {});
+
+        // Properties
+        transformerBuilder.pushPropertyValue(...this.propertyDeserializer.buildProperties(transformerDef, analyticProperties));
+        return {analytic: transformerBuilder.build().validate(transformerDef), inChannels: inChanNamesAndIndexes, outChannels: outChanNamesAndIndexes};
+      } else {
+        throw new Error(`Analytic '${analyticName}' not found in definitions`);
+      }
+    } else {
+      throw new Error(`Not a valid analytic: ${analyticLine}`)
+    }
   }
 }
