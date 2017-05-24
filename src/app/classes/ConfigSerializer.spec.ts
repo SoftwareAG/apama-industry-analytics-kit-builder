@@ -92,8 +92,8 @@ describe('ConfigSerializer', () => {
         chunkedRows.forEach((rowLines, z)=> {
           expect(rowLines).toBeArrayOfSize(3);
           expect((rowLines[0].match(/(\\\\ Row:\s)(.*)/) as RegExpMatchArray)[2]).toEqual(z.toString());
-          expect((rowLines[1].match(/([\.\w]*Analytic\()(.*)\)/) as RegExpMatchArray)[2]).toEqual(`"Analytic1",["Input Channel 1"],["Row${z}:Channel1"],{}`);
-          expect((rowLines[2].match(/([\.\w]*Analytic\()(.*)\)/) as RegExpMatchArray)[2]).toEqual(`"Analytic2",["Row${z}:Channel1"],["Output Channel 1"],{}`);
+          expect((rowLines[1].match(/([\.\w]*Analytic\()(.*)\)/) as RegExpMatchArray)[2]).toEqual(`"Analytic1",["Input Channel 1"],["Row${z}:Channel1.0"],{}`);
+          expect((rowLines[2].match(/([\.\w]*Analytic\()(.*)\)/) as RegExpMatchArray)[2]).toEqual(`"Analytic2",["Row${z}:Channel1.0"],["Output Channel 1"],{}`);
         })
       })
     }

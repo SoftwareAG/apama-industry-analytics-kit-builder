@@ -6,6 +6,7 @@ export interface TransformerChannelDefJsonInterface {
   description: string;
   repeated?: boolean;
   optional?: boolean;
+  prefix?: string;
 }
 
 export interface TransformerChannelDefInterface {
@@ -13,6 +14,7 @@ export interface TransformerChannelDefInterface {
   description: string;
   repeated: boolean;
   optional: boolean;
+  prefix: string;
 }
 
 export class TransformerChannelDef extends AbstractModel<TransformerChannelDefJsonInterface, never> {
@@ -20,6 +22,7 @@ export class TransformerChannelDef extends AbstractModel<TransformerChannelDefJs
   readonly description: string;
   readonly repeated: boolean;
   readonly optional: boolean;
+  readonly prefix: string;
 
   constructor(obj: TransformerChannelDefInterface) {
     super();
@@ -27,11 +30,16 @@ export class TransformerChannelDef extends AbstractModel<TransformerChannelDefJs
     this.description = obj.description;
     this.repeated = obj.repeated;
     this.optional = obj.optional;
+    this.prefix = obj.prefix;
   }
 
   validate(): this {
     //TODO: do some validation
     return this;
+  }
+
+  hasPrefix(): boolean {
+    return this.prefix !== "";
   }
 }
 
@@ -40,6 +48,7 @@ export class TransformerChannelDefBuilder extends ClassBuilder<TransformerChanne
   description: string;
   repeated: boolean = false;
   optional: boolean = false;
+  prefix: string = "";
 
   Name(name: string): this {
     this.name = name;
@@ -55,6 +64,10 @@ export class TransformerChannelDefBuilder extends ClassBuilder<TransformerChanne
   }
   Optional(optional: boolean): this {
     this.optional = optional;
+    return this;
+  }
+  Prefix(prefix: string): this {
+    this.prefix = prefix;
     return this;
   }
   build(): TransformerChannelDef {

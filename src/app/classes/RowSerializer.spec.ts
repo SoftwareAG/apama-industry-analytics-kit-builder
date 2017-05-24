@@ -87,8 +87,8 @@ describe('RowSerializer', () => {
 
     const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
     expect(analytics).toEqual([
-      '"Analytic1",["Row0:Input0"],["Row0:Channel1"],{}',
-      '"Analytic2",["Row0:Channel1"],["Row0:Output0"],{}',
+      '"Analytic1",["Row0:Input0"],["Row0:Channel1.0"],{}',
+      '"Analytic2",["Row0:Channel1.0"],["Row0:Output0"],{}',
     ]);
   });
 
@@ -127,8 +127,8 @@ describe('RowSerializer', () => {
 
     const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
     expect(analytics).toEqual([
-      '"Analytic1",["OverriddenInput"],["Row0:Channel1"],{}',
-      '"Analytic2",["Row0:Channel1"],["OverriddenOutput"],{}',
+      '"Analytic1",["OverriddenInput"],["Row0:Channel1.0"],{}',
+      '"Analytic2",["Row0:Channel1.0"],["OverriddenOutput"],{}',
     ]);
   });
 

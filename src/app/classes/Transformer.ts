@@ -122,6 +122,35 @@ export class Transformer implements AbstractModel<TransformerJsonInterface, Tran
       }
     });
 
+    this.inputChannels.forEach((channel: TransformerChannel) => {
+      if (!transformerDef.inputChannelsByName.has(channel.name)) { throw new Error(`Channel "${channel.name}" does not exist so channel shouldn't exist`); }
+    });
+
+    transformerDef.inputChannelsByName.forEach((channelDef: TransformerChannelDef) => {
+      const channels = this.getInputChannels(channelDef.name);
+      if (channelDef.repeated) {
+
+      } else if (channelDef.optional) {
+        if (channels.size > 1) { throw new Error(`Transformer ${transformerDef.name}\n\nOptional channel :[${channelDef.name}] cannot have more than 1 value, there were: ${channels.size}`)}
+      } else {
+        if (channels.size !== 1) { throw new Error(`Transformer ${transformerDef.name}\n\nNon-optional channel :[${channelDef.name}] must have exactly one value, there were: ${channels.size}`)}
+      }
+    });
+
+    this.outputChannels.forEach((channel: TransformerChannel) => {
+      if (!transformerDef.outputChannelsByName.has(channel.name)) { throw new Error(`Channel "${channel.name}" does not exist so channel shouldn't exist`); }
+    });
+
+    transformerDef.outputChannelsByName.forEach((channelDef: TransformerChannelDef) => {
+      const channels = this.getOutputChannels(channelDef.name);
+      if (channelDef.repeated) {
+
+      } else if (channelDef.optional) {
+        if (channels.size > 1) { throw new Error(`Transformer ${transformerDef.name}\n\nOptional channel :[${channelDef.name}] cannot have more than 1 value, there were: ${channels.size}`)}
+      } else {
+        if (channels.size !== 1) { throw new Error(`Transformer ${transformerDef.name}\n\nNon-optional channel :[${channelDef.name}] must have exactly one value, there were: ${channels.size}`)}
+      }
+    });
     return this;
   }
 
@@ -306,7 +335,7 @@ export class NestedTransformerBuilder<Parent> extends TransformerBuilder impleme
 export class TransformerSerializer {
   constructor(private propertySerializer: PropertySerializer) {}
 
-  toApama(transformer: Transformer, transformerDef: TransformerDef, transformerIndex: number, row: Row, rowIndex: number) {
+  toApama(transformer: Transformer, transformerDef: TransformerDef, transformerIndex: number, row: Row, rowIndex: number): string {
     const namespace  = 'com.industry.analytics';
 
     transformer.validate(transformerDef);
@@ -314,10 +343,10 @@ export class TransformerSerializer {
     return `${namespace}.Analytic(` +
       `"${transformer.name}",` +
       "[" +
-        TransformerSerializer.getInChannels(transformer, transformerIndex, row, rowIndex) +
+        TransformerSerializer.getInChannels(transformerDef, transformer, transformerIndex, row, rowIndex) +
       "]," +
       "[" +
-        TransformerSerializer.getOutChannels(transformer, transformerIndex, row, rowIndex) +
+        TransformerSerializer.getOutChannels(transformerDef, transformer, transformerIndex, row, rowIndex) +
       "]," +
       "{" +
         transformer.propertyValues.map((propertyVal: Property) => this.propertySerializer.toApama(propertyVal, transformerDef.getProperty(propertyVal.definitionName))).join(",") +
@@ -325,36 +354,38 @@ export class TransformerSerializer {
     ")";
   }
 
-  private static getInChannels(transformer: Transformer, transformerIndex: number, row: Row, rowIndex: number) : string {
+  private static getInChannels(transformerDef: TransformerDef, transformer: Transformer, transformerIndex: number, row: Row, rowIndex: number) : string {
     if (!transformer.inputChannels.size) {
       return "";
     }
-    return "\"" + transformer.inputChannels.map((channel, channelIndex: number) => {
+    return "\"" + transformer.inputChannels.map((channel: TransformerChannel, channelIndex: number) => {
+      const channelDef = transformerDef.getInputChannel(channel.name);
       if (transformerIndex === 0) {
         if (row.inputChannelOverrides.getValue().has(channelIndex)) {
-          return row.inputChannelOverrides.getValue().get(channelIndex).name.getValue();
+          return channelDef.prefix + row.inputChannelOverrides.getValue().get(channelIndex).name.getValue();
         } else {
-          return `Row${rowIndex}:Input${channelIndex}`;
+          return `${channelDef.prefix}Row${rowIndex}:Input${channelIndex}`;
         }
       } else {
-        return `Row${rowIndex}:Channel${transformerIndex}`
+        return `${channelDef.prefix}Row${rowIndex}:Channel${transformerIndex}.${channelIndex}`
       }
     }).join("\",\"") + "\""
   }
 
-  private static getOutChannels(transformer: Transformer, transformerIndex: number, row: Row, rowIndex: number) : string {
+  private static getOutChannels(transformerDef: TransformerDef, transformer: Transformer, transformerIndex: number, row: Row, rowIndex: number) : string {
     if (!transformer.outputChannels.size) {
       return "";
     }
-    return "\"" + transformer.outputChannels.map((channel, channelIndex: number) => {
+    return "\"" + transformer.outputChannels.map((channel: TransformerChannel, channelIndex: number) => {
+      const channelDef = transformerDef.getOutputChannel(channel.name);
       if (transformerIndex === row.transformers.getValue().size-1) {
         if (row.outputChannelOverrides.getValue().has(channelIndex)) {
-          return row.outputChannelOverrides.getValue().get(channelIndex).name.getValue();
+          return channelDef.prefix + row.outputChannelOverrides.getValue().get(channelIndex).name.getValue();
         } else {
-          return `Row${rowIndex}:Output${channelIndex}`;
+          return `${channelDef.prefix}Row${rowIndex}:Output${channelIndex}`;
         }
       } else {
-        return `Row${rowIndex}:Channel${transformerIndex+1}`
+        return `${channelDef.prefix}Row${rowIndex}:Channel${transformerIndex+1}.${channelIndex}`
       }
     }).join("\",\"") + "\""
   }
