@@ -9,6 +9,8 @@ import {Config} from "../../classes/Config";
 import {List} from "immutable";
 import {Transformer} from "app/classes/Transformer";
 import {AbstractDragService, Draggable, Dragged, Point} from "../../services/AbstractDragService";
+import {RowChannelComponent} from "../row-channel/row-channel.component";
+import {FormsModule} from "@angular/forms";
 
 @Injectable()
 class DataServiceMock extends AbstractDataService {}
@@ -29,10 +31,13 @@ describe('ChannelSelectorComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ChannelSelectorComponent ],
+      declarations: [ ChannelSelectorComponent, RowChannelComponent ],
       providers: [
         {provide: AbstractDataService, useClass: DataServiceMock},
         {provide: AbstractDragService, useClass: DragServiceMock}
+      ],
+      imports: [
+        FormsModule
       ]
     })
     .compileComponents();
@@ -48,10 +53,6 @@ describe('ChannelSelectorComponent', () => {
     el = fixture.debugElement.nativeElement;
   });
 
-  it('should have an svg child element', () => {
-    expect(el.children[2].nodeName).toEqual('svg');
-  });
-
   it('should create transformer elements', () => {
     const channels = List(new ChannelArrayBuilder()
         .with().Name('Default 1').endWith()
@@ -63,8 +64,9 @@ describe('ChannelSelectorComponent', () => {
 
     channelDataService.channels.next(channels);
     fixture.detectChanges();
-    expect(Array.from(el.querySelectorAll('.channel'))).toBeArrayOfSize(5);
-    Array.from(el.querySelectorAll('.channel')).forEach((channelEl, i) => {
+    const rowChannels = Array.from(el.querySelectorAll('row-channel'));
+    expect(rowChannels).toBeArrayOfSize(5);
+    rowChannels.forEach((channelEl, i) => {
       expect((channelEl.querySelector('text') as Element).textContent).toEqual(channels.get(i).name.getValue());
     });
   });

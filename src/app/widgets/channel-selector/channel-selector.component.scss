@@ -1,12 +1,22 @@
 @import '../../../_theme.scss';
 
-* /deep/ {
-  .channel:hover rect {
-    stroke-width: 1;
-    stroke: grey;
-  }
-}
+$transformer-color: saturate($brand-primary, 20%);
 
 h4 {
   color: $gray;
+}
+
+.add-channel {
+  circle {
+    fill: $white;
+    stroke: $black;
+    stroke-dasharray: 2,2;
+  }
+  text {
+    text-anchor: middle;
+    alignment-baseline: middle;
+  }
+  * {
+    vertical-align: middle;
+  }
 }

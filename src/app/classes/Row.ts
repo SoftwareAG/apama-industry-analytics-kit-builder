@@ -193,6 +193,7 @@ export class RowDeserializer {
   }
 
   private addRowChannels(rowBuilder: RowBuilder, rowChannels: List<{analytic: Transformer, inChannels: Map<number, string>, outChannels: Map<number, string>}>) {
+    // TODO: add any row channels loaded here to the dataService.channels
     rowChannels.first().inChannels.forEach((chanName: string, i: number) => {
       rowBuilder.withInputChannel(i).Name(chanName).endWith();
     });

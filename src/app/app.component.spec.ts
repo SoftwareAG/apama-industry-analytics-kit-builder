@@ -26,6 +26,7 @@ import {InformationComponent} from "./widgets/information/information.component"
 import {TransformerDefinitionComponent} from "./widgets/transformer-definition/transformer-definition.component";
 import {FocusDirective} from "./directives/focus.directive";
 import {TransformerChannelDeserializer} from "./classes/TransformerChannel";
+import {RowChannelComponent} from "./widgets/row-channel/row-channel.component";
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
@@ -42,7 +43,8 @@ describe('AppComponent', () => {
         SaveConfigurationComponent,
         FocusDirective,
         InformationComponent,
-        TransformerDefinitionComponent
+        TransformerDefinitionComponent,
+        RowChannelComponent
       ],
       imports: [
         BrowserModule,

@@ -1,78 +1,33 @@
-import {Component, ElementRef, OnInit} from "@angular/core";
-import * as d3 from "d3";
-import {RowChannel} from "../../classes/Channel";
+import {Component} from "@angular/core";
+import {RowChannel, RowChannelBuilder} from "../../classes/Channel";
 import {AbstractDataService} from "../../services/AbstractDataService";
-import {Observable} from "rxjs";
 import {List} from "immutable";
 import {AbstractDragService} from "../../services/AbstractDragService";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
 @Component({
   templateUrl: './channel-selector.component.html',
   selector: 'channel-selector',
   styleUrls: ['./channel-selector.component.scss']
 })
-export class ChannelSelectorComponent implements OnInit {
+export class ChannelSelectorComponent {
   readonly nativeElement;
-  readonly channels: Observable<List<RowChannel>>;
-  readonly dataService : AbstractDataService;
+  readonly channels: BehaviorSubject<List<RowChannel>>;
   readonly dragService: AbstractDragService;
 
-  constructor(myElement: ElementRef, dataService: AbstractDataService, dragService: AbstractDragService) {
-    this.nativeElement = myElement.nativeElement;
-    this.dataService = dataService;
-    this.channels = this.dataService.channels;
+  addChannelName: string = "";
+
+  constructor(dataService: AbstractDataService, dragService: AbstractDragService) {
+    this.channels = dataService.channels;
     this.dragService = dragService;
   }
 
-  ngOnInit() {
-    const component = this;
-
-    const padding = {left:20, top: 20, right: 20, bottom: 20};
-    const width = 250 - padding.left - padding.right;
-    const height = 300 - padding.top - padding.bottom;
-    const channelHeight = 50;
-
-    const svg = d3.select(this.nativeElement).select("svg")
-      .attr("width", width + padding.left + padding.right)
-      .attr("height", height + padding.top + padding.bottom);
-
-    const container = svg.append("g")
-      .attr("transform", `translate(${padding.left},${padding.top})`);
-
-    this.channels.subscribe((channels: List<RowChannel>) => {
-      const groups = container.selectAll(".channel").data(channels.toArray());
-      groups.exit().remove();
-      const groupsEnter = groups.enter().append("g")
-        .classed("channel", true)
-        .on('mousedown', function(d) {
-          component.dragService.startDrag({sourceElement: this as SVGGElement, object: d});
-          d3.event.preventDefault();
-        });
-      const groupsUpdate = groups.merge(groupsEnter)
-        .attr("transform", (d,i) => `translate(0,${i*60})`);
-
-      groupsEnter.append("rect")
-        .attr('width', width)
-        .attr('height', channelHeight)
-        .attr('fill', 'rgba(0,0,0,0)');
-
-      groupsEnter.append("circle")
-        .attr("fill", "steelblue")
-        .attr("r", 20)
-        .attr("cx", channelHeight/2)
-        .attr("cy", channelHeight/2);
-      groupsEnter.append("text")
-        .attr("alignment-baseline", "middle")
-        .attr("text-anchor", "left")
-        .attr("dx", 25)
-        .attr("x", channelHeight/2)
-        .attr("y", channelHeight/2);
-
-      groupsUpdate.select('text')
-        .classed('unselectable', true)
-        .text((d: RowChannel) => d.name.getValue());
-    })
+  onChannelDrag(event, channel) {
+    this.dragService.startDrag({sourceElement: event.srcElement.parentNode, object: channel});
+    event.preventDefault();
   }
 
-
+  addChannel(channelName: string) {
+    this.channels.next(this.channels.getValue().push(new RowChannelBuilder().Name(channelName).build()));
+  }
 }

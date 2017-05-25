@@ -27,6 +27,7 @@ import {InformationComponent} from "./widgets/information/information.component"
 import {TransformerDefinitionComponent} from "./widgets/transformer-definition/transformer-definition.component";
 import {ResizableModule} from "angular-resizable-element";
 import {TransformerChannelDeserializer} from "./classes/TransformerChannel";
+import {RowChannelComponent} from "./widgets/row-channel/row-channel.component";
 
 @NgModule({
   declarations: [
@@ -41,7 +42,8 @@ import {TransformerChannelDeserializer} from "./classes/TransformerChannel";
     SaveConfigurationComponent,
     FocusDirective,
     InformationComponent,
-    TransformerDefinitionComponent
+    TransformerDefinitionComponent,
+    RowChannelComponent
   ],
   imports: [
     BrowserModule,
