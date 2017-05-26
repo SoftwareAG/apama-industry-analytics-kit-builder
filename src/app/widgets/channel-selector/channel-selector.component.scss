@@ -1,6 +1,26 @@
 @import '../../../_theme.scss';
 
-$transformer-color: saturate($brand-primary, 20%);
+$channel-color: saturate($brand-primary, 20%);
+
+* /deep/ {
+  .channel {
+    fill: $channel-color;
+    filter: url('#dropshadow');
+
+    .channel-circle {
+      stroke: $black;
+      stroke-width: 2;
+
+      &.placeholder {
+        fill: $white;
+      }
+    }
+
+    text {
+      fill: black;
+    }
+  }
+}
 
 h4 {
   color: $gray;
