@@ -204,6 +204,9 @@ export class ConfigDeserializer {
 
     const rows = _.flatMap(groupedLines.rowAnalyticLines, analyticLines => {
       try {
+        if (analyticLines.length === 0 ) {
+          return [];
+        }
         return [this.rowDeserializer.buildRow(List(analyticLines))];
       } catch(e) {
         if (e instanceof IgnoreableDeserializationError) {
