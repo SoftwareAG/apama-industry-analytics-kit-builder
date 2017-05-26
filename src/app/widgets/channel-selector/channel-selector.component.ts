@@ -28,6 +28,9 @@ export class ChannelSelectorComponent {
   }
 
   addChannel(channelName: string) {
-    this.channels.next(this.channels.getValue().push(new RowChannelBuilder().Name(channelName).build()));
+    if (this.addChannelName.trim() !== "") {
+      this.channels.next(this.channels.getValue().push(new RowChannelBuilder().Name(channelName).build()));
+      this.addChannelName = "";
+    }
   }
 }

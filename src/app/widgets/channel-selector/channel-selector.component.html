@@ -9,6 +9,6 @@
     </g>
   </svg>
   <div class="d-inline-block">
-    <input class="form-control" type="text" [(ngModel)]="addChannelName" placeholder="Enter a channel name..."/>
+    <input class="form-control" type="text" [(ngModel)]="addChannelName" (keyup.enter)="addChannel(addChannelName)" placeholder="Enter a channel name..."/>
   </div>
 </div>
