@@ -79,6 +79,6 @@ export class DragOverlayComponent implements OnInit {
         .attr('transform', (d: Dragged) => `translate(${d.getStartLocation().x},${d.getStartLocation().y})`)
         .attr('opacity', 0);
     this.dragService.stopDrag();
-    this.dataService.selectedTransformer.next(undefined);
+
   }
 }
