@@ -527,7 +527,7 @@ export class TransformerDeserializer {
         outputChannelMappings.forEach((channelNames: List<string>, channelDef: TransformerChannelDef) => transformerBuilder.pushOutputChannel(...channelNames.toArray().map(channelName => TransformerChannelBuilder.fromTransformerChannelDef(channelDef).build())));
 
         const unPrefixedInChannelNames = inputChannelMappings.valueSeq().flatMap((channelNames: List<string>) => channelNames);
-        const unPrefixedOutChannelNames = inputChannelMappings.valueSeq().flatMap((channelNames: List<string>) => channelNames);
+        const unPrefixedOutChannelNames = outputChannelMappings.valueSeq().flatMap((channelNames: List<string>) => channelNames);
 
         // Create the Row Channel Overrides
         const inChanNamesAndIndexes = unPrefixedInChannelNames.reduce((result: Map<number, string>, chanName: string, i: number) => {
