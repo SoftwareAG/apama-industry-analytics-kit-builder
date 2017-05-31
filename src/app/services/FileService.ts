@@ -1,7 +1,8 @@
-import {Config, ConfigDeserializer, ConfigSerializer} from "../classes/Config";
+import {Config, ConfigSerializer} from "../classes/Config";
 import {Injectable} from "@angular/core";
 import {AbstractMetadataService} from "./MetadataService";
 import {validate} from "validate.js";
+import {ConfigDeserializer} from "../classes/ConfigDeserializer";
 
 export class UserCancelled extends Error {}
 

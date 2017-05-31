@@ -1,19 +1,21 @@
 import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 import {NavBarComponent} from "./nav-bar.component";
 import {AbstractDataService} from "../../services/AbstractDataService";
-import {Config, ConfigArrayBuilder, ConfigDeserializer, ConfigSerializer} from "../../classes/Config";
+import {Config, ConfigArrayBuilder, ConfigSerializer} from "../../classes/Config";
 import {BehaviorSubject} from "rxjs";
 import {List} from "immutable";
 import {Injectable} from "@angular/core";
 import {TransformerDeserializer, TransformerSerializer} from "../../classes/Transformer";
 import {FileService} from "../../services/FileService";
-import {RowDeserializer, RowSerializer} from "../../classes/Row";
+import {RowSerializer} from "../../classes/Row";
 import {PropertyDeserializer, PropertySerializer} from "../../classes/Property";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {AbstractMetadataService, MetadataService} from "../../services/MetadataService";
 import {FormsModule} from "@angular/forms";
 import {BrowserModule} from "@angular/platform-browser";
 import {TransformerChannelDeserializer} from "../../classes/TransformerChannel";
+import {ConfigDeserializer} from "../../classes/ConfigDeserializer";
+import {RowDeserializer} from "../../classes/RowDeserializer";
 
 @Injectable()
 class DataServiceMock extends AbstractDataService {

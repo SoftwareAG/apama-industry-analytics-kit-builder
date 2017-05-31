@@ -13,8 +13,8 @@ import {DragService} from "./services/DragService";
 import {DragOverlayComponent} from "./widgets/dragoverlay/drag-overlay.component";
 import {FormsModule} from "@angular/forms";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
-import {ConfigDeserializer, ConfigSerializer} from "./classes/Config";
-import {RowDeserializer, RowSerializer} from "./classes/Row";
+import {ConfigSerializer} from "./classes/Config";
+import {RowSerializer} from "./classes/Row";
 import {PropertyDeserializer, PropertySerializer} from "app/classes/Property";
 import {TransformerDeserializer, TransformerSerializer} from "./classes/Transformer";
 import {FileService} from "./services/FileService";
@@ -27,6 +27,8 @@ import {TransformerDefinitionComponent} from "./widgets/transformer-definition/t
 import {FocusDirective} from "./directives/focus.directive";
 import {TransformerChannelDeserializer} from "./classes/TransformerChannel";
 import {RowChannelComponent} from "./widgets/row-channel/row-channel.component";
+import {ConfigDeserializer} from "./classes/ConfigDeserializer";
+import {RowDeserializer} from "./classes/RowDeserializer";
 
 describe('AppComponent', () => {
   beforeEach(async(() => {

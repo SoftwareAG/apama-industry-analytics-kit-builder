@@ -1,7 +1,7 @@
 import {
   NestedTransformerBuilder,
   Transformer,
-  TransformerBuilder, TransformerDeserializer,
+  TransformerBuilder,
   TransformerJsonInterface,
   TransformerSerializer
 } from "./Transformer";
@@ -16,7 +16,6 @@ import {Metadata} from "./Metadata";
 import * as _ from "lodash";
 import {TransformerChannel} from "app/classes/TransformerChannel";
 import {TransformerChannelDef} from "./TransformerChannelDef";
-import {IgnoreableDeserializationError} from "./Errors";
 
 export interface RowJsonInterface {
   maxTransformerCount: number;
@@ -175,31 +174,4 @@ export class RowSerializer {
   }
 }
 
-@Injectable()
-export class RowDeserializer {
 
-  constructor(private readonly transformerDeserializer: TransformerDeserializer) {}
-
-  buildRow(analyticLines: List<string>): Row {
-    const analytics = analyticLines.map((analyticLine:string) => this.transformerDeserializer.buildAnalytic(analyticLine)) as List<{analytic: Transformer, inChannels: Map<number, string>, outChannels: Map<number, string>}>;
-    if (analytics.size > 0) {
-      const rowBuilder = new RowBuilder()
-        .pushTransformer(...analytics.toArray().map(a => a.analytic));
-      this.addRowChannels(rowBuilder, analytics);
-      return rowBuilder.build().validate();
-    } else {
-      throw new IgnoreableDeserializationError("Row must have an Analytic in it")
-    }
-  }
-
-  private addRowChannels(rowBuilder: RowBuilder, rowChannels: List<{analytic: Transformer, inChannels: Map<number, string>, outChannels: Map<number, string>}>) {
-    // TODO: add any row channels loaded here to the dataService.channels
-    rowChannels.first().inChannels.forEach((chanName: string, i: number) => {
-      rowBuilder.withInputChannel(i).Name(chanName).endWith();
-    });
-    rowChannels.last().outChannels.forEach((chanName: string, i: number) => {
-      rowBuilder.withOutputChannel(i).Name(chanName).endWith();
-    });
-  }
-
-}

@@ -4,13 +4,15 @@ import {FormsModule} from "@angular/forms";
 import {AbstractDataService} from "../../services/AbstractDataService";
 import {DataService} from "../../services/DataService";
 import {FileService} from "../../services/FileService";
-import {ConfigDeserializer, ConfigSerializer} from "../../classes/Config";
-import {RowDeserializer, RowSerializer} from "../../classes/Row";
+import {ConfigSerializer} from "../../classes/Config";
+import {RowSerializer} from "../../classes/Row";
 import {TransformerDeserializer, TransformerSerializer} from "../../classes/Transformer";
 import {PropertyDeserializer, PropertySerializer} from "../../classes/Property";
 import {AbstractMetadataService, MetadataService} from "../../services/MetadataService";
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {TransformerChannelDeserializer} from "../../classes/TransformerChannel";
+import {ConfigDeserializer} from "../../classes/ConfigDeserializer";
+import {RowDeserializer} from "../../classes/RowDeserializer";
 
 describe('SaveConfigurationComponent', () => {
   let component: SaveConfigurationComponent;

@@ -15,8 +15,8 @@ import {NavBarComponent} from "./widgets/nav-bar/nav-bar.component";
 import {AbstractDragService} from "app/services/AbstractDragService";
 import {DragService} from "./services/DragService";
 import {DragOverlayComponent} from "./widgets/dragoverlay/drag-overlay.component";
-import {ConfigDeserializer, ConfigSerializer} from "./classes/Config";
-import {RowDeserializer, RowSerializer} from "./classes/Row";
+import {ConfigSerializer} from "./classes/Config";
+import {RowSerializer} from "./classes/Row";
 import {TransformerDeserializer, TransformerSerializer} from "./classes/Transformer";
 import {PropertyDeserializer, PropertySerializer} from "./classes/Property";
 import {FileService} from "./services/FileService";
@@ -28,6 +28,8 @@ import {TransformerDefinitionComponent} from "./widgets/transformer-definition/t
 import {ResizableModule} from "angular-resizable-element";
 import {TransformerChannelDeserializer} from "./classes/TransformerChannel";
 import {RowChannelComponent} from "./widgets/row-channel/row-channel.component";
+import {RowDeserializer} from "./classes/RowDeserializer";
+import {ConfigDeserializer} from "./classes/ConfigDeserializer";
 
 @NgModule({
   declarations: [
