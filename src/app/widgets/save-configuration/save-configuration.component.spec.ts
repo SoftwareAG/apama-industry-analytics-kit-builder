@@ -24,7 +24,7 @@ describe('SaveConfigurationComponent', () => {
         SaveConfigurationComponent
       ],
         imports: [
-          FormsModule,
+          FormsModule
       ],
       providers: [
         {provide: AbstractDataService, useClass: DataService},
@@ -41,8 +41,7 @@ describe('SaveConfigurationComponent', () => {
         TransformerChannelDeserializer,
         PropertyDeserializer
       ]
-    })
-    .compileComponents();
+    }).compileComponents();
   }));
 
   beforeEach(() => {

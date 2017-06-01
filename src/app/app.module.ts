@@ -2,7 +2,6 @@ import {BrowserModule} from "@angular/platform-browser";
 import {NgModule} from "@angular/core";
 import {FormsModule} from "@angular/forms";
 import {HttpModule} from "@angular/http";
-
 import {AppComponent} from "./app.component";
 import {ChannelSelectorComponent} from "./widgets/channel-selector/channel-selector.component";
 import {TransformerSelectorComponent} from "./widgets/transformer-selector/transformer-selector.component";
@@ -30,6 +29,7 @@ import {TransformerChannelDeserializer} from "./classes/TransformerChannel";
 import {RowChannelComponent} from "./widgets/row-channel/row-channel.component";
 import {RowDeserializer} from "./classes/RowDeserializer";
 import {ConfigDeserializer} from "./classes/ConfigDeserializer";
+import {LoginDialogComponent} from "./widgets/login-dialog/login-dialog.component";
 
 @NgModule({
   declarations: [
@@ -45,7 +45,8 @@ import {ConfigDeserializer} from "./classes/ConfigDeserializer";
     FocusDirective,
     InformationComponent,
     TransformerDefinitionComponent,
-    RowChannelComponent
+    RowChannelComponent,
+    LoginDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -70,7 +71,8 @@ import {ConfigDeserializer} from "./classes/ConfigDeserializer";
     PropertyDeserializer
   ],
   entryComponents: [
-    SaveConfigurationComponent
+    SaveConfigurationComponent,
+    LoginDialogComponent
   ],
   bootstrap: [AppComponent]
 })

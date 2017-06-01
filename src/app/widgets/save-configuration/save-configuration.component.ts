@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {Component} from "@angular/core";
 import {AbstractDataService} from "../../services/AbstractDataService";
 import {FileService} from "../../services/FileService";
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
@@ -8,7 +8,7 @@ import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
   templateUrl: './save-configuration.component.html',
   styleUrls: ['./save-configuration.component.scss']
 })
-export class SaveConfigurationComponent implements OnInit {
+export class SaveConfigurationComponent {
 
   constructor(public dataService: AbstractDataService, public fileService: FileService, private activeModal: NgbActiveModal) { }
 
@@ -34,11 +34,6 @@ export class SaveConfigurationComponent implements OnInit {
 
   dismiss(reason: any) {
     this.activeModal.close(reason);
-  }
-
-
-ngOnInit() {
-
   }
 
 }

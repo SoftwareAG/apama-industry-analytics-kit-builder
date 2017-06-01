@@ -1,17 +1,19 @@
-import {Component} from "@angular/core";
+import {AfterViewInit, Component} from "@angular/core";
 import {AbstractDataService} from "./services/AbstractDataService";
 import {DataService} from "./services/DataService";
 import {AbstractMetadataService} from "./services/MetadataService";
 import {MetadataBuilder} from "./classes/Metadata";
 import {ResizeEvent} from "angular-resizable-element";
 import {ConfigBuilder} from "./classes/Config";
+import {LoginDialogComponent} from "./widgets/login-dialog/login-dialog.component";
+import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
 
   private readonly _informationHeightMax = 85;
   private readonly _informationHeightMin = 15;
@@ -26,7 +28,7 @@ export class AppComponent {
 
   informationHeightStartPixels = 0;
 
-  constructor(dataService: AbstractDataService, metadataService: AbstractMetadataService)  {
+  constructor(dataService: AbstractDataService, metadataService: AbstractMetadataService, public modalService: NgbModal) {
     (dataService as DataService).loadChannels();
 
     metadataService.metadata.next(new MetadataBuilder()
@@ -135,4 +137,11 @@ export class AppComponent {
     }
   }
 
+  openLoginDialog() {
+    this.modalService.open(LoginDialogComponent, {size: "lg", backdrop: "static", keyboard: false});
+  }
+
+  ngAfterViewInit() {
+    this.openLoginDialog();
+  }
 }
