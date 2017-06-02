@@ -7,6 +7,9 @@ import {ResizeEvent} from "angular-resizable-element";
 import {ConfigBuilder} from "./classes/Config";
 import {LoginDialogComponent} from "./widgets/login-dialog/login-dialog.component";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {Http} from "@angular/http";
+import {List} from "immutable";
+import {RowChannel} from "./classes/Channel";
 
 @Component({
   selector: 'app-root',
@@ -28,88 +31,7 @@ export class AppComponent implements AfterViewInit {
 
   informationHeightStartPixels = 0;
 
-  constructor(dataService: AbstractDataService, metadataService: AbstractMetadataService, public modalService: NgbModal) {
-    (dataService as DataService).loadChannels();
-
-    metadataService.metadata.next(new MetadataBuilder()
-      .Version("1.0.0")
-      .withAnalytic()
-        .Name("Sorter")
-        .Group("Group1")
-        .withInputChannel().Name("In1").Description("").endWith()
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith()
-      .withAnalytic()
-        .Name("NoInput")
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith()
-      .withAnalytic()
-        .Name("NoOutput")
-        .withInputChannel().Name("In1").Description("").endWith()
-      .endWith()
-      .withAnalytic()
-        .Name("Drift")
-        .withInputChannel().Name("In1").Description("").endWith()
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith()
-      .withAnalytic()
-        .Name("Spike")
-        .withInputChannel().Name("In1").Description("").endWith()
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith()
-      .withAnalytic()
-        .Name("Threshold")
-        .withInputChannel().Name("In1").Description("").endWith()
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith()
-      .withAnalytic()
-        .Name("Delta")
-        .withInputChannel().Name("In1").Description("").endWith()
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith()
-      .withAnalytic()
-        .Name("Gradient")
-        .withInputChannel().Name("In1").Description("").endWith()
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith()
-      .withAnalytic()
-        .Name("Average")
-        .withInputChannel().Name("In1").Description("").endWith()
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith()
-      .withAnalytic()
-        .Name("Sum")
-        .withInputChannel().Name("In1").Description("").endWith()
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith()
-      .withAnalytic()
-        .Name("Mode")
-        .withInputChannel().Name("In1").Description("").endWith()
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith()
-      .withAnalytic()
-        .Name("Spread")
-        .withInputChannel().Name("In1").Description("").endWith()
-        .withOutputChannel().Name("Out1").Description("").endWith()
-      .endWith().build()
-    );
-
-     dataService.configurations.next(dataService.configurations.getValue().push(() => {
-      return new ConfigBuilder()
-        .Name("Peer Analysis")
-        .Description("")
-        .withRow()
-          .MaxTransformerCount(3)
-          .pushTransformer(metadataService.createAnalytic('Average'))
-        .endWith()
-        .withRow()
-          .MaxTransformerCount(3)
-          .pushTransformer(metadataService.createAnalytic('Spread'))
-          .pushTransformer(metadataService.createAnalytic('Threshold'))
-        .endWith()
-        .build()
-     }));
-  }
+  constructor(private dataService: AbstractDataService, private metadataService: AbstractMetadataService, public modalService: NgbModal, private http: Http) { }
 
   onValidateResize(event: ResizeEvent): boolean {
     if (event.rectangle) {
@@ -141,7 +63,19 @@ export class AppComponent implements AfterViewInit {
     this.modalService.open(LoginDialogComponent, {size: "lg", backdrop: "static", keyboard: false});
   }
 
+  loadDefaultMetadata() {
+    this.http.get('assets/metadata.json')
+      .toPromise()
+      .then( (result => {
+          this.metadataService.loadMetadata(result.json())
+      }))
+      .catch(err => console.log(err));
+  }
+
   ngAfterViewInit() {
-    window.setTimeout(() => this.openLoginDialog());
+    window.setTimeout(() => {
+      this.loadDefaultMetadata();
+      this.openLoginDialog()
+    });
   }
 }
