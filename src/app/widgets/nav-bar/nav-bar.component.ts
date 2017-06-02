@@ -8,6 +8,7 @@ import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {AbstractMetadataService} from "../../services/MetadataService";
 import {SaveConfigurationComponent} from "app/widgets/save-configuration/save-configuration.component";
 import {ModalDismissReasons, NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {RowChannel} from "../../classes/Channel";
 
 @Component({
   selector: 'nav-bar',
@@ -42,6 +43,7 @@ export class NavBarComponent implements OnInit {
       .build();
     this.dataService.hierarchy.next(config);
     this.dataService.selectedTransformer.next(undefined);
+    this.dataService.channels.next(List<RowChannel>());
   }
 
   loadConfig() {

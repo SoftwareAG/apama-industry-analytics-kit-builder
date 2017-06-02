@@ -8,12 +8,12 @@ import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 })
 export class LoginDialogComponent {
 
-  public username: string;
-  public password: string;
+  public u: string;
+  public p: string;
   public invalid_username_password: boolean;
 
-  readonly USERNAME: string = "demo";
-  readonly PASSWORD: string = "welcome1";
+  readonly U: string = "demo";
+  readonly P: string = "welcome1";
   readonly TAB = 9;
 
   private dialog;
@@ -25,7 +25,7 @@ export class LoginDialogComponent {
   login() {
     this.invalid_username_password = false;
     // Check for this hard coded username and password
-    if (this.username === this.USERNAME && this.password === this.PASSWORD) {
+    if (this.u === this.U && this.p === this.P) {
       this.activeModal.close('loginDialog');
     } else {
       this.invalid_username_password = true;

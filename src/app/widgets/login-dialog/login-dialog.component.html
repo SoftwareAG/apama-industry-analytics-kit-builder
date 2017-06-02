@@ -10,7 +10,7 @@
         <input  type="text"
                 id="username"
                 name="username"
-                [(ngModel)]="username"
+                [(ngModel)]="u"
                 class="form-control"
                 #_username="ngModel"
                 required
@@ -22,7 +22,7 @@
         [class.has-danger]="_password.invalid && (_password.dirty || _password.touched)">
       <label for="password" class="col-2 col-form-label">Password</label>
       <div class="col-10">
-          <input [(ngModel)]="password"
+          <input [(ngModel)]="p"
                     name="password"
                     type="password"
                     id="password"

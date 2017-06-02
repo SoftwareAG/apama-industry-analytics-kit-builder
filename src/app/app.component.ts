@@ -142,6 +142,6 @@ export class AppComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.openLoginDialog();
+    window.setTimeout(() => this.openLoginDialog());
   }
 }
