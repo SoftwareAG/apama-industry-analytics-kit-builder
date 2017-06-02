@@ -89,7 +89,8 @@ export class NavBarComponent implements OnInit {
     this.fileService.getFileData(".json")
       .then(result => result.fileContent)
       .then(jsonStr => JSON.parse(jsonStr))
-      .then(json => this.metadataService.loadMetadata(json));
+      .then(json => this.metadataService.loadMetadata(json))
+      .then(() => this.dataService.channels.next(List<RowChannel>()));
   }
 
   isSelectedVersion(version) {

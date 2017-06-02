@@ -1,7 +1,7 @@
 <div class="modal-header bg-primary">
   <h4 class="modal-title">Login</h4>
 </div>
-<form name="loginDialog" #loginDialog="ngForm">
+<form name="loginDialog" #loginDialog="ngForm" (submit)="login()">
   <div class="modal-body">
     <div class="form-group row"
         [class.has-danger]="_username.invalid && (_username.dirty || _username.touched)">
@@ -38,8 +38,11 @@
     <div class="form-control-feedback text-danger" *ngIf="invalid_username_password">
         <p>Please enter a valid username and password</p>
     </div>
+    <!-- allows the user to press enter to submit -->
+    <button type="submit" style="display:none">hidden submit</button>
+
     <button name="login" class="btn btn-primary"
-            type="submit"
+            type="button"
             [disabled]="!loginDialog.valid"
             (click)="login()">Login
     </button>
