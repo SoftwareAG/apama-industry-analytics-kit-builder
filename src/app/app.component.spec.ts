@@ -29,6 +29,7 @@ import {TransformerChannelDeserializer} from "./classes/TransformerChannel";
 import {RowChannelComponent} from "./widgets/row-channel/row-channel.component";
 import {ConfigDeserializer} from "./classes/ConfigDeserializer";
 import {RowDeserializer} from "./classes/RowDeserializer";
+import {HttpModule} from "@angular/http";
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
@@ -51,6 +52,7 @@ describe('AppComponent', () => {
       imports: [
         BrowserModule,
         FormsModule,
+        HttpModule,
         ResizableModule,
         NgbModule.forRoot()
       ],

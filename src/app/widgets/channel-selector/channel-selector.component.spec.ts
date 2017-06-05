@@ -70,4 +70,17 @@ describe('ChannelSelectorComponent', () => {
       expect((channelEl.querySelector('text') as Element).textContent).toEqual(channels.get(i).name.getValue());
     });
   });
+
+  it('should prevent duplicate channels being entered', () => {
+    component.addChannel('abc');
+    component.addChannel('def');
+    component.addChannel('abc');
+
+    fixture.detectChanges();
+    const rowChannels = Array.from(el.querySelectorAll('row-channel'));
+    expect(rowChannels).toBeArrayOfSize(2);
+    rowChannels.forEach((channelEl, i) => {
+      expect((channelEl.querySelector('text') as Element).textContent).toEqual(channelDataService.channels.getValue().get(i).name.getValue());
+    });
+  });
 });
