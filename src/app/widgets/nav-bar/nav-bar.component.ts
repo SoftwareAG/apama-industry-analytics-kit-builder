@@ -25,8 +25,7 @@ export class NavBarComponent implements OnInit {
   constructor(dataService: AbstractDataService, private fileService: FileService, private readonly metadataService: AbstractMetadataService, public modalService: NgbModal) {
     this.dataService = dataService;
     this.configurations = this.dataService.configurations.asObservable();
-    // this.metadataVersions = new BehaviorSubject(Set.of("1.0.0", "1.1.0", "1.1.1", "1.2.x-BETA"));
-    this.metadataVersions = new BehaviorSubject(Set.of("1.0.0"));
+    this.metadataVersions = new BehaviorSubject(Set.of("2.0.0.0"));
     this.currentMetaVersion = metadataService.metadata.map(metadata => metadata.version);
     this.currentMetaVersion.subscribe(version => this.metadataVersions.next(this.metadataVersions.getValue().add(version)));
   }

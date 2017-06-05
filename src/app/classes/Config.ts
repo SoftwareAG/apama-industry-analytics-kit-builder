@@ -66,7 +66,7 @@ export class Config extends AbstractModel<ConfigJsonInterface, never> implements
 export class ConfigBuilder extends ClassBuilder<Config> implements ConfigInterface {
   name: string = "";
   description: string = "";
-  metadataVersion: string = "0.0.0.0";
+  metadataVersion: string = "2.0.0.0";
   rows: Row[] = [];
 
   Name(name: string): this {

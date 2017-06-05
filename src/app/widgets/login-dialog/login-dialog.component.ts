@@ -27,6 +27,7 @@ export class LoginDialogComponent {
     // Check for this hard coded username and password
     if (this.u === this.U && this.p === this.P) {
       this.activeModal.close('loginDialog');
+
     } else {
       this.invalid_username_password = true;
     }

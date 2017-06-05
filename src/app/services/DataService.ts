@@ -10,6 +10,4 @@ export class DataService extends AbstractDataService {
         this.channels.next(this.channels.getValue().push(new RowChannelBuilder().Name(channelName).build()));
     }
   }
-
-
 }

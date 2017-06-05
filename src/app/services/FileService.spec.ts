@@ -38,7 +38,7 @@ describe('FileService', () => {
     metadataService = TestBed.get(AbstractMetadataService) as MetadataService;
 
     metadataService.loadMetadata({
-      version: "0.0.0.0",
+      version: "2.0.0.0",
       groupOrder: [],
       analytics: [{
         description: "Suppress events after a triggering event.",
@@ -318,21 +318,21 @@ describe('FileService', () => {
 
   it('should error if no name has been provided in the .evt file', () => {
     const apama = `\\\\ Description: Sample configuration description
-\\\\ Version: 0.0.0.0`;
+\\\\ Version: 2.0.0.0`;
     expect( () => { fileService.deserialize(apama); }).toThrowError();
   });
 
   it('should error if empty Name is provided in the .evt file', () => {
     const apama = `\\\\ Name:  
 \\\\ Description: No Name data provided
-\\\\ Version: 0.0.0.0`;
+\\\\ Version: 2.0.0.0`;
     expect( () => { fileService.deserialize(apama); }).toThrowError();
   });
 
   it('should parse if no rows exist in the .evt file', () => {
     const apama = `\\\\ Name: No Rows 
 \\\\ Description: Sample configuration description
-\\\\ Version: 0.0.0.0`;
+\\\\ Version: 2.0.0.0`;
     const config: Config = fileService.deserialize(apama);
     expect(config.rows.getValue().size).toEqual(0);
   });
@@ -340,7 +340,7 @@ describe('FileService', () => {
   it('should parse correctly if provided with rows with no analytics (ignores the rows)', () => {
     const apama = `\\\\ Name: One row with no analytics
 \\\\ Description: Sample configuration description
-\\\\ Version: 0.0.0.0
+\\\\ Version: 2.0.0.0
 \\\\ Row: 0
 \\\\ Row: 1
 \\\\ Row: 2`;
@@ -350,7 +350,7 @@ describe('FileService', () => {
 
   it('should parse correctly if no Description is provided', () => {
     const apama = `\\\\ Name: No Description provided
-\\\\ Version: 0.0.0.0
+\\\\ Version: 2.0.0.0
 \\\\ Row: 0`;
     const config: Config = fileService.deserialize(apama);
     expect(config.description.getValue()).toEqual("");
@@ -359,7 +359,7 @@ describe('FileService', () => {
   it('should parse correctly if provided with a row with analytics', () => {
     const apama = `\\\\ Name: Single row with three analytics
 \\\\ Description: This configuration demonstrates a single rows containing three analytics
-\\\\ Version: 0.0.0.0
+\\\\ Version: 2.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
 com.industry.analytics.Analytic("Sorter",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
@@ -372,7 +372,7 @@ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1
   it('should parse correctly if provided with a row with duplicate analytics', () => {
     const apama = `\\\\ Name: Three rows with duplicate Analytics
 \\\\ Description: This configuration demonstrates a single row with duplicate analytics
-\\\\ Version: 0.0.0.0
+\\\\ Version: 2.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
@@ -385,7 +385,7 @@ com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{
   it('should parse correctly if provided with 2 rows each with three analytics', () => {
     const apama = `\\\\ Name: Two rows with multiple analytics
 \\\\ Description: This configuration demonstrates multiple rows containing analytics
-\\\\ Version: 0.0.0.0
+\\\\ Version: 2.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
 com.industry.analytics.Analytic("Sorter",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
@@ -404,7 +404,7 @@ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1
   it('should ignore Rows which do not contain any analytics', () => {
     const apama = `\\\\ Name: Ignore Rows which do not contain any analytics
 \\\\ Description: Ignore Rows which do not contain any analytics
-\\\\ Version: 0.0.0.0
+\\\\ Version: 2.0.0.0
 \\\\ Row: 0
 
 \\\\ Row: 1
@@ -419,7 +419,7 @@ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1
   it('should parse correctly if provided with out of sequence row numbers', () => {
     const apama = `\\\\ Name: Two out of sequence rows
 \\\\ Description: Two out of sequence rows
-\\\\ Version: 0.0.0.0
+\\\\ Version: 2.0.0.0
 \\\\ Row: 2
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
 com.industry.analytics.Analytic("Sorter",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
@@ -438,7 +438,7 @@ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1
   it('should parse correctly if provided with duplicate row numbers each with three analytics', () => {
     const apama = `\\\\ Name: Duplicate row numbers with three analytics
 \\\\ Description: Duplicate row numbers with three analytics
-\\\\ Version: 0.0.0.0
+\\\\ Version: 2.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
 com.industry.analytics.Analytic("Sorter",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
@@ -457,7 +457,7 @@ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1
   it('should ignore commented out lines in the .evt file', () => {
     const apama = `\\\\ Name: Three rows with complex Analytic and channel configurations
 \\\\ Description: Three rows with commented out lines
-\\\\ Version: 0.0.0.0
+\\\\ Version: 2.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
 \\\\ com.industry.analytics.Analytic("Sorter",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
@@ -481,7 +481,7 @@ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1
   it('should assume row 0 if an "Analytic line" is read before a "Row" line in the .evt file', () => {
     const apama = `\\\\ Name: Analytic before a Row
 \\\\ Description: Analytic before a Row
-\\\\ Version: 0.0.0.0
+\\\\ Version: 2.0.0.0
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
 \\\\ com.industry.analytics.Analytic("Sorter",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
 \\\\ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})`;
@@ -493,7 +493,7 @@ com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{
   it('should error if an invalid Analytic name is provided', () => {
     const apama = `\\\\ Name: Invalid Analytic
 \\\\ Description: Invalid Analytic
-\\\\ Version: 0.0.0.0
+\\\\ Version: 2.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("InvalidAnalyticName",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})`;
   expect( () => { fileService.deserialize(apama); }).toThrowError("Analytic 'InvalidAnalyticName' not found in definitions");
@@ -502,7 +502,7 @@ com.industry.analytics.Analytic("InvalidAnalyticName",["Input Channel 1"],["Row0
   it('should error if an Analytic is provided with an incorrect property name', () => {
     const apama = `\\\\ Name: Invalid Analytic
 \\\\ Description: Invalid Analytic
-\\\\ Version: 0.0.0.0
+\\\\ Version: 2.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"invalidPropertyName":"10.0d"})`;
     const config: Config = fileService.deserialize(apama);
@@ -513,7 +513,7 @@ com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{
   it('should error if an Analytic is provided with an invalid property', () => {
     const apama = `\\\\ Name: Invalid Analytic
 \\\\ Description: Invalid Analytic
-\\\\ Version: 0.0.0.0
+\\\\ Version: 2.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"invalidPropertyName"})`;
   expect( () => { fileService.deserialize(apama); }).toThrowError('Properties in Slicer is not valid : {"invalidPropertyName"}');
@@ -522,7 +522,7 @@ com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{
   it('should error if an Analytic is provided with an incorrect property string value for the decimal property type', () => {
     const apama = `\\\\ Name: Invalid Analytic
 \\\\ Description: Invalid Analytic
-\\\\ Version: 0.0.0.0
+\\\\ Version: 2.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1"],{"timeWindow": "ABC"})`;
   expect( () => { fileService.deserialize(apama); }).toThrowError(`Property value "ABC" cannot be converted to the required property decimal type`);
@@ -531,7 +531,7 @@ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1
   it('should error if an Analytic is provided with an incorrect property value for the property type', () => {
     const apama = `\\\\ Name: Invalid Analytic
 \\\\ Description: Invalid Analytic
-\\\\ Version: 0.0.0.0
+\\\\ Version: 2.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1"],{"testBoolean": "ABC"})`;
   expect( () => { fileService.deserialize(apama); }).toThrowError('Unable to parse "ABC" to boolean');
@@ -540,7 +540,7 @@ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1
   it('should pass even where no properties exist for an Analytic', () => {
     const apama = `\\\\ Name: New one
 \\\\ Description: new one description
-\\\\ Version: 0.0.0.0
+\\\\ Version: 2.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("Combiner",["Row0:Input0"],["Row0:Channel1"],{})`;
     const config: Config = fileService.deserialize(apama);
@@ -551,7 +551,7 @@ com.industry.analytics.Analytic("Combiner",["Row0:Input0"],["Row0:Channel1"],{})
   it('should parse multiple properties in an Analytic', () => {
     const apama = `\\\\ Name: my config
 \\\\ Description: with a description
-\\\\ Version: 0.0.0.0
+\\\\ Version: 2.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("Corridor",["Row0:Channel1"],["Row0"],{"upperThreshold":"20.0d","lowerThreshold":"10.0d","zone":"outside","duration":"5.0d"})`;
     const config: Config = fileService.deserialize(apama);
@@ -566,7 +566,7 @@ com.industry.analytics.Analytic("Corridor",["Row0:Channel1"],["Row0"],{"upperThr
 
   xit('should create the row input and output channels based on the Analytics on the row', () => {
     const apama = `\\\\ Name: Peer Analysis
-\\\\ Version: 0.0.0.0
+\\\\ Version: 2.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("Average",["Orders"],["Moving Average"],{"timeWindow":"0.0d"})
 

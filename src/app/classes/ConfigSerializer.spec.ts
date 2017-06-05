@@ -47,7 +47,7 @@ describe('ConfigSerializer', () => {
 
   it('should handle an empty Config', () => {
     const result = configSerializer.toApama(testMetadata, new ConfigBuilder().build());
-    expect(result).toBe('\\\\ Version: 0.0.0.0\n')
+    expect(result).toBe('\\\\ Version: 2.0.0.0\n')
   });
 
   it('should correctly serialize name, description, and version', () => {

@@ -16,7 +16,7 @@ describe('MetadataService', () => {
 
   it('should correctly parse a valid metadata json object', () => {
     metadataService.loadMetadata({
-      version: "0.0.0.0",
+      version: "2.0.0.0",
       groupOrder: [],
       analytics: [{
         name: "TestTransformer",
