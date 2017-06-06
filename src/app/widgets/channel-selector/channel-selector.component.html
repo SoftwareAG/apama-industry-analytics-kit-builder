@@ -1,6 +1,4 @@
-<h4>Channels</h4>
-<hr>
-<row-channel *ngFor="let channel of (channels | async)" [name]="channel.name | async" (mousedown)="onChannelDrag($event, channel)"></row-channel>
+<h4 class="unselectable">Channels</h4>
 <div class="add-channel">
   <svg width="50" height="50" class="d-inline-block" (click)="addChannel(addChannelName)">
     <g>
@@ -11,4 +9,8 @@
   <div class="d-inline-block">
     <input class="form-control" type="text" [(ngModel)]="addChannelName" (keyup.enter)="addChannel(addChannelName)" placeholder="Enter a channel name..."/>
   </div>
+</div>
+<hr>
+<div class="content">
+  <row-channel *ngFor="let channel of (channels | async)" [name]="channel.name | async" (mousedown)="onChannelDrag($event, channel)"></row-channel>
 </div>

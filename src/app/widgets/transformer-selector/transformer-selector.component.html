@@ -1,8 +1,11 @@
-<h4>Analytics</h4>
-<ngb-accordion [closeOthers]="true">
-  <ngb-panel *ngFor="let analyticsGroup of (analyticsByGroup | async)" [id]="analyticsGroup.groupName" [title]="analyticsGroup.groupName || 'Other'">
-    <ng-template ngbPanelContent>
-      <transformer-definition *ngFor="let analytic of analyticsGroup.analytics" [analytic]="analytic"></transformer-definition>
-    </ng-template>
-  </ngb-panel>
-</ngb-accordion>
+<h4 class="unselectable">Analytics</h4>
+<hr>
+<div class="content">
+  <ngb-accordion [closeOthers]="true">
+    <ngb-panel *ngFor="let analyticsGroup of (analyticsByGroup | async)" [id]="analyticsGroup.groupName" [title]="analyticsGroup.groupName || 'Other'">
+      <ng-template ngbPanelContent>
+        <transformer-definition *ngFor="let analytic of analyticsGroup.analytics" [analytic]="analytic"></transformer-definition>
+      </ng-template>
+    </ngb-panel>
+  </ngb-accordion>
+</div>
