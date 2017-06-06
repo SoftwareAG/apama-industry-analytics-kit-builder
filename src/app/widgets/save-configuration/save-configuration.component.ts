@@ -22,6 +22,7 @@ export class SaveConfigurationComponent {
       saveFile.href = "data:application/octet-stream," + encodeURI(data);
       saveFile.download = config.name.getValue().replace(/[ *]/g, "_") + ".evt";
       saveFile.click();
+      this.dataService.hierarchy.getValue().setSaved();
     }
     catch(error) {
       alert(error.message);

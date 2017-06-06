@@ -1,0 +1,24 @@
+<div class="modal-header bg-primary">
+  <h4 class="modal-title">Configuration not saved</h4>
+  <button type="button" class="close" (click)="dismiss('Cross click')">
+    <span>&times;</span>
+  </button>
+</div>
+
+<form name="newConfigurationDialog" #newConfigurationDialog="ngForm">
+  <div class="modal-body">
+    <div class="alert alert-danger newConfigurationMessage">
+      <label>The current configuration changes have not been saved</label>
+      <label>Do you wish to continue clearing the configuration without saving?</label>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button name="newConfigurationButton" class="btn btn-primary"
+            type="button"
+            (click)="close('Yes')">Yes
+    </button>
+    <button type="button" class="btn btn-secondary"
+            (click)="close('No')">No
+    </button>
+  </div>
+</form>

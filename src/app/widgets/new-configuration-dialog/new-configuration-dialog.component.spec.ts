@@ -1,16 +1,16 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { LoginDialogComponent } from './login-dialog.component';
+import {async, ComponentFixture, TestBed} from "@angular/core/testing";
+import {NewConfigurationDialogComponent} from "./new-configuration-dialog.component";
 import {FormsModule} from "@angular/forms";
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 
-describe('LoginDialogComponent', () => {
-  let component: LoginDialogComponent;
-  let fixture: ComponentFixture<LoginDialogComponent>;
+describe('NewConfigurationDialogComponent', () => {
+  let component: NewConfigurationDialogComponent;
+  let fixture: ComponentFixture<NewConfigurationDialogComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
-        LoginDialogComponent
+        NewConfigurationDialogComponent
       ],
       imports: [
         FormsModule
@@ -18,11 +18,12 @@ describe('LoginDialogComponent', () => {
       providers: [
         NgbActiveModal
       ]
-    }).compileComponents();
+    })
+    .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(LoginDialogComponent);
+    fixture = TestBed.createComponent(NewConfigurationDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

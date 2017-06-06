@@ -1,15 +1,10 @@
 import {AfterViewInit, Component} from "@angular/core";
 import {AbstractDataService} from "./services/AbstractDataService";
-import {DataService} from "./services/DataService";
 import {AbstractMetadataService} from "./services/MetadataService";
-import {MetadataBuilder} from "./classes/Metadata";
 import {ResizeEvent} from "angular-resizable-element";
-import {ConfigBuilder} from "./classes/Config";
 import {LoginDialogComponent} from "./widgets/login-dialog/login-dialog.component";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {Http} from "@angular/http";
-import {List} from "immutable";
-import {RowChannel} from "./classes/Channel";
 
 @Component({
   selector: 'app-root',

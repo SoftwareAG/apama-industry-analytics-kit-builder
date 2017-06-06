@@ -30,6 +30,7 @@ import {RowChannelComponent} from "./widgets/row-channel/row-channel.component";
 import {RowDeserializer} from "./classes/RowDeserializer";
 import {ConfigDeserializer} from "./classes/ConfigDeserializer";
 import {LoginDialogComponent} from "./widgets/login-dialog/login-dialog.component";
+import {NewConfigurationDialogComponent} from "./widgets/new-configuration-dialog/new-configuration-dialog.component";
 
 @NgModule({
   declarations: [
@@ -46,7 +47,8 @@ import {LoginDialogComponent} from "./widgets/login-dialog/login-dialog.componen
     InformationComponent,
     TransformerDefinitionComponent,
     RowChannelComponent,
-    LoginDialogComponent
+    LoginDialogComponent,
+    NewConfigurationDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -72,7 +74,8 @@ import {LoginDialogComponent} from "./widgets/login-dialog/login-dialog.componen
   ],
   entryComponents: [
     SaveConfigurationComponent,
-    LoginDialogComponent
+    LoginDialogComponent,
+    NewConfigurationDialogComponent
   ],
   bootstrap: [AppComponent]
 })

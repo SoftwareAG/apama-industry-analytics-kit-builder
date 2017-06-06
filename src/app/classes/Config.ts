@@ -34,12 +34,31 @@ export class Config extends AbstractModel<ConfigJsonInterface, never> implements
   readonly metadataVersion: string;
   readonly rows : BehaviorSubject<List<Row>>;
 
+  saved: boolean;
+
+  isModified(): boolean {
+    const totalAnalytics = this.rows.getValue().reduce( (total:number, row: Row) => {
+        return total += row.transformers.getValue().size;
+      }, 0);
+
+    return totalAnalytics > 0;
+  }
+
+  isSaved(): boolean {
+    return this.saved;
+  }
+
+  setSaved() {
+    this.saved = true;
+  }
+
   constructor(obj: ConfigInterface) {
     super();
     this.name = new BehaviorSubject(obj.name || "");
     this.description = new BehaviorSubject(obj.description || "");
     this.metadataVersion = obj.metadataVersion;
     this.rows = new BehaviorSubject(List(obj.rows));
+    this.saved = false;
   }
 
   asObservable(): Observable<this> {

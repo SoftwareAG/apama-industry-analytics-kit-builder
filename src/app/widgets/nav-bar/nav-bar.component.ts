@@ -9,6 +9,7 @@ import {AbstractMetadataService} from "../../services/MetadataService";
 import {SaveConfigurationComponent} from "app/widgets/save-configuration/save-configuration.component";
 import {ModalDismissReasons, NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {RowChannel} from "../../classes/Channel";
+import {NewConfigurationDialogComponent} from "../new-configuration-dialog/new-configuration-dialog.component";
 
 @Component({
   selector: 'nav-bar',
@@ -38,11 +39,26 @@ export class NavBarComponent implements OnInit {
   }
 
   newConfig() {
-    const config = new ConfigBuilder()
-      .build();
-    this.dataService.hierarchy.next(config);
-    this.dataService.selectedTransformer.next(undefined);
-    this.dataService.channels.next(List<RowChannel>());
+    if (this.dataService.hierarchy.getValue().isModified()
+      && (!this.dataService.hierarchy.getValue().isSaved())) {
+      this.modalService.open(NewConfigurationDialogComponent, {size: "lg"}).result
+        .then(result => {
+          if (result === "Yes") {
+            const config = new ConfigBuilder()
+              .build();
+            this.dataService.hierarchy.next(config);
+            this.dataService.selectedTransformer.next(undefined);
+            this.dataService.channels.next(List<RowChannel>());
+          };
+        }, () => {
+        })
+    } else if (this.dataService.hierarchy.getValue().isSaved()) {
+      const config = new ConfigBuilder()
+        .build();
+      this.dataService.hierarchy.next(config);
+      this.dataService.selectedTransformer.next(undefined);
+      this.dataService.channels.next(List<RowChannel>());
+    }
   }
 
   loadConfig() {
@@ -50,7 +66,7 @@ export class NavBarComponent implements OnInit {
       .then(result => result.fileContent)
       .then(apamaEPL => this.fileService.deserialize(apamaEPL))
       .then(config => {
-        this.dataService.hierarchy.next(config)
+        this.dataService.hierarchy.next(config);
       })
       .catch(error => {
         if (error instanceof UserCancelled) {
