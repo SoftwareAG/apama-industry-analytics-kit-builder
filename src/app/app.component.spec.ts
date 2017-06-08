@@ -16,7 +16,7 @@ import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {ConfigSerializer} from "./classes/Config";
 import {RowSerializer} from "./classes/Row";
 import {PropertyDeserializer, PropertySerializer} from "app/classes/Property";
-import {TransformerDeserializer, TransformerSerializer} from "./classes/Transformer";
+import {TransformerSerializer} from "./classes/Transformer";
 import {FileService} from "./services/FileService";
 import {AbstractMetadataService, MetadataService} from "./services/MetadataService";
 import {SaveConfigurationComponent} from "./widgets/save-configuration/save-configuration.component";
@@ -30,6 +30,7 @@ import {RowChannelComponent} from "./widgets/row-channel/row-channel.component";
 import {ConfigDeserializer} from "./classes/ConfigDeserializer";
 import {RowDeserializer} from "./classes/RowDeserializer";
 import {HttpModule} from "@angular/http";
+import {TransformerDeserializer} from "./classes/TransformerDeserializer";
 
 describe('AppComponent', () => {
   beforeEach(async(() => {

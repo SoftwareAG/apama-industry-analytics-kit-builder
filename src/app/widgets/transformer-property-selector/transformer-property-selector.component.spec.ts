@@ -1,14 +1,10 @@
 import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 import {TransformerPropertySelectorComponent} from "./transformer-property-selector.component";
-import {Transformer, TransformerBuilder} from "../../classes/Transformer";
+import {TransformerBuilder} from "../../classes/Transformer";
 import {Injectable} from "@angular/core";
 import {AbstractDataService} from "../../services/AbstractDataService";
-import {BehaviorSubject} from "rxjs";
-import {Config} from "../../classes/Config";
-import {RowChannel} from "../../classes/Channel";
 import {FormsModule} from "@angular/forms";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
-import {List} from "immutable";
 import {MetadataBuilder} from "../../classes/Metadata";
 import {AbstractMetadataService, MetadataService} from "../../services/MetadataService";
 
@@ -123,7 +119,7 @@ describe('TransformerPropertySelectorComponent', () => {
       .withPropertyValue().NameAndDef('integerProperty_optional').endWith()
       .withPropertyValue().NameAndDef('floatProperty_optional').endWith()
       .withPropertyValue().NameAndDef('booleanProperty_optional').endWith()
-      .withPropertyValue().NameAndDef('stringProperty_optional') .endWith()
+      .withPropertyValue().NameAndDef('stringProperty_optional').endWith()
       .build();
 
     metadataService.metadata.next(testMetadata);
@@ -132,7 +128,7 @@ describe('TransformerPropertySelectorComponent', () => {
     fixture.detectChanges();
 
     // Check that all of the transformer properties have rendered into the DOM
-    expect(el.children.length).toEqual(12);
+    expect((el.querySelector('.content') as Element).children.length).toEqual(10);
 
     // Get the data so we can compare it against the DOM elements
     Array.from(el.querySelectorAll('h6')).forEach((transformerPropertyEl, i) => {

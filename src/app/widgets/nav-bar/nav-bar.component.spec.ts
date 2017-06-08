@@ -5,7 +5,7 @@ import {Config, ConfigArrayBuilder, ConfigSerializer} from "../../classes/Config
 import {BehaviorSubject} from "rxjs";
 import {List} from "immutable";
 import {Injectable} from "@angular/core";
-import {TransformerDeserializer, TransformerSerializer} from "../../classes/Transformer";
+import {TransformerSerializer} from "../../classes/Transformer";
 import {FileService} from "../../services/FileService";
 import {RowSerializer} from "../../classes/Row";
 import {PropertyDeserializer, PropertySerializer} from "../../classes/Property";
@@ -16,6 +16,7 @@ import {BrowserModule} from "@angular/platform-browser";
 import {TransformerChannelDeserializer} from "../../classes/TransformerChannel";
 import {ConfigDeserializer} from "../../classes/ConfigDeserializer";
 import {RowDeserializer} from "../../classes/RowDeserializer";
+import {TransformerDeserializer} from "../../classes/TransformerDeserializer";
 
 @Injectable()
 class DataServiceMock extends AbstractDataService {

@@ -1,10 +1,12 @@
-import {TransformerDeserializer} from "./Transformer";
 import {TransformerChannelDeserializer} from "./TransformerChannel";
 import {PropertyDeserializer} from "./Property";
 import {TestBed} from "@angular/core/testing";
 import {AbstractMetadataService, MetadataService} from "../services/MetadataService";
 import {MetadataBuilder} from "./Metadata";
 import {NestedTransformerDefBuilder, TransformerDefBuilder} from "./TransformerDef";
+import {TransformerDeserializer} from "./TransformerDeserializer";
+import {AbstractDataService} from "../services/AbstractDataService";
+import {DataService} from "../services/DataService";
 
 describe('TransformerDeserializer', () => {
   let transformerDeserializer: TransformerDeserializer;
@@ -13,6 +15,7 @@ describe('TransformerDeserializer', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
+        {provide: AbstractDataService, useClass: DataService},
         {provide: AbstractMetadataService, useClass: MetadataService},
         TransformerDeserializer,
         TransformerChannelDeserializer,

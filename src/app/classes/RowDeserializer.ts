@@ -1,11 +1,11 @@
 import {Injectable} from "@angular/core";
-import {Transformer, TransformerDeserializer} from "./Transformer";
+import {Transformer} from "./Transformer";
 import {AbstractDataService} from "../services/AbstractDataService";
 import {Row, RowBuilder} from "./Row";
 import {List, Map} from "immutable";
 import {IgnoreableDeserializationError} from "./Errors";
-import {RowChannel, RowChannelBuilder} from "./Channel";
 import {DataService} from "../services/DataService";
+import {TransformerDeserializer} from "./TransformerDeserializer";
 
 @Injectable()
 export class RowDeserializer {
@@ -27,11 +27,13 @@ export class RowDeserializer {
   private addRowChannels(rowBuilder: RowBuilder, rowChannels: List<{analytic: Transformer, inChannels: Map<number, string>, outChannels: Map<number, string>}>) {
     rowChannels.first().inChannels.forEach((chanName: string, i: number) => {
       rowBuilder.withInputChannel(i).Name(chanName).endWith();
-      (this.dataService as DataService).loadChannel(chanName);
+      // Add the channels to the Channel Selector Component
+      (this.dataService as DataService).addChannel(chanName);
     });
     rowChannels.last().outChannels.forEach((chanName: string, i: number) => {
       rowBuilder.withOutputChannel(i).Name(chanName).endWith();
-      (this.dataService as DataService).loadChannel(chanName);
+      // Add the channels to the Channel Selector Component
+      (this.dataService as DataService).addChannel(chanName);
     });
   }
 

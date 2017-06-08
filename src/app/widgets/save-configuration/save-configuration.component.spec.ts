@@ -6,13 +6,14 @@ import {DataService} from "../../services/DataService";
 import {FileService} from "../../services/FileService";
 import {ConfigSerializer} from "../../classes/Config";
 import {RowSerializer} from "../../classes/Row";
-import {TransformerDeserializer, TransformerSerializer} from "../../classes/Transformer";
+import {TransformerSerializer} from "../../classes/Transformer";
 import {PropertyDeserializer, PropertySerializer} from "../../classes/Property";
 import {AbstractMetadataService, MetadataService} from "../../services/MetadataService";
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {TransformerChannelDeserializer} from "../../classes/TransformerChannel";
 import {ConfigDeserializer} from "../../classes/ConfigDeserializer";
 import {RowDeserializer} from "../../classes/RowDeserializer";
+import {TransformerDeserializer} from "../../classes/TransformerDeserializer";
 
 describe('SaveConfigurationComponent', () => {
   let component: SaveConfigurationComponent;

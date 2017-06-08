@@ -16,7 +16,7 @@ import {DragService} from "./services/DragService";
 import {DragOverlayComponent} from "./widgets/dragoverlay/drag-overlay.component";
 import {ConfigSerializer} from "./classes/Config";
 import {RowSerializer} from "./classes/Row";
-import {TransformerDeserializer, TransformerSerializer} from "./classes/Transformer";
+import {TransformerSerializer} from "./classes/Transformer";
 import {PropertyDeserializer, PropertySerializer} from "./classes/Property";
 import {FileService} from "./services/FileService";
 import {AbstractMetadataService, MetadataService} from "./services/MetadataService";
@@ -31,6 +31,7 @@ import {RowDeserializer} from "./classes/RowDeserializer";
 import {ConfigDeserializer} from "./classes/ConfigDeserializer";
 import {LoginDialogComponent} from "./widgets/login-dialog/login-dialog.component";
 import {NewConfigurationDialogComponent} from "./widgets/new-configuration-dialog/new-configuration-dialog.component";
+import {TransformerDeserializer} from "./classes/TransformerDeserializer";
 
 @NgModule({
   declarations: [

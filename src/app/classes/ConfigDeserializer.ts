@@ -4,6 +4,8 @@ import {RowDeserializer} from "./RowDeserializer";
 import {Config, ConfigBuilder} from "./Config";
 import {List} from "immutable";
 import * as _ from "lodash";
+import {AbstractDataService} from "../services/AbstractDataService";
+import {DataService} from "../services/DataService";
 
 @Injectable()
 export class ConfigDeserializer {
@@ -11,7 +13,7 @@ export class ConfigDeserializer {
   readonly markerCommentPattern =/^\\\\\s*([^:]*)\s*:\s*(.*)\s*$/;
   readonly analyticPattern = /^com.industry.analytics.Analytic/;
 
-  constructor(private readonly rowDeserializer: RowDeserializer) {}
+  constructor(private readonly rowDeserializer: RowDeserializer, private dataService: AbstractDataService) {}
 
   fromApama(apama: string) : Config {
     const apamaLines = apama.split("\n");
@@ -64,6 +66,8 @@ export class ConfigDeserializer {
         }
       }
     });
+
+    (this.dataService as DataService).clearChannels();
 
     const rows = _.flatMap(groupedLines.rowAnalyticLines, analyticLines => {
       try {

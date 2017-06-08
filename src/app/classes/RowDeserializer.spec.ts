@@ -1,7 +1,6 @@
 import {ComponentFixture, TestBed} from "@angular/core/testing";
 import {RowDeserializer} from "./RowDeserializer";
 import {List} from "immutable";
-import {TransformerDeserializer} from "./Transformer";
 import {AbstractMetadataService, MetadataService} from "../services/MetadataService";
 import {PropertyDeserializer} from "./Property";
 import {TransformerChannelDeserializer} from "./TransformerChannel";
@@ -17,6 +16,8 @@ import {AbstractDragService, Draggable, Dragged, Point} from "app/services/Abstr
 import {Row} from "./Row";
 import * as _ from "lodash";
 import {RowChannel} from "./Channel";
+import {TransformerDeserializer} from "./TransformerDeserializer";
+import {TransformerChannelDef} from "./TransformerChannelDef";
 
 @Injectable()
 class DragServiceMock extends AbstractDragService {
@@ -147,14 +148,31 @@ describe('RowDeserializer', () => {
     fixture.detectChanges();
 
     const rowChannels = Array.from(el.querySelectorAll('row-channel'));
-    expect(rowChannels).toBeArrayOfSize(2);
+    expect(rowChannels).toBeArrayOfSize(4);
+
+    const metaDataChannels = metadataService.getAnalytic('Corridor').inputChannelsByName.concat(metadataService.getAnalytic('Corridor').outputChannelsByName).toArray();
+    expect(metaDataChannels.length).toEqual(2);
 
     // combine the input and output rows so we can check
     const combinedRowChannels = row.inputChannelOverrides.getValue().toArray().concat(row.outputChannelOverrides.getValue().toArray());
+    expect(combinedRowChannels.length).toEqual(2);
+
+    const allChannels = metaDataChannels
+      .map( (metaDataChannel:TransformerChannelDef) => {
+        return metaDataChannel.name;
+      })
+      .concat(combinedRowChannels
+        .map( (rowChannel:RowChannel) => {
+          return rowChannel.name.getValue()
+        })
+    );
 
     // Check Channels
-    rowChannels.forEach((channelEl:HTMLElement, i) => {
-      expect((channelEl.querySelector('text') as Element).textContent).toEqual(combinedRowChannels[i].name.getValue());
+    rowChannels.forEach((channelEl:HTMLElement) => {
+      const htmlElementChannelName = (channelEl.querySelector('text') as Element).textContent;
+      expect(allChannels.find( channelName => {
+        return channelName === htmlElementChannelName;
+      })).toEqual(htmlElementChannelName);
     });
   });
 
@@ -170,22 +188,35 @@ describe('RowDeserializer', () => {
     // OUT - Output Override channels in the analytic
     expect(row.outputChannelOverrides.getValue().toArray()).toBeArrayOfSize(1);
 
-    const combinedRowChannels = row.inputChannelOverrides.getValue().toArray()
-      .concat(row.outputChannelOverrides.getValue().toArray())
-      .map( (rowChannel: RowChannel) => {
-        return rowChannel.name.getValue();
-      });
-
     const rowChannels = Array.from(el.querySelectorAll('row-channel'));
 
     // AAA, BBB, OUT - Channel Names shown in the Channel Selector Component
-    expect(rowChannels).toBeArrayOfSize(3);
+    expect(rowChannels).toBeArrayOfSize(5);
 
-    rowChannels.forEach((channelEl:HTMLElement) => {
-      const searchVal: string = (channelEl.querySelector('text') as Element).textContent || "";
-      const result = _.countBy(combinedRowChannels)[searchVal];
-      expect(result).toBeGreaterThan(0);
+    const metaDataChannels = metadataService.getAnalytic('Combiner').inputChannelsByName.concat(metadataService.getAnalytic('Combiner').outputChannelsByName).toArray();
+    expect(metaDataChannels.length).toEqual(2);
+
+    // combine the input and output rows so we can check
+    const combinedRowChannels = row.inputChannelOverrides.getValue().toArray().concat(row.outputChannelOverrides.getValue().toArray());
+    expect(combinedRowChannels.length).toEqual(4);
+
+    const allChannels = metaDataChannels
+      .map((metaDataChannel: TransformerChannelDef) => {
+        return metaDataChannel.name;
+      })
+      .concat(combinedRowChannels
+        .map((rowChannel: RowChannel) => {
+          return rowChannel.name.getValue()
+        })
+    );
+
+    // Check Channels
+    rowChannels.forEach((channelEl: HTMLElement) => {
+      const htmlElementChannelName = (channelEl.querySelector('text') as Element).textContent;
+      expect(allChannels.find(channelName => {
+        return channelName === htmlElementChannelName;
+      })).toEqual(htmlElementChannelName);
     });
-  });
 
+  })
 });

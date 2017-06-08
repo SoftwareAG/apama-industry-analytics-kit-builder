@@ -1,7 +1,7 @@
 import {FileService} from "./FileService";
 import {TestBed} from "@angular/core/testing";
 import {Config, ConfigSerializer} from "../classes/Config";
-import {TransformerDeserializer, TransformerSerializer} from "app/classes/Transformer";
+import {TransformerSerializer} from "app/classes/Transformer";
 import {RowSerializer} from "../classes/Row";
 import {PropertyDeserializer, PropertySerializer} from "../classes/Property";
 import {AbstractMetadataService, MetadataService} from "./MetadataService";
@@ -10,6 +10,7 @@ import {ConfigDeserializer} from "../classes/ConfigDeserializer";
 import {RowDeserializer} from "../classes/RowDeserializer";
 import {AbstractDataService} from "./AbstractDataService";
 import {DataService} from "./DataService";
+import {TransformerDeserializer} from "../classes/TransformerDeserializer";
 
 describe('FileService', () => {
 
