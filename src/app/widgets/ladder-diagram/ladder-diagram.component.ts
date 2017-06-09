@@ -404,9 +404,9 @@ export class LadderDiagramComponent implements OnInit {
             if (dragging) {
               if (dragging.object instanceof Transformer) {
                 d.row.transformers.next(d.row.transformers.getValue().insert(i, dragging.object));
-                (component.dataService as DataService).addTransformerChannels(dragging.object);
                 this.dragService.stopDrag();
                 d3.event.stopPropagation();
+                (component.dataService as DataService).addTransformerChannels(dragging.object);
               }
             }
           });

@@ -20,7 +20,6 @@ export class DataService extends AbstractDataService {
   }
 
   addTransformerChannels(transformer: Transformer) {
-
     transformer.inputChannels.map( (transformerChannel: TransformerChannel) => {
       this.addChannel(transformerChannel.name);
     });
@@ -31,7 +30,6 @@ export class DataService extends AbstractDataService {
   }
 
   removeChannels(transformer: Transformer) {
-
     transformer.inputChannels
       .concat(transformer.outputChannels)
       .map( (transformerChannel: TransformerChannel) => {
