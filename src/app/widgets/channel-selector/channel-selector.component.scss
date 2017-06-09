@@ -5,16 +5,7 @@ $channel-color: saturate($brand-primary, 20%);
 * /deep/ {
   .channel {
     fill: $channel-color;
-    filter: url('#dropshadow');
-
-    .channel-circle {
-      stroke: $black;
-      stroke-width: 2;
-
-      &.placeholder {
-        fill: $white;
-      }
-    }
+    filter: url('#channel-dropshadow');
 
     text {
       fill: black;

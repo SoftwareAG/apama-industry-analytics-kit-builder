@@ -1,6 +1,16 @@
 <h4 class="unselectable">Channels</h4>
 <div class="add-channel">
   <svg width="50" height="50" class="d-inline-block" (click)="addChannel(addChannelName)">
+    <defs>
+      <filter id="channel-dropshadow">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+        <feOffset dx="2" dy="2"/>
+        <feComponentTransfer>
+          <feFuncA type="linear" slope="0.3"/>
+        </feComponentTransfer>
+        <feBlend mode="normal" in="SourceGraphic" />
+      </filter>
+    </defs>
     <g>
       <circle r="20" cx="25" cy="25"></circle>
       <text x="25" y="25" class="no-pointer">+</text>
