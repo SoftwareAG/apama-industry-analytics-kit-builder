@@ -13,6 +13,7 @@ import {TransformerChannelDef} from "../../classes/TransformerChannelDef";
 import {List} from "immutable";
 import {Path} from "d3-path";
 import {Selection} from "d3-selection";
+import {DataService} from "../../services/DataService";
 
 @Component({
   selector: 'ladder-diagram',
@@ -91,6 +92,7 @@ export class LadderDiagramComponent implements OnInit {
         const dragging = component.dragService.dragging.getValue();
         if (dragging) {
           if (dragging.object instanceof Transformer) {
+            (component.dataService as DataService).addTransformerChannels(dragging.object);
             const rows = this.dataService.hierarchy.getValue().rows;
             rows.next(rows.getValue().push(new RowBuilder().pushTransformer(dragging.object).build()));
             this.dragService.stopDrag();
@@ -265,6 +267,8 @@ export class LadderDiagramComponent implements OnInit {
             const dragging = component.dragService.dragging.getValue();
             if (dragging && d.transformer === dragging.object) {
               d.row.removeTransformer(d.transformer);
+              // When we remove the analytic, remove the channel names for the analytic from the Channel Component if they are not used
+              (component.dataService as DataService).removeChannels(d.transformer);
               if (d.row.transformers.getValue().size === 0) {
                 component.dataService.hierarchy.getValue().removeRow(d.row);
               }
@@ -400,6 +404,7 @@ export class LadderDiagramComponent implements OnInit {
             if (dragging) {
               if (dragging.object instanceof Transformer) {
                 d.row.transformers.next(d.row.transformers.getValue().insert(i, dragging.object));
+                (component.dataService as DataService).addTransformerChannels(dragging.object);
                 this.dragService.stopDrag();
                 d3.event.stopPropagation();
               }
