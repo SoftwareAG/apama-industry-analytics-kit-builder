@@ -12,6 +12,7 @@ export interface PropertyDefJsonInterface {
   validValues?: any[];
   validator?: string;
   repeated?: boolean;
+  advanced?: boolean;
 }
 
 export interface PropertyDefInterface {
@@ -23,6 +24,7 @@ export interface PropertyDefInterface {
   validValues?: string[] | number[] | boolean[];
   validator?: string;
   repeated?: boolean;
+  advanced?: boolean;
 }
 
 export class PropertyDef extends AbstractModel<PropertyDefJsonInterface, never> {
@@ -34,6 +36,7 @@ export class PropertyDef extends AbstractModel<PropertyDefJsonInterface, never> 
   readonly validValues?: List<string | number | boolean>;
   readonly validator?: string;
   readonly repeated: boolean;
+  readonly advanced: boolean;
 
   constructor(obj: PropertyDefInterface) {
     super();
@@ -47,6 +50,7 @@ export class PropertyDef extends AbstractModel<PropertyDefJsonInterface, never> 
     this.validator = obj.validator;
     //noinspection PointlessBooleanExpressionJS
     this.repeated = !!obj.repeated;
+    this.advanced = !!obj.advanced;
   }
 
   validate(): this {
@@ -95,6 +99,10 @@ export class PropertyDef extends AbstractModel<PropertyDefJsonInterface, never> 
     // validate repeated
     // If the repeated element has been provided, it must contain boolean data
     if (this.repeated !== undefined && !validate.isBoolean(this.repeated)) { throw new Error('repeated must contain Boolean data'); }
+
+    // validate advanced
+    // If the advanced element has been provided, it must contain boolean data
+    if (this.advanced !== undefined && !validate.isBoolean(this.advanced)) { throw new Error('advanced must contain Boolean data'); }
     return this;
   }
 }
@@ -108,6 +116,7 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
   validValues?: string[] | number[] | boolean[] | undefined;
   validator?: string;
   repeated: boolean = false;
+  advanced: boolean = false;
 
   Name(name: string): this {
     this.name = name;
@@ -141,6 +150,10 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
     this.repeated = repeated;
     return this;
   }
+  Advanced(advanced: boolean) : this {
+    this.advanced = advanced;
+    return this;
+  }
   build(): PropertyDef {
     return new PropertyDef(this);
   }
@@ -161,7 +174,8 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
       .DefaultValue(jsonData.defaultValue)
       .ValidValues(jsonData.validValues)
       .Validator(jsonData.validator)
-      .Repeated(!!jsonData.repeated);
+      .Repeated(!!jsonData.repeated)
+      .Advanced(!!jsonData.advanced);
   }
 }
 

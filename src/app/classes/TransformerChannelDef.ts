@@ -7,6 +7,8 @@ export interface TransformerChannelDefJsonInterface {
   repeated?: boolean;
   optional?: boolean;
   prefix?: string;
+  dataProperties?: Array<string>;
+  type?: "string" | "boolean" | "number" | undefined;
 }
 
 export interface TransformerChannelDefInterface {
@@ -15,6 +17,8 @@ export interface TransformerChannelDefInterface {
   repeated: boolean;
   optional: boolean;
   prefix: string;
+  dataProperties: Array<string>;
+  type: "string" | "boolean" | "number" | undefined;
 }
 
 export class TransformerChannelDef extends AbstractModel<TransformerChannelDefJsonInterface, never> {
@@ -23,6 +27,8 @@ export class TransformerChannelDef extends AbstractModel<TransformerChannelDefJs
   readonly repeated: boolean;
   readonly optional: boolean;
   readonly prefix: string;
+  readonly dataProperties: Array<string>;
+  readonly type: "string" | "boolean" | "number" | undefined;
 
   constructor(obj: TransformerChannelDefInterface) {
     super();
@@ -31,6 +37,8 @@ export class TransformerChannelDef extends AbstractModel<TransformerChannelDefJs
     this.repeated = obj.repeated;
     this.optional = obj.optional;
     this.prefix = obj.prefix;
+    this.dataProperties = obj.dataProperties;
+    this.type = obj.type;
   }
 
   validate(): this {
@@ -49,6 +57,8 @@ export class TransformerChannelDefBuilder extends ClassBuilder<TransformerChanne
   repeated: boolean = false;
   optional: boolean = false;
   prefix: string = "";
+  dataProperties = new Array<string>();
+  type: "string" | "boolean" | "number" | undefined = undefined;
 
   Name(name: string): this {
     this.name = name;
@@ -68,6 +78,14 @@ export class TransformerChannelDefBuilder extends ClassBuilder<TransformerChanne
   }
   Prefix(prefix: string): this {
     this.prefix = prefix;
+    return this;
+  }
+  DataProperties(dataProperties: Array<string>): this {
+    this.dataProperties.concat(dataProperties);
+    return this;
+  }
+  Type(type: "string" | "boolean" | "number" | undefined) : this {
+    this.type = type;
     return this;
   }
   build(): TransformerChannelDef {
