@@ -10,6 +10,9 @@ export abstract class AbstractDataService {
   readonly selectedTransformer: BehaviorSubject<Transformer|undefined> = new BehaviorSubject(undefined);
   readonly configurations: BehaviorSubject<List<() => Config>> = new BehaviorSubject(List<() => Config>());
 
-  addAnalyticChannelsToChannelsPanel(transformer: Transformer) {};
-  removeAnalyticChannelsFromChannelsPanel(transformer: Transformer) {};
+  abstract addAnalyticChannelsToChannelsPanel(transformer: Transformer);
+  abstract removeAnalyticChannelsFromChannelsPanel(transformer: Transformer);
+  abstract addChannel(channelName: string);
+  abstract setModified(modifiedValue: boolean);
+  abstract isModified(): boolean;
 }

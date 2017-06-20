@@ -21,6 +21,6 @@
   </div>
 </div>
 <hr>
-<div class="content">
+<div class="content h-100">
   <row-channel *ngFor="let channel of (channels | async)" [name]="channel.name | async" (mousedown)="onChannelDrag($event, channel)"></row-channel>
 </div>

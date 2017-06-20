@@ -12,9 +12,16 @@ import {TestUtils} from "../../services/TestUtil.spec";
 import {AbstractMetadataService, MetadataService} from "../../services/MetadataService";
 import {Metadata, MetadataBuilder} from "../../classes/Metadata";
 import {TransformerChannel} from "../../classes/TransformerChannel";
+import {Transformer} from "../../classes/Transformer";
 
 @Injectable()
-class DataServiceMock extends AbstractDataService {}
+class DataServiceMock extends AbstractDataService {
+  addAnalyticChannelsToChannelsPanel(transformer: Transformer) {};
+  removeAnalyticChannelsFromChannelsPanel(transformer: Transformer) {};
+  addChannel(channelName: string) {};
+  setModified(modifiedValue: boolean) {};
+  isModified(): boolean { return false};
+}
 
 describe('LadderDiagramComponent', () => {
   let component: LadderDiagramComponent;

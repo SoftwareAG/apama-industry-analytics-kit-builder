@@ -67,8 +67,7 @@ describe('MetadataService', () => {
             "description": "The channel on which to output the moving average",
             "name": "Moving Average",
             "optional": true,
-            "prefix": "avg:",
-            "type": "string"
+            "prefix": "avg:"
           },
           {
             "dataProperties": [
@@ -82,8 +81,7 @@ describe('MetadataService', () => {
             "description": "The channel on which to output the moving average",
             "name": "Variance",
             "optional": true,
-            "prefix": "variance:",
-            "type": "string"
+            "prefix": "variance:"
           },
           {
             "dataProperties": [
@@ -97,8 +95,7 @@ describe('MetadataService', () => {
             "description": "The channel on which to output the Standard deviation",
             "name": "Standard Deviation",
             "optional": true,
-            "prefix": "stddev:",
-            "type": "string"
+            "prefix": "stddev:"
           },
           {
             "dataProperties": [
@@ -112,8 +109,7 @@ describe('MetadataService', () => {
             "description": "The channel on which to output the upper boundary",
             "name": "Upper",
             "optional": true,
-            "prefix": "upper:",
-            "type": "string"
+            "prefix": "upper:"
           },
           {
             "dataProperties": [
@@ -127,8 +123,7 @@ describe('MetadataService', () => {
             "description": "The channel on which to output the lower boundary",
             "name": "Lower",
             "optional": true,
-            "prefix": "lower:",
-            "type": "string"
+            "prefix": "lower:"
           }
         ],
         "properties": [
@@ -165,20 +160,19 @@ describe('MetadataService', () => {
 
     const analyticInputChannelsArray = analytic.inputChannels.toArray();
     expect(analyticInputChannelsArray).toBeArrayOfSize(1);
-    expect(analyticInputChannelsArray[0].dataProperties).toBeArrayOfSize(1);
+    expect(analyticInputChannelsArray[0].dataProperties.toArray()).toBeArrayOfSize(1);
 
     const analyticOutputChannelsArray = analytic.outputChannels.toArray();
     expect(analyticOutputChannelsArray).toBeArrayOfSize(6);
-    expect(analyticOutputChannelsArray[0].dataProperties).toBeArrayOfSize(1);
-    expect(analyticOutputChannelsArray[1].dataProperties).toBeArrayOfSize(6);
+    expect(analyticOutputChannelsArray[0].dataProperties.toArray()).toBeArrayOfSize(1);
+    expect(analyticOutputChannelsArray[1].dataProperties.toArray()).toBeArrayOfSize(6);
     expect(analyticOutputChannelsArray[1].optional).toEqual(true);
     expect(analyticOutputChannelsArray[1].prefix).toEqual('avg:');
     expect(analyticOutputChannelsArray[1].repeated).toEqual(false);
-    expect(analyticOutputChannelsArray[1].type).toEqual('string');
-    expect(analyticOutputChannelsArray[2].dataProperties).toBeArrayOfSize(6);
-    expect(analyticOutputChannelsArray[3].dataProperties).toBeArrayOfSize(6);
-    expect(analyticOutputChannelsArray[4].dataProperties).toBeArrayOfSize(6);
-    expect(analyticOutputChannelsArray[5].dataProperties).toBeArrayOfSize(6);
+    expect(analyticOutputChannelsArray[2].dataProperties.toArray()).toBeArrayOfSize(6);
+    expect(analyticOutputChannelsArray[3].dataProperties.toArray()).toBeArrayOfSize(6);
+    expect(analyticOutputChannelsArray[4].dataProperties.toArray()).toBeArrayOfSize(6);
+    expect(analyticOutputChannelsArray[5].dataProperties.toArray()).toBeArrayOfSize(6);
 
     const analyticPropertiesArray = metadataService.metadata.getValue().analytics.toArray()[0].properties.toArray();
     expect(analyticPropertiesArray[0].name).toEqual('timeWindow');

@@ -1,6 +1,6 @@
 import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 import {TransformerPropertySelectorComponent} from "./transformer-property-selector.component";
-import {TransformerBuilder} from "../../classes/Transformer";
+import {Transformer, TransformerBuilder} from "../../classes/Transformer";
 import {Injectable} from "@angular/core";
 import {AbstractDataService} from "../../services/AbstractDataService";
 import {FormsModule} from "@angular/forms";
@@ -9,7 +9,13 @@ import {MetadataBuilder} from "../../classes/Metadata";
 import {AbstractMetadataService, MetadataService} from "../../services/MetadataService";
 
 @Injectable()
-class DataServiceMock extends AbstractDataService {}
+class DataServiceMock extends AbstractDataService {
+  addAnalyticChannelsToChannelsPanel(transformer: Transformer) {};
+  removeAnalyticChannelsFromChannelsPanel(transformer: Transformer) {};
+  addChannel(channelName: string) {};
+  setModified(modifiedValue: boolean) {};
+  isModified(): boolean { return false};
+}
 
 describe('TransformerPropertySelectorComponent', () => {
   let dataService: DataServiceMock;

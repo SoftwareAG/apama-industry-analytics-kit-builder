@@ -5,7 +5,7 @@ import {Config, ConfigArrayBuilder, ConfigSerializer} from "../../classes/Config
 import {BehaviorSubject} from "rxjs";
 import {List} from "immutable";
 import {Injectable} from "@angular/core";
-import {TransformerSerializer} from "../../classes/Transformer";
+import {Transformer, TransformerSerializer} from "../../classes/Transformer";
 import {FileService} from "../../services/FileService";
 import {RowSerializer} from "../../classes/Row";
 import {PropertyDeserializer, PropertySerializer} from "../../classes/Property";
@@ -20,6 +20,11 @@ import {TransformerDeserializer} from "../../classes/TransformerDeserializer";
 
 @Injectable()
 class DataServiceMock extends AbstractDataService {
+
+  addAnalyticChannelsToChannelsPanel(transformer: Transformer) {};
+  removeAnalyticChannelsFromChannelsPanel(transformer: Transformer) {};
+  addChannel(channelName: string) {};
+
   readonly configurations: BehaviorSubject<List<() => Config>> = new BehaviorSubject(List<() => Config>(()=>new ConfigArrayBuilder()
     .with()
       .Name("Config1")
@@ -39,6 +44,9 @@ class DataServiceMock extends AbstractDataService {
     .endWith()
     .build()
   ));
+
+  setModified(modifiedValue: boolean) {};
+  isModified(): boolean { return false};
 }
 
 describe('NavBarComponent', () => {

@@ -201,21 +201,15 @@ describe('RowDeserializer', () => {
     expect(combinedRowChannels.length).toEqual(4);
 
     const allChannels = metaDataChannels
-      .map((metaDataChannel: TransformerChannelDef) => {
-        return metaDataChannel.name;
-      })
+      .map((metaDataChannel: TransformerChannelDef) => metaDataChannel.name)
       .concat(combinedRowChannels
-        .map((rowChannel: RowChannel) => {
-          return rowChannel.name.getValue()
-        })
-    );
+        .map((rowChannel: RowChannel) => rowChannel.name.getValue())
+      );
 
     // Check Channels
     rowChannels.forEach((channelEl: HTMLElement) => {
       const htmlElementChannelName = (channelEl.querySelector('text') as Element).textContent;
-      expect(allChannels.find(channelName => {
-        return channelName === htmlElementChannelName;
-      })).toEqual(htmlElementChannelName);
+      expect(allChannels.find(channelName => channelName === htmlElementChannelName)).toEqual(htmlElementChannelName);
     });
 
   })

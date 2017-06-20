@@ -1,5 +1,6 @@
 import {ClassArrayBuilder, ClassBuilder, NestedClassBuilder} from "./ClassBuilder";
 import {AbstractModel} from "./AbstractModel";
+import {List} from "immutable";
 
 export interface TransformerChannelDefJsonInterface {
   name: string;
@@ -8,7 +9,6 @@ export interface TransformerChannelDefJsonInterface {
   optional?: boolean;
   prefix?: string;
   dataProperties?: Array<string>;
-  type?: "string" | "boolean" | "number" | undefined;
 }
 
 export interface TransformerChannelDefInterface {
@@ -17,8 +17,7 @@ export interface TransformerChannelDefInterface {
   repeated: boolean;
   optional: boolean;
   prefix: string;
-  dataProperties: Array<string>;
-  type: "string" | "boolean" | "number" | undefined;
+  dataProperties: List<string>;
 }
 
 export class TransformerChannelDef extends AbstractModel<TransformerChannelDefJsonInterface, never> {
@@ -27,18 +26,17 @@ export class TransformerChannelDef extends AbstractModel<TransformerChannelDefJs
   readonly repeated: boolean;
   readonly optional: boolean;
   readonly prefix: string;
-  readonly dataProperties: Array<string>;
+  readonly dataProperties: List<string>;
   readonly type: "string" | "boolean" | "number" | undefined;
 
-  constructor(obj: TransformerChannelDefInterface) {
+  constructor(obj: TransformerChannelDefJsonInterface) {
     super();
     this.name = obj.name;
     this.description = obj.description;
-    this.repeated = obj.repeated;
-    this.optional = obj.optional;
-    this.prefix = obj.prefix;
-    this.dataProperties = obj.dataProperties;
-    this.type = obj.type;
+    this.repeated = !!obj.repeated;
+    this.optional = !!obj.optional;
+    this.prefix = obj.prefix || "";
+    this.dataProperties = List(obj.dataProperties || []);
   }
 
   validate(): this {
@@ -51,14 +49,13 @@ export class TransformerChannelDef extends AbstractModel<TransformerChannelDefJs
   }
 }
 
-export class TransformerChannelDefBuilder extends ClassBuilder<TransformerChannelDef> implements TransformerChannelDefInterface {
+export class TransformerChannelDefBuilder extends ClassBuilder<TransformerChannelDef> implements TransformerChannelDefJsonInterface {
   name: string;
   description: string;
   repeated: boolean = false;
   optional: boolean = false;
   prefix: string = "";
-  dataProperties = new Array<string>();
-  type: "string" | "boolean" | "number" | undefined = undefined;
+  dataProperties: Array<string> = [];
 
   Name(name: string): this {
     this.name = name;
@@ -82,10 +79,6 @@ export class TransformerChannelDefBuilder extends ClassBuilder<TransformerChanne
   }
   DataProperties(dataProperties: Array<string>): this {
     this.dataProperties.concat(dataProperties);
-    return this;
-  }
-  Type(type: "string" | "boolean" | "number" | undefined) : this {
-    this.type = type;
     return this;
   }
   build(): TransformerChannelDef {

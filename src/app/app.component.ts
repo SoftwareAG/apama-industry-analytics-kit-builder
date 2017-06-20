@@ -68,7 +68,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    window.setTimeout(() => {
+    setTimeout(() => {
       this.loadDefaultMetadata();
       this.openLoginDialog()
     });

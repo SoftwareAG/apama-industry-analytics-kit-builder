@@ -1,6 +1,6 @@
 <h4 class="unselectable">Analytics</h4>
 <hr>
-<div class="content">
+<div class="content h-100">
   <ngb-accordion [closeOthers]="true">
     <ngb-panel *ngFor="let analyticsGroup of (analyticsByGroup | async)" [id]="analyticsGroup.groupName" [title]="analyticsGroup.groupName || 'Other'">
       <ng-template ngbPanelContent>

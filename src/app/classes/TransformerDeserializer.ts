@@ -7,7 +7,6 @@ import {TransformerChannelDef} from "./TransformerChannelDef";
 import {Transformer, TransformerBuilder} from "./Transformer";
 import {TransformerDef} from "./TransformerDef";
 import {AbstractDataService} from "../services/AbstractDataService";
-import {DataService} from "../services/DataService";
 
 @Injectable()
 export class TransformerDeserializer {
@@ -129,10 +128,8 @@ export class TransformerDeserializer {
       if (transformerDef) {
 
         // Add the analytics input and output channel names into the Channels Component
-        transformerDef.inputChannelsByName.concat(transformerDef.outputChannelsByName)
-          .valueSeq().toArray().map(channelData => {
-            (this.dataService as DataService).addChannel(channelData.name);
-        });
+        transformerDef.inputChannels.concat(transformerDef.outputChannels)
+          .forEach(( channelData : TransformerChannelDef) => this.dataService.addChannel(channelData.name));
 
         const transformerBuilder = new TransformerBuilder()
           .Name(transformerDef.name)

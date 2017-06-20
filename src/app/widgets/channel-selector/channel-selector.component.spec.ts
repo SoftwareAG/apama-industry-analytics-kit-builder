@@ -13,7 +13,13 @@ import {RowChannelComponent} from "../row-channel/row-channel.component";
 import {FormsModule} from "@angular/forms";
 
 @Injectable()
-class DataServiceMock extends AbstractDataService {}
+class DataServiceMock extends AbstractDataService {
+  addAnalyticChannelsToChannelsPanel(transformer: Transformer) {};
+  removeAnalyticChannelsFromChannelsPanel(transformer: Transformer) {};
+  addChannel(channelName: string) {};
+  setModified(modifiedValue: boolean) {};
+  isModified(): boolean { return false};
+}
 
 @Injectable()
 class DragServiceMock extends AbstractDragService {

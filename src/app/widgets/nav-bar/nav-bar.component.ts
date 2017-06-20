@@ -38,30 +38,29 @@ export class NavBarComponent implements OnInit {
     this.dataService.hierarchy.next(config());
   }
 
+  clearConfiguration() {
+    const config = new ConfigBuilder()
+      .build();
+    this.dataService.hierarchy.next(config);
+    this.dataService.selectedTransformer.next(undefined);
+    this.dataService.channels.next(List<RowChannel>());
+  }
+
   newConfig() {
-    if (this.dataService.hierarchy.getValue().isModified()
-      && (!this.dataService.hierarchy.getValue().isSaved())) {
+    if (this.dataService.isModified()) {
       this.modalService.open(NewConfigurationDialogComponent, {size: "lg"}).result
         .then(result => {
           if (result === "Yes") {
-            const config = new ConfigBuilder()
-              .build();
-            this.dataService.hierarchy.next(config);
-            this.dataService.selectedTransformer.next(undefined);
-            this.dataService.channels.next(List<RowChannel>());
-          };
+           this.clearConfiguration();
+          }
         }, () => {
         })
-    } else if (this.dataService.hierarchy.getValue().isSaved()) {
-      const config = new ConfigBuilder()
-        .build();
-      this.dataService.hierarchy.next(config);
-      this.dataService.selectedTransformer.next(undefined);
-      this.dataService.channels.next(List<RowChannel>());
+    } else {
+      this.clearConfiguration();
     }
   }
 
-  loadConfig() {
+  loadDataFile() {
     this.fileService.getFileData(".evt")
       .then(result => result.fileContent)
       .then(apamaEPL => this.fileService.deserialize(apamaEPL))
@@ -74,7 +73,21 @@ export class NavBarComponent implements OnInit {
         } else {
           alert(error);
         }
-      })
+      });
+  }
+
+  loadConfig() {
+    if (this.dataService.isModified()) {
+      this.modalService.open(NewConfigurationDialogComponent, {size: "lg"}).result
+        .then(result => {
+          if (result === "Yes") {
+            this.loadDataFile();
+          };
+        }, () => {
+        })
+    } else {
+      this.loadDataFile();
+    }
   }
 
   openSaveConfigurationDialog() {

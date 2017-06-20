@@ -5,9 +5,33 @@ import {List} from "immutable";
 import {Transformer} from "../classes/Transformer";
 import {TransformerChannel} from "../classes/TransformerChannel";
 import {Row} from "../classes/Row";
+import {Data} from "@angular/router";
 
 @Injectable()
 export class DataService extends AbstractDataService {
+
+  modified: boolean = false;
+
+  constructor() {
+    super();
+    this.hierarchy.switchMap(hierarchy => hierarchy.asObservable()).subscribe(() => {
+      this.setModified(true);
+    });
+
+    this.hierarchy.subscribe( () => {
+      setTimeout( () => {
+        this.setModified(false);
+      });
+    })
+  }
+
+  setModified(modifiedValue: boolean) {
+    this.modified = modifiedValue;
+  }
+
+  isModified(): boolean {
+    return this.modified === true;
+  }
 
   addChannel(channelName: string) {
     if (!this.channels.getValue().find((rowChannel: RowChannel) => rowChannel.name.getValue() === channelName)) {
@@ -30,43 +54,19 @@ export class DataService extends AbstractDataService {
   }
 
   removeAnalyticChannelsFromChannelsPanel(transformer: Transformer) {
-    transformer.inputChannels
-      .concat(transformer.outputChannels)
-      .map( (transformerChannel: TransformerChannel) => {
+    const allChannels = List<string>(this.hierarchy.getValue().rows.getValue().reduce( (arr: List<string>, row: Row) => {
+      if (row.transformers.getValue().size) {
+        const inputChannels = row.transformers.getValue().get(0).inputChannels.map( (transformerChannel: TransformerChannel) => transformerChannel.name);
+        const outputChannels = row.transformers.getValue().get(row.transformers.getValue().size - 1).outputChannels.map((transformerChannel: TransformerChannel) => transformerChannel.name);
+        return arr.concat(inputChannels).concat(outputChannels);
+      }
+      return arr;
+    }, List<string>()));
 
-        // Get the total count of analytics in all rows which use the transformerChannel.name
-        const totalCount = this.hierarchy.getValue().rows.getValue().reduce( (totalCount:number, row:Row) => {
-
-          return row.transformers.getValue().reduce( (totalCount: number, transformer: Transformer) => {
-
-            const totalInputChannelCount = transformer.inputChannels.reduce( (totalCount: number, transformerInputChannel:TransformerChannel) => {
-                                              if (transformerInputChannel.name === transformerChannel.name) {
-                                                return totalCount+1;
-                                              }
-                                           },totalCount);
-            const totalOutputChannelCount = transformer.outputChannels.reduce( (totalCount: number, transformerOutputChannel:TransformerChannel) => {
-                                              if (transformerOutputChannel.name === transformerChannel.name) {
-                                                return totalCount + 1;
-                                              }
-                                           },totalCount);
-            if (totalInputChannelCount) {
-              totalCount += totalInputChannelCount;
-            }
-
-            if (totalOutputChannelCount) {
-              totalCount += totalOutputChannelCount;
-            }
-            return totalCount;
-          }, totalCount);
-        }, 0);
-
-        if (totalCount === 0) {
-            const newChannels: List<RowChannel> = this.channels.getValue()
-              .filter( (rowChannel: RowChannel) => {
-                return rowChannel.name.getValue() !== transformerChannel.name;
-              }).toList();
-            this.channels.next(newChannels);
-        }
-    });
+    const newChannels = this.channels.getValue()
+       .filter( (rowChannel: RowChannel) => {
+          return allChannels.findIndex((channelName:string) => rowChannel.name.getValue() === channelName) != -1;
+       }).toList();
+    this.channels.next(newChannels);
   }
 }
