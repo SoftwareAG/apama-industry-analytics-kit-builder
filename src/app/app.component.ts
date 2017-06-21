@@ -5,9 +5,11 @@ import {ResizeEvent} from "angular-resizable-element";
 import {LoginDialogComponent} from "./widgets/login-dialog/login-dialog.component";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {Http} from "@angular/http";
+import {CookieService} from "ng2-cookies";
 
 @Component({
   selector: 'app-root',
+  providers: [CookieService],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
@@ -26,7 +28,7 @@ export class AppComponent implements AfterViewInit {
 
   informationHeightStartPixels = 0;
 
-  constructor(private dataService: AbstractDataService, private metadataService: AbstractMetadataService, public modalService: NgbModal, private http: Http) { }
+  constructor(private dataService: AbstractDataService, private metadataService: AbstractMetadataService, public modalService: NgbModal, private http: Http, private cookieService: CookieService) { }
 
   onValidateResize(event: ResizeEvent): boolean {
     if (event.rectangle) {
@@ -55,7 +57,9 @@ export class AppComponent implements AfterViewInit {
   }
 
   openLoginDialog() {
-    this.modalService.open(LoginDialogComponent, {size: "lg", backdrop: "static", keyboard: false});
+    if (!this.cookieService.check('loggedIn')) {
+      this.modalService.open(LoginDialogComponent, {size: "lg", backdrop: "static", keyboard: false});
+    }
   }
 
   loadDefaultMetadata() {

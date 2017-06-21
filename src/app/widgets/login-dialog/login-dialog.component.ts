@@ -1,8 +1,10 @@
-import {Component, HostListener} from "@angular/core";
+import {Component} from "@angular/core";
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
+import {CookieService} from "ng2-cookies";
 
 @Component({
   selector: 'app-login-dialog',
+  providers: [CookieService],
   templateUrl: './login-dialog.component.html',
   styleUrls: ['./login-dialog.component.scss']
 })
@@ -18,7 +20,7 @@ export class LoginDialogComponent {
 
   private dialog;
 
-  constructor(private activeModal: NgbActiveModal) {
+  constructor(private activeModal: NgbActiveModal, private cookieService: CookieService) {
     this.dialog = this;
   }
 
@@ -26,8 +28,8 @@ export class LoginDialogComponent {
     this.invalid_username_password = false;
     // Check for this hard coded username and password
     if (this.u === this.U && this.p === this.P) {
+      this.cookieService.set('loggedIn', 'true', 365);
       this.activeModal.close('loginDialog');
-
     } else {
       this.invalid_username_password = true;
     }
