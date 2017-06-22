@@ -31,6 +31,9 @@ import {ConfigDeserializer} from "./classes/ConfigDeserializer";
 import {LoginDialogComponent} from "./widgets/login-dialog/login-dialog.component";
 import {NewConfigurationDialogComponent} from "./widgets/new-configuration-dialog/new-configuration-dialog.component";
 import {TransformerDeserializer} from "./classes/TransformerDeserializer";
+import {PropertySelectorComponent} from "./widgets/property-selector/property-selector.component";
+import {ChannelPropertySelectorComponent} from "./widgets/channel-property-selector/channel-property-selector.component";
+import {SelectionService} from "./services/SelectionService";
 
 @NgModule({
   declarations: [
@@ -47,7 +50,9 @@ import {TransformerDeserializer} from "./classes/TransformerDeserializer";
     TransformerDefinitionComponent,
     RowChannelComponent,
     LoginDialogComponent,
-    NewConfigurationDialogComponent
+    NewConfigurationDialogComponent,
+    PropertySelectorComponent,
+    ChannelPropertySelectorComponent
   ],
   imports: [
     BrowserModule,
@@ -60,6 +65,7 @@ import {TransformerDeserializer} from "./classes/TransformerDeserializer";
     {provide: AbstractDataService, useClass: DataService},
     {provide: AbstractDragService, useClass: DragService},
     {provide: AbstractMetadataService, useClass: MetadataService},
+    SelectionService,
     FileService,
     ConfigSerializer,
     RowSerializer,

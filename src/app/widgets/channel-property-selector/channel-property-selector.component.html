@@ -1,0 +1,5 @@
+<div class="content h-100">
+  <div class="w-100 container-fluid">
+    <input class="form-control" type="text" [ngModel]="selectedChannelName | async" (ngModelChange)="selectedChannelName.next($event)"/>
+  </div>
+</div>

@@ -1,11 +1,10 @@
-import {Component, ElementRef, HostListener, Input, OnInit} from "@angular/core";
+import {Component, ElementRef, Input, OnInit} from "@angular/core";
 import {TransformerDef} from "../../classes/TransformerDef";
 import * as d3 from "d3";
 import {roundedRectangle} from "../ladder-diagram/ladder-diagram.component";
 import {AbstractDragService} from "../../services/AbstractDragService";
 import {AbstractMetadataService} from "../../services/MetadataService";
-import {AbstractDataService} from "../../services/AbstractDataService";
-import {Observable} from "rxjs/Observable";
+import {SelectionService} from "../../services/SelectionService";
 
 @Component({
   selector: 'transformer-definition',
@@ -19,7 +18,7 @@ export class TransformerDefinitionComponent implements OnInit {
   @Input() width: number = 150;
   @Input() height: number = 50;
 
-  constructor(myElement: ElementRef, private dragService: AbstractDragService, private metadataService: AbstractMetadataService, private dataService: AbstractDataService) {
+  constructor(myElement: ElementRef, private dragService: AbstractDragService, private selectionService: SelectionService, private metadataService: AbstractMetadataService) {
     this.nativeElement = myElement.nativeElement;
   }
 
@@ -34,11 +33,12 @@ export class TransformerDefinitionComponent implements OnInit {
 
     const transformer = svg.append('g')
       .classed('transformer', true)
-      .attr('transform', `translate(${padding},${padding})`)
+      .attr('transform', `translate(${
+        padding},${padding})`)
       .on('mousedown', function() {
         const newAnalytic = component.metadataService.createAnalytic(component.analytic.name);
         component.dragService.startDrag({sourceElement: this as SVGGElement, object: newAnalytic});
-        component.dataService.selectedTransformer.next(newAnalytic);
+        component.selectionService.selection.next(newAnalytic);
         d3.event.preventDefault();
       });
 

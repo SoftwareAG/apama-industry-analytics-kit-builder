@@ -7,6 +7,7 @@ import {FormsModule} from "@angular/forms";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {MetadataBuilder} from "../../classes/Metadata";
 import {AbstractMetadataService, MetadataService} from "../../services/MetadataService";
+import {SelectionService} from "../../services/SelectionService";
 
 @Injectable()
 class DataServiceMock extends AbstractDataService {
@@ -18,6 +19,7 @@ class DataServiceMock extends AbstractDataService {
 }
 
 describe('TransformerPropertySelectorComponent', () => {
+  let selectionService: SelectionService;
   let dataService: DataServiceMock;
   let metadataService: MetadataService;
   let component: TransformerPropertySelectorComponent;
@@ -96,6 +98,7 @@ describe('TransformerPropertySelectorComponent', () => {
       providers: [
         {provide: AbstractDataService, useClass: DataServiceMock},
         {provide: AbstractMetadataService, useClass: MetadataService},
+        SelectionService
       ],
       imports: [
         FormsModule,
@@ -105,6 +108,7 @@ describe('TransformerPropertySelectorComponent', () => {
   }));
 
   beforeEach(() => {
+    selectionService = TestBed.get(SelectionService) as SelectionService;
     dataService = TestBed.get(AbstractDataService) as DataServiceMock;
     metadataService = TestBed.get(AbstractMetadataService) as MetadataService;
     fixture = TestBed.createComponent(TransformerPropertySelectorComponent);
@@ -129,7 +133,7 @@ describe('TransformerPropertySelectorComponent', () => {
       .build();
 
     metadataService.metadata.next(testMetadata);
-    dataService.selectedTransformer.next(transformer);
+    selectionService.selection.next(transformer);
 
     fixture.detectChanges();
 

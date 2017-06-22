@@ -7,6 +7,8 @@ import {PropertyDef} from "../../classes/PropertyDef";
 import {Transformer} from "../../classes/Transformer";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {AbstractMetadataService} from "../../services/MetadataService";
+import {SelectionService} from "../../services/SelectionService";
+import {selection} from "d3-selection";
 
 @Component({
   selector: 'transformer-property-selector',
@@ -16,10 +18,10 @@ import {AbstractMetadataService} from "../../services/MetadataService";
 export class TransformerPropertySelectorComponent implements OnInit {
 
   readonly transformerProperties: Observable<List<{definition: PropertyDef, values: List<Property>}>>;
-  readonly selectedTransformer: BehaviorSubject<Transformer | undefined>;
+  readonly selectedTransformer: Observable<Transformer | undefined>;
 
-  constructor(dataService: AbstractDataService, metadataService: AbstractMetadataService) {
-    this.selectedTransformer = dataService.selectedTransformer;
+  constructor(selectionService: SelectionService, dataService: AbstractDataService, metadataService: AbstractMetadataService) {
+    this.selectedTransformer = selectionService.selection.map(selection => selection instanceof Transformer ? selection : undefined);
     const metadata = metadataService.metadata;
 
     this.transformerProperties = this.selectedTransformer // Track the selectedTransformer changes
@@ -34,17 +36,15 @@ export class TransformerPropertySelectorComponent implements OnInit {
   }
 
   addPropertyValue(propertyDef: PropertyDef) {
-    const selectedTransformer = this.selectedTransformer.getValue();
-    if (selectedTransformer) {
+    this.selectedTransformer.first().filter(selectedTransformer => !!selectedTransformer).subscribe((selectedTransformer: Transformer) => {
       selectedTransformer.addPropertyValue(propertyDef.name, PropertyBuilder.fromPropertyDef(propertyDef).build());
-    }
+    });
   }
 
   removePropertyValue(property: Property) {
-    const selectedTransformer = this.selectedTransformer.getValue();
-    if (selectedTransformer) {
+    this.selectedTransformer.first().filter(selectedTransformer => !!selectedTransformer).subscribe((selectedTransformer: Transformer) => {
       selectedTransformer.removePropertyValue(property)
-    }
+    });
   }
 
   ngOnInit() { }

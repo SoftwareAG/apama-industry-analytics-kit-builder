@@ -3,6 +3,7 @@ import {AbstractMetadataService} from "../../services/MetadataService";
 import {AbstractDataService} from "../../services/AbstractDataService";
 import {Transformer} from "../../classes/Transformer";
 import {Observable} from "rxjs/Observable";
+import {SelectionService} from "../../services/SelectionService";
 
 @Component({
   selector: 'information',
@@ -13,10 +14,10 @@ export class InformationComponent {
 
   readonly transformerDocumentation: Observable<string>;
 
-  constructor(private dataService: AbstractDataService, private metadataService: AbstractMetadataService) {
+  constructor(private selectionService: SelectionService, private metadataService: AbstractMetadataService) {
     // Listen for updates to selectedTransformer
-    this.transformerDocumentation = this.dataService.selectedTransformer
-      .filter(transformer => transformer !== undefined)
+    this.transformerDocumentation = this.selectionService.selection
+      .filter(transformer => transformer instanceof Transformer)
       .combineLatest(
         this.metadataService.metadata,
         (transformer: Transformer, metadata) => metadata.getAnalytic(transformer.name).documentation

@@ -14,6 +14,7 @@ import {List} from "immutable";
 import {Path} from "d3-path";
 import {Selection} from "d3-selection";
 import {DataService} from "../../services/DataService";
+import {SelectionService} from "../../services/SelectionService";
 
 @Component({
   selector: 'ladder-diagram',
@@ -23,7 +24,7 @@ import {DataService} from "../../services/DataService";
 export class LadderDiagramComponent implements OnInit {
   readonly nativeElement;
 
-  constructor(myElement: ElementRef, private readonly dataService: AbstractDataService, private readonly dragService: AbstractDragService, private readonly metadataService: AbstractMetadataService) {
+  constructor(myElement: ElementRef, private readonly dataService: AbstractDataService, private readonly selectionService: SelectionService, private readonly dragService: AbstractDragService, private readonly metadataService: AbstractMetadataService) {
     this.nativeElement = myElement.nativeElement;
   }
 
@@ -245,7 +246,7 @@ export class LadderDiagramComponent implements OnInit {
               clearTimeout(d.mousedownHandler.timeout);
               d.mousedownHandler = undefined;
             }
-            component.dataService.selectedTransformer.next(d.transformer);
+            component.selectionService.selection.next(d.transformer);
           })
           .on('mouseenter', function(d) {
             const transformer = d3.select(this);
@@ -572,7 +573,7 @@ export class LadderDiagramComponent implements OnInit {
   @HostListener('mouseup', ['$event.target'])
   parentMouseUp() {
     if (!this.dragService.dragging.getValue()) {
-      this.dataService.selectedTransformer.next(undefined);
+      this.selectionService.selection.next(undefined);
     }
   }
 }

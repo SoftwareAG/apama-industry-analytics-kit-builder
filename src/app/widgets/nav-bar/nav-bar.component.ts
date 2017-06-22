@@ -10,28 +10,24 @@ import {SaveConfigurationComponent} from "app/widgets/save-configuration/save-co
 import {ModalDismissReasons, NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {RowChannel} from "../../classes/Channel";
 import {NewConfigurationDialogComponent} from "../new-configuration-dialog/new-configuration-dialog.component";
+import {SelectionService} from "../../services/SelectionService";
 
 @Component({
   selector: 'nav-bar',
   templateUrl: './nav-bar.component.html',
   styleUrls: ['./nav-bar.component.scss']
 })
-export class NavBarComponent implements OnInit {
+export class NavBarComponent {
   readonly configurations: Observable<List<() => Config>>;
-  readonly dataService: AbstractDataService;
   readonly metadataVersions: BehaviorSubject<Set<string>>;
   readonly currentMetaVersion: Observable<string>;
   isNavbarCollapsed: boolean = true;
 
-  constructor(dataService: AbstractDataService, private fileService: FileService, private readonly metadataService: AbstractMetadataService, public modalService: NgbModal) {
-    this.dataService = dataService;
+  constructor(private dataService: AbstractDataService, private fileService: FileService, private readonly metadataService: AbstractMetadataService, public modalService: NgbModal, private selectionService: SelectionService) {
     this.configurations = this.dataService.configurations.asObservable();
     this.metadataVersions = new BehaviorSubject(Set.of("2.0.0.0"));
     this.currentMetaVersion = metadataService.metadata.map(metadata => metadata.version);
     this.currentMetaVersion.subscribe(version => this.metadataVersions.next(this.metadataVersions.getValue().add(version)));
-  }
-
-  ngOnInit() {
   }
 
   onConfigurationClick(config: () => Config) {
@@ -42,7 +38,7 @@ export class NavBarComponent implements OnInit {
     const config = new ConfigBuilder()
       .build();
     this.dataService.hierarchy.next(config);
-    this.dataService.selectedTransformer.next(undefined);
+    this.selectionService.selection.next(undefined);
     this.dataService.channels.next(List<RowChannel>());
   }
 
