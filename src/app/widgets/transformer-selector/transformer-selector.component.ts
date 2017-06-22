@@ -1,9 +1,10 @@
-import {Component, ElementRef} from "@angular/core";
+import {Component, ViewChild} from "@angular/core";
 import {TransformerDef} from "../../classes/TransformerDef";
 import {Observable} from "rxjs";
 import {List, OrderedMap} from "immutable";
 import {AbstractDragService} from "../../services/AbstractDragService";
 import {AbstractMetadataService} from "../../services/MetadataService";
+import {NgbAccordion} from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'transformer-selector',
@@ -11,8 +12,10 @@ import {AbstractMetadataService} from "../../services/MetadataService";
   styleUrls: ['./transformer-selector.component.scss']
 })
 export class TransformerSelectorComponent {
-  readonly analyticsByGroup: Observable<List<List<TransformerDef>>>;
+  readonly analyticsByGroup: Observable<List<{groupName: string, analytics: List<TransformerDef>}>>;
   readonly dragService: AbstractDragService;
+
+  @ViewChild(NgbAccordion) accordion: NgbAccordion;
 
   constructor( private metadataService: AbstractMetadataService, dragService: AbstractDragService) {
     this.analyticsByGroup = metadataService.metadata
@@ -26,6 +29,16 @@ export class TransformerSelectorComponent {
             return {groupName: groupName, analytics: analytics};
           }));
         });
+
+    // Open the first group so that we have something to show
+    this.analyticsByGroup.subscribe((analyticsByGroup) => {
+      if (!analyticsByGroup.isEmpty()) {
+        setTimeout(() => {
+          this.accordion.activeIds = analyticsByGroup.first().groupName;
+        });
+      }
+    });
+
     this.dragService = dragService;
   }
 }
