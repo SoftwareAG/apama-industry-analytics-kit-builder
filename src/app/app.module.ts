@@ -3,7 +3,6 @@ import {NgModule} from "@angular/core";
 import {FormsModule} from "@angular/forms";
 import {HttpModule} from "@angular/http";
 import {AppComponent} from "./app.component";
-import {ChannelSelectorComponent} from "./widgets/channel-selector/channel-selector.component";
 import {TransformerSelectorComponent} from "./widgets/transformer-selector/transformer-selector.component";
 import {LadderDiagramComponent} from "./widgets/ladder-diagram/ladder-diagram.component";
 import {AbstractDataService} from "./services/AbstractDataService";
@@ -36,7 +35,6 @@ import {TransformerDeserializer} from "./classes/TransformerDeserializer";
 @NgModule({
   declarations: [
     AppComponent,
-    ChannelSelectorComponent,
     TransformerSelectorComponent,
     LadderDiagramComponent,
     TransformerSelectorComponent,

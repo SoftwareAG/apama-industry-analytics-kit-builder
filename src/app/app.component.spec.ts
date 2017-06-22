@@ -1,7 +1,6 @@
 import {async, TestBed} from "@angular/core/testing";
 
 import {AppComponent} from "./app.component";
-import {ChannelSelectorComponent} from "./widgets/channel-selector/channel-selector.component";
 import {TransformerSelectorComponent} from "./widgets/transformer-selector/transformer-selector.component";
 import {TransformerPropertySelectorComponent} from "./widgets/transformer-property-selector/transformer-property-selector.component";
 import {LadderDiagramComponent} from "./widgets/ladder-diagram/ladder-diagram.component";
@@ -37,7 +36,6 @@ describe('AppComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         AppComponent,
-        ChannelSelectorComponent,
         TransformerSelectorComponent,
         LadderDiagramComponent,
         TransformerSelectorComponent,
