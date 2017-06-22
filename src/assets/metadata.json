@@ -507,14 +507,8 @@
                     "type": "boolean"
                 },
                 {
-                    "description": "The mapping of an input parameter to the PMML model to a value within one of the input Data events. See documentation for further details on the syntax.",
-                    "name": "input parameter name",
-                    "repeated": true,
-                    "type": "string"
-                },
-                {
-                    "description": "The mapping of an output parameter to the PMML model to a value within one of the output Data events. See documentation for further details on the syntax.",
-                    "name": "output parameter name",
+                    "description": "The mapping of an input and output parameters for the PMML model to a value within one of the input or output Data events. See documentation for further details on the syntax.",
+                    "name": "input / output parameter name",
                     "repeated": true,
                     "type": "string"
                 }

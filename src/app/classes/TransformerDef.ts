@@ -73,6 +73,13 @@ export class TransformerDef extends AbstractModel<TransformerDefJsonInterface, n
     return this.propertiesByName.get(name);
   }
 
+  getRepeatedProperty() : PropertyDef | undefined {
+    // return the repeated property in the Analytic if one exists
+    return this.propertiesByName.find((propertyDef : PropertyDef) => {
+      return propertyDef.repeated == true;
+    });
+  }
+
   getInputChannel(name: string): TransformerChannelDef {
     return this.inputChannelsByName.get(name);
   }

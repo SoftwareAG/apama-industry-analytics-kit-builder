@@ -309,6 +309,78 @@ describe('FileService', () => {
               "type": "boolean"
             }
           ]
+        },
+
+        {
+          "description": "Connect to PMML predictive model.",
+          "documentation": "Prediction Documentation",
+          "group": "Extensions",
+          "inputChannels": [
+            {
+              "description": "An input to the PMML model",
+              "name": "Data",
+              "repeated": true
+            }
+          ],
+          "name": "Prediction",
+          "outputChannels": [
+            {
+              "dataProperties": [
+                "+dValue",
+                "+sValue",
+                "+xValue",
+                "+yValue",
+                "+zValue",
+                "+params"
+              ],
+              "description": "An output from the PMML model",
+              "name": "PMML Output"
+            }
+          ],
+          "properties": [
+            {
+              "advanced": true,
+              "defaultValue": false,
+              "description": "Defines whether the output Data events have a combination of all the params in the Data events used for the calculation (true) or just the params from the input Data from the alphabetically first input stream (false). The latter is more performant.",
+              "name": "combineParams",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "description": "The name of the model to be used within the PMML file.",
+              "name": "modelName",
+              "type": "string",
+              "validator": "function(value) { return value.trim().length > 0 || 'Must provide a model name' }"
+            },
+            {
+              "advanced": true,
+              "defaultValue": "Current working directory",
+              "description": "Defines whether to check for data inside or outside the corridor. Required when the model file is not in the working directory.",
+              "name": "pmmlFileDirectory",
+              "optional": true,
+              "type": "string",
+              "validator": "function(value) { return value.trim().length > 0 || 'Must provide a pmml directory name' }"
+            },
+            {
+              "description": "The file containing the PMML model.",
+              "name": "pmmlFileName",
+              "type": "string",
+              "validator": "function(value) { return value.trim().length > 0 || 'Must provide a file name' }"
+            },
+            {
+              "defaultValue": true,
+              "description": "Whether the input stream Data events should be dealt with synchronously or as they arrive.",
+              "name": "synchronous",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "description": "The mapping of an input and output parameters for the PMML model to a value within one of the input or output Data events. See documentation for further details on the syntax.",
+              "name": "input / output parameter name",
+              "repeated": true,
+              "type": "string"
+            }
+          ]
         }]
     });
   });
@@ -583,6 +655,28 @@ com.industry.analytics.Analytic("Threshold",["Row1:Channel1","Row1:Channel1"],["
     expect( config.rows.getValue().last().inputChannelOverrides.getValue().get(0).name.getValue()).toEqual('Moving Average');
     expect( config.rows.getValue().last().inputChannelOverrides.getValue().get(1).name.getValue()).toEqual('Orders');
     expect( config.rows.getValue().last().outputChannelOverrides.getValue().get(0).name.getValue()).toEqual('Outliers');
+  });
+
+  it('should create the repeated properties for the Prediction analytic', () => {
+    const apama = `\\\\ Name: Sample
+\\\\ Version: 2.0.0.0
+\\\\ Row: 0
+com.industry.analytics.Analytic("Prediction",["setting1","setting2","s2"],["RUL_PREDICTION"],{"modelName":"principal_component_model","pmmlFileName":"osi_pca_model.pmml","synchronous":"true","pmmlFileDirectory":"./model","combineParams":"false","setting1":"setting1.DVALUE","setting2":"setting2.DVALUE","s2":"s2.DVALUE","Predicted_PC1":"RUL_PREDICTION.DVALUE"})`;
+    const config: Config = fileService.deserialize(apama);
+    expect(config.rows.getValue().size).toEqual(1);
+    expect( config.rows.getValue().first().transformers.getValue().size).toEqual(1);
+
+    // Check all properties have been loaded
+    const analyticProperties = config.rows.getValue().first().transformers.getValue().get(0).propertyValues.toArray();
+    expect(analyticProperties).toBeArrayOfSize(9);
+    expect(analyticProperties[5].definitionName).toEqual('input / output parameter name');
+    expect(analyticProperties[5].value.getValue()).toEqual('setting1.DVALUE');
+    expect(analyticProperties[6].definitionName).toEqual('input / output parameter name');
+    expect(analyticProperties[6].value.getValue()).toEqual('setting2.DVALUE');
+    expect(analyticProperties[7].definitionName).toEqual('input / output parameter name');
+    expect(analyticProperties[7].value.getValue()).toEqual('s2.DVALUE');
+    expect(analyticProperties[8].definitionName).toEqual('input / output parameter name');
+    expect(analyticProperties[8].value.getValue()).toEqual('RUL_PREDICTION.DVALUE');
   });
 
 });

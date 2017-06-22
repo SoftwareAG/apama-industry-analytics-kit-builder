@@ -270,7 +270,17 @@ export class PropertyDeserializer {
               .build()
               .validate(propertyDef)];
           } else {
-            console.error(new IgnoreableDeserializationError(`Analytic '${transformerDef.name}' does not contain property '${name}'`));
+            const repeatedPropertyDef = transformerDef.getRepeatedProperty();
+            if (repeatedPropertyDef) {
+              return [new PropertyBuilder()
+                .Name(name)
+                .DefinitionName(repeatedPropertyDef.name)
+                .Value(this.parseStringWithPropertyDef(value, repeatedPropertyDef))
+                .build()
+                .validate(repeatedPropertyDef)];
+            } else {
+              console.error(new IgnoreableDeserializationError(`Analytic '${transformerDef.name}' does not contain property '${name}'`));
+            }
           }
         } else {
           throw new IgnoreableDeserializationError(`Property must contain name and value pair e.g. "offset":"2.0d" (invalid property data is ${data})`);
