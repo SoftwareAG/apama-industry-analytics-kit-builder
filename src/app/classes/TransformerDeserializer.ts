@@ -126,11 +126,6 @@ export class TransformerDeserializer {
       const [, analyticName, analyticInChannels, analyticOutChannels, analyticProperties] = analyticMatch;
       const transformerDef: TransformerDef = this.metadataService.getAnalytic(analyticName);
       if (transformerDef) {
-
-        // Add the analytics input and output channel names into the Channels Component
-        transformerDef.inputChannels.concat(transformerDef.outputChannels)
-          .forEach(( channelData : TransformerChannelDef) => this.dataService.addChannel(channelData.name));
-
         const transformerBuilder = new TransformerBuilder()
           .Name(transformerDef.name)
           .PropertyValues(

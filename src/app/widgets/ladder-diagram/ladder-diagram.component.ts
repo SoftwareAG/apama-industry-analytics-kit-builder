@@ -5,14 +5,14 @@ import {AbstractDataService} from "../../services/AbstractDataService";
 import {Config} from "../../classes/Config";
 import {Row, RowBuilder} from "../../classes/Row";
 import {TransformerChannel} from "../../classes/TransformerChannel";
-import {RowChannel} from "../../classes/Channel";
+import {RowChannel, RowChannelBuilder} from "../../classes/Channel";
 import {AbstractDragService} from "../../services/AbstractDragService";
 import {Transformer} from "../../classes/Transformer";
 import {AbstractMetadataService} from "../../services/MetadataService";
 import {TransformerChannelDef} from "../../classes/TransformerChannelDef";
 import {List} from "immutable";
 import {Path} from "d3-path";
-import {Selection} from "d3-selection";
+import {BaseType, Selection} from "d3-selection";
 import {DataService} from "../../services/DataService";
 import {SelectionService} from "../../services/SelectionService";
 
@@ -35,9 +35,7 @@ export class LadderDiagramComponent implements OnInit {
     const padding = deepFreeze({top: 20, right: 200, bottom: 20, left: 200});
     const width = 1100 - padding.left - padding.right;
     const transformerWidth = 150;
-    const defaultTransformerHeight = 50;
     const dropTargetWidth = 40;
-    const transformerSpacing = dropTargetWidth + 20;
     const rowSpacing = 10;
     const channelSpacing = 40;
 
@@ -93,7 +91,6 @@ export class LadderDiagramComponent implements OnInit {
         const dragging = component.dragService.dragging.getValue();
         if (dragging) {
           if (dragging.object instanceof Transformer) {
-            component.dataService.addAnalyticChannelsToChannelsPanel(dragging.object);
             const rows = this.dataService.hierarchy.getValue().rows;
             rows.next(rows.getValue().push(new RowBuilder().pushTransformer(dragging.object).build()));
             this.dragService.stopDrag();
@@ -150,7 +147,7 @@ export class LadderDiagramComponent implements OnInit {
           const rowInputChannels = d[0];
           if (!rowInputChannels) { return [] }
           const rowChannels = rowInputChannels.row.getInChannels(component.metadataService.metadata.getValue());
-          return rowInputChannels.channelGroup.map((channelLocation, channelIndex) => { return {location: channelLocation, channel: rowChannels.get(channelIndex), row: rowInputChannels.row} })
+          return rowInputChannels.channelGroup.map((channelLocation, channelIndex) => { return {type: 'input' as 'input', location: channelLocation, channel: rowChannels.get(channelIndex), row: rowInputChannels.row} })
         });
         rowInputChannel.exit().remove();
         const rowInputChannelEnter = rowInputChannel.enter().append('g')
@@ -163,7 +160,7 @@ export class LadderDiagramComponent implements OnInit {
           if (!d.length) { return [] }
           const rowOutputChannels = d[d.length -1];
           const rowChannels = rowOutputChannels.row.getOutChannels(component.metadataService.metadata.getValue());
-          return rowOutputChannels.channelGroup.map((channelLocation, channelIndex) => { return {location: channelLocation, channel: rowChannels.get(channelIndex), row: rowOutputChannels.row} })
+          return rowOutputChannels.channelGroup.map((channelLocation, channelIndex) => { return {type: 'output' as 'output', location: channelLocation, channel: rowChannels.get(channelIndex), row: rowOutputChannels.row} })
         });
         rowOutputChannel.exit().remove();
         const rowOutputChannelEnter = rowOutputChannel.enter().append('g')
@@ -172,61 +169,99 @@ export class LadderDiagramComponent implements OnInit {
           .attr('transform', d => `translate(${width},${d.location.endY + channelSpacing})`)
           .call(updateRowChannel);
 
-        function buildRowChannel(rowChannelEnter: Selection<SVGGElement, {location: any, channel: RowChannel, row: Row}, any, any>, type: "input" | "output") {
+        function buildRowChannel(rowChannelEnter: Selection<BaseType, {type: 'input' | 'output', location: any, channel: RowChannel | TransformerChannel, row: Row, mousedownHandler?: {callback:() => any, timeout: any}}, any, any>, type: "input" | "output") {
           rowChannelEnter
-            .classed(`row-channel row-${type}-channel`, true);
+            .classed(`row-channel row-${type}-channel`, true)
+            .classed('grabbable', true)
+            .on('mouseup', (d, i) => {
+              d3.event.stopPropagation();
+              function selectChannel(channel: RowChannel) {
+                component.selectionService.selection.next(channel);
+                // If the channel name is empty, or the same as the default name, then delete the RowChannel
+                component.selectionService.selection.skip(1).first().subscribe(() => {
+                  const channelName = channel.name.getValue();
+                  if (d.type === 'input') {
+                    if (!channelName || channelName === d.row.transformers.getValue().first().inputChannels.get(i).name) {
+                      d.row.removeInputChannelOverride(i);
+                    }
+                  } else {
+                    if (!channelName || channelName === d.row.transformers.getValue().last().outputChannels.get(i).name) {
+                      d.row.removeOutputChannelOverride(i);
+                    }
+                  }
+                });
+              }
+              function updateChannel(channel: RowChannel, row: Row, channelNumber: number, type: 'input' | 'output') {
+                if (type === 'input') {
+                  row.addInputChannelOverride(channelNumber, channel);
+                } else {
+                  row.addOutputChannelOverride(channelNumber, channel);
+                }
+              }
+
+              if (d.mousedownHandler) {
+                clearTimeout(d.mousedownHandler.timeout);
+                if (d.channel instanceof RowChannel) {
+                  selectChannel(d.channel);
+                } else {
+                  const channel = new RowChannelBuilder().Name(d.channel.name).build();
+                  updateChannel(channel, d.row, i, d.type);
+                  selectChannel(channel);
+                }
+                d.mousedownHandler = undefined;
+              } else {
+                const dragged = component.dragService.dragging.getValue();
+                if (dragged && dragged.object instanceof RowChannel) {
+                  const draggedChannel = dragged.object;
+                  component.dragService.stopDrag();
+                  updateChannel(draggedChannel, d.row, i, d.type);
+                  selectChannel(draggedChannel);
+                }
+              }
+            })
+            .on('mouseleave', function(d) {
+              if (d.mousedownHandler) {
+                clearTimeout(d.mousedownHandler.timeout);
+                d.mousedownHandler.callback();
+              }
+            })
+            .on('mousedown', function(d) {
+              const channel = d.channel instanceof RowChannel ? d.channel.clone() : new RowChannelBuilder().Name(d.channel.name).build();
+              const mousedownCallback = () => {
+                d.mousedownHandler = undefined;
+                component.dragService.startDrag({sourceElement: this as SVGGElement, object: channel});
+              };
+              d.mousedownHandler = {
+                callback: mousedownCallback,
+                timeout: setTimeout(mousedownCallback, 250)
+              };
+              d3.event.preventDefault();
+            });
+
+          rowChannelEnter.append('rect')
+            .attr('width', 300)
+            .attr('height', channelSpacing)
+            .attr('transform', `translate(${type === 'input' ? -290 : -10}, ${-channelSpacing/2})`)
+            .attr('fill', 'rgba(0,0,0,0)')
+            .attr('stroke', 'none');
 
           rowChannelEnter.append('circle')
             .classed('channel-circle', true)
             .attr('r', 8)
             .attr('stroke', 'black')
-            .attr('stroke-width', '2')
-            .on('mouseup', (d, i) => {
-              const dragged = component.dragService.dragging.getValue();
-                if (dragged && dragged.object instanceof RowChannel) {
-                  component.dragService.stopDrag();
-                  d3.event.stopPropagation();
-                  if (type === 'input') {
-                    d.row.inputChannelOverrides.next(d.row.inputChannelOverrides.getValue().set(i, dragged.object));
-                  } else {
-                    d.row.outputChannelOverrides.next(d.row.outputChannelOverrides.getValue().set(i, dragged.object));
-                  }
-                }
-              })
-              .on('mouseleave', (d, i) => {
-                const dragging = component.dragService.dragging.getValue();
-                if (dragging && d.channel === dragging.object) {
-                  if (type === 'input') {
-                    d.row.inputChannelOverrides.next(d.row.inputChannelOverrides.getValue().remove(i));
-                  } else {
-                    d.row.outputChannelOverrides.next(d.row.outputChannelOverrides.getValue().remove(i));
-                  }
-                }
-              })
-              .on('mousedown', function(d) {
-                if (d.channel instanceof RowChannel) {
-                  component.dragService.startDrag({sourceElement: (this as SVGCircleElement).parentNode as SVGGElement, object: d.channel});
-                  d3.event.preventDefault();
-                }
-              });
+            .attr('stroke-width', '2');
 
           rowChannelEnter.append('text')
             .classed('channel-name', true)
+            .classed('unselectable', true)
             .attr('text-anchor', type === "input" ? "end": "start")
             .attr('dx', type === "input" ? -12: 12)
             .attr('dy', "0.3em")
         }
 
-        function updateRowChannel(rowChannelUpdate: Selection<SVGGElement, {location: any, channel: RowChannel, row: Row}, any, any>) {
-          rowChannelUpdate
-            .classed('placeholder-channel', d => d.channel instanceof TransformerChannel);
-
+        function updateRowChannel(rowChannelUpdate: Selection<BaseType, {type: 'input' | 'output', location: any, channel: RowChannel | TransformerChannel, row: Row}, any, any>) {
           rowChannelUpdate.select('.channel-name')
             .text(d => d.channel.toJson().name);
-
-          rowChannelUpdate.select('.channel-circle')
-            .attr('classed', d => d.channel instanceof TransformerChannel ? 'placeholder' : null)
-            .classed('grabbable', d => d.channel instanceof RowChannel)
         }
 
         const transformersEnter = rowEnter.append('g')
@@ -268,8 +303,6 @@ export class LadderDiagramComponent implements OnInit {
             const dragging = component.dragService.dragging.getValue();
             if (dragging && d.transformer === dragging.object) {
               d.row.removeTransformer(d.transformer);
-              // When we remove the analytic, remove the channel names for the analytic from the Channel Component if they are not used
-              component.dataService.removeAnalyticChannelsFromChannelsPanel(d.transformer);
               if (d.row.transformers.getValue().size === 0) {
                 component.dataService.hierarchy.getValue().removeRow(d.row);
               }
@@ -407,7 +440,6 @@ export class LadderDiagramComponent implements OnInit {
                 d.row.transformers.next(d.row.transformers.getValue().insert(i, dragging.object));
                 this.dragService.stopDrag();
                 d3.event.stopPropagation();
-                component.dataService.addAnalyticChannelsToChannelsPanel(dragging.object);
               }
             }
           });

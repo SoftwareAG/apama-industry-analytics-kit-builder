@@ -1,4 +1,4 @@
-<h4 class="unselectable">{{propertiesType}} Properties <span class="analytic-name" *ngIf="analyticName">({{analyticName}})</span></h4>
+<h4 class="unselectable pb-2">{{propertiesType}} Properties <span class="analytic-name" *ngIf="name">({{name | async}})</span></h4>
 <ng-container [ngSwitch]="propertiesType">
   <transformer-property-selector class="d-flex flex-column" *ngSwitchCase="'Analytic'"></transformer-property-selector>
   <channel-property-selector class="d-flex flex-column" *ngSwitchCase="'Channel'"></channel-property-selector>

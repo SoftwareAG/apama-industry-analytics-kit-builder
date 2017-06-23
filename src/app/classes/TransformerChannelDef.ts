@@ -8,7 +8,7 @@ export interface TransformerChannelDefJsonInterface {
   repeated?: boolean;
   optional?: boolean;
   prefix?: string;
-  dataProperties?: Array<string>;
+  dataProperties?: string[];
 }
 
 export interface TransformerChannelDefInterface {
@@ -17,7 +17,7 @@ export interface TransformerChannelDefInterface {
   repeated: boolean;
   optional: boolean;
   prefix: string;
-  dataProperties: List<string>;
+  dataProperties: string[];
 }
 
 export class TransformerChannelDef extends AbstractModel<TransformerChannelDefJsonInterface, never> {
@@ -29,13 +29,13 @@ export class TransformerChannelDef extends AbstractModel<TransformerChannelDefJs
   readonly dataProperties: List<string>;
   readonly type: "string" | "boolean" | "number" | undefined;
 
-  constructor(obj: TransformerChannelDefJsonInterface) {
+  constructor(obj: TransformerChannelDefInterface) {
     super();
     this.name = obj.name;
     this.description = obj.description;
-    this.repeated = !!obj.repeated;
-    this.optional = !!obj.optional;
-    this.prefix = obj.prefix || "";
+    this.repeated = obj.repeated;
+    this.optional = obj.optional;
+    this.prefix = obj.prefix;
     this.dataProperties = List(obj.dataProperties || []);
   }
 
@@ -49,13 +49,13 @@ export class TransformerChannelDef extends AbstractModel<TransformerChannelDefJs
   }
 }
 
-export class TransformerChannelDefBuilder extends ClassBuilder<TransformerChannelDef> implements TransformerChannelDefJsonInterface {
+export class TransformerChannelDefBuilder extends ClassBuilder<TransformerChannelDef> implements TransformerChannelDefInterface {
   name: string;
   description: string;
   repeated: boolean = false;
   optional: boolean = false;
   prefix: string = "";
-  dataProperties: Array<string> = [];
+  dataProperties: string[] = [];
 
   Name(name: string): this {
     this.name = name;

@@ -39,7 +39,6 @@ export class NavBarComponent {
       .build();
     this.dataService.hierarchy.next(config);
     this.selectionService.selection.next(undefined);
-    this.dataService.channels.next(List<RowChannel>());
   }
 
   newConfig() {
@@ -114,7 +113,6 @@ export class NavBarComponent {
       .then(result => result.fileContent)
       .then(jsonStr => JSON.parse(jsonStr))
       .then(json => this.metadataService.loadMetadata(json))
-      .then(() => this.dataService.channels.next(List<RowChannel>()));
   }
 
   isSelectedVersion(version) {

@@ -30,6 +30,10 @@ export class RowChannel extends AbstractModel<ChannelJsonInterface, never> imple
     if (validate.isEmpty(this.name.getValue())) { throw new Error('Name cannot be empty'); }
     return this;
   }
+
+  clone(): RowChannel {
+    return RowChannelBuilder.fromJson(this.toJson()).build();
+  }
 }
 
 export class RowChannelBuilder extends ClassBuilder<RowChannel> implements ChannelInterface {

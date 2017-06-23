@@ -1,7 +1,7 @@
 import {Component, ElementRef, HostListener, OnInit} from "@angular/core";
 import {AbstractDragService, Dragged} from "../../services/AbstractDragService";
 import * as d3 from "d3";
-import {AbstractDataService} from "../../services/AbstractDataService";
+import {SelectionService} from "../../services/SelectionService";
 
 @Component({
   templateUrl: './drag-overlay.component.html',
@@ -16,7 +16,7 @@ export class DragOverlayComponent implements OnInit {
 
   private currentTransition = null;
 
-  constructor(myElement: ElementRef, private readonly dragService: AbstractDragService, private dataService: AbstractDataService) {
+  constructor(myElement: ElementRef, private readonly dragService: AbstractDragService, private selectionService: SelectionService) {
     this.nativeElement = myElement.nativeElement;
   }
 
@@ -60,7 +60,6 @@ export class DragOverlayComponent implements OnInit {
         overlay.select('.draggable')
           .attr('transform', `translate(${currentLocation.x},${currentLocation.y})`);
       });
-
   }
 
   @HostListener('document:mousemove', ['$event'])
@@ -78,7 +77,9 @@ export class DragOverlayComponent implements OnInit {
       .transition("Dropped").duration(500)
         .attr('transform', (d: Dragged) => `translate(${d.getStartLocation().x},${d.getStartLocation().y})`)
         .attr('opacity', 0);
+    if (this.dragService.isDragging()) {
+      this.selectionService.selection.next(undefined);
+    }
     this.dragService.stopDrag();
-
   }
 }

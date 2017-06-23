@@ -1,16 +1,14 @@
 import {Injectable} from "@angular/core";
 import {Transformer} from "./Transformer";
-import {AbstractDataService} from "../services/AbstractDataService";
 import {Row, RowBuilder} from "./Row";
 import {List, Map} from "immutable";
 import {IgnoreableDeserializationError} from "./Errors";
-import {DataService} from "../services/DataService";
 import {TransformerDeserializer} from "./TransformerDeserializer";
 
 @Injectable()
 export class RowDeserializer {
 
-  constructor(private readonly transformerDeserializer: TransformerDeserializer, private dataService: AbstractDataService) {}
+  constructor(private readonly transformerDeserializer: TransformerDeserializer) {}
 
   buildRow(analyticLines: List<string>): Row {
     const analytics = analyticLines.map((analyticLine:string) => this.transformerDeserializer.buildAnalytic(analyticLine)) as List<{analytic: Transformer, inChannels: Map<number, string>, outChannels: Map<number, string>}>;
@@ -25,15 +23,19 @@ export class RowDeserializer {
   }
 
   private addRowChannels(rowBuilder: RowBuilder, rowChannels: List<{analytic: Transformer, inChannels: Map<number, string>, outChannels: Map<number, string>}>) {
-    rowChannels.first().inChannels.forEach((chanName: string, i: number) => {
-      rowBuilder.withInputChannel(i).Name(chanName).endWith();
-      // Add the channels to the Channel Selector Component
-      (this.dataService as DataService).addChannel(chanName);
+    const first = rowChannels.first();
+    const last = rowChannels.last();
+    first.inChannels.forEach((chanName: string, i: number) => {
+      // Only add the channel if it does not have the default name
+      if (first.analytic.inputChannels.get(i).name !== chanName) {
+        rowBuilder.withInputChannel(i).Name(chanName).endWith();
+      }
     });
-    rowChannels.last().outChannels.forEach((chanName: string, i: number) => {
-      rowBuilder.withOutputChannel(i).Name(chanName).endWith();
-      // Add the channels to the Channel Selector Component
-      (this.dataService as DataService).addChannel(chanName);
+    last.outChannels.forEach((chanName: string, i: number) => {
+      // Only add the channel if it does not have the default name
+      if (last.analytic.outputChannels.get(i).name !== chanName) {
+        rowBuilder.withOutputChannel(i).Name(chanName).endWith();
+      }
     });
   }
 

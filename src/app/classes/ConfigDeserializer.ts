@@ -69,8 +69,6 @@ export class ConfigDeserializer {
       }
     });
 
-    (this.dataService as DataService).clearChannels();
-
     const rows = _.flatMap(groupedLines.rowAnalyticLines, analyticLines => {
       try {
         if (analyticLines.length === 0 ) {

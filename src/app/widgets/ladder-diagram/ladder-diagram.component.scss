@@ -22,13 +22,6 @@ $transformer-color: saturate($brand-primary, 20%);
   }
 
   .row-channel {
-    &.placeholder-channel {
-      .channel-circle {
-        stroke: $black;
-        stroke-dasharray: 2,2;
-        fill: $white;
-      }
-    }
 
     .channel-circle {
       stroke: $black;

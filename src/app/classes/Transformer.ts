@@ -355,7 +355,7 @@ export class TransformerSerializer {
         if (row.inputChannelOverrides.getValue().has(channelIndex)) {
           return channelDef.prefix + row.inputChannelOverrides.getValue().get(channelIndex).name.getValue();
         } else {
-          return `${channelDef.prefix}Row${rowIndex}:Input${channelIndex}`;
+          return `${channelDef.prefix}${channelDef.name}`;
         }
       } else {
         return `${channelDef.prefix}Row${rowIndex}:Channel${transformerIndex}.${channelIndex}`
@@ -373,7 +373,7 @@ export class TransformerSerializer {
         if (row.outputChannelOverrides.getValue().has(channelIndex)) {
           return channelDef.prefix + row.outputChannelOverrides.getValue().get(channelIndex).name.getValue();
         } else {
-          return `${channelDef.prefix}Row${rowIndex}:Output${channelIndex}`;
+          return `${channelDef.prefix}${channelDef.name}`;
         }
       } else {
         return `${channelDef.prefix}Row${rowIndex}:Channel${transformerIndex+1}.${channelIndex}`

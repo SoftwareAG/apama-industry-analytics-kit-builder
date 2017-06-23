@@ -78,6 +78,22 @@ export class Row extends AbstractModel<RowJsonInterface, never> implements AsObs
   removeTransformer(transformer: Transformer) {
     this.transformers.next(List<Transformer>(this.transformers.getValue().filter(t => t !== transformer)))
   }
+
+  addInputChannelOverride(i: number, rowChannel: RowChannel) {
+    this.inputChannelOverrides.next(this.inputChannelOverrides.getValue().set(i, rowChannel));
+  }
+
+  addOutputChannelOverride(i: number, rowChannel: RowChannel) {
+    this.outputChannelOverrides.next(this.outputChannelOverrides.getValue().set(i, rowChannel));
+  }
+
+  removeInputChannelOverride(i: number) {
+    this.inputChannelOverrides.next(this.inputChannelOverrides.getValue().remove(i));
+  }
+
+  removeOutputChannelOverride(i: number) {
+    this.outputChannelOverrides.next(this.outputChannelOverrides.getValue().remove(i));
+  }
 }
 
 export class RowBuilder extends ClassBuilder<Row> implements RowInterface {
