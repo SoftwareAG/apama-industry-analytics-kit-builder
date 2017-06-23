@@ -122,14 +122,18 @@ export class LadderDiagramComponent implements OnInit {
           return createChannelConnections(d.row).map((channelGroup, i, channelConnections) => { return { row: d.row, channelGroup:channelGroup, channelWidth: d.channelWidth } })
         });
 
-        const channelGroups = channelsUpdate.selectAll('.channel-group').data(d => d);
-        channelGroups.exit().remove();
-        const channelGroupsEnter = channelGroups.enter().append('g')
+        const channelGroupsEnter = channelsEnter.append('g')
+          .classed('channel-groups', true);
+        const channelGroupsUpdate = channelsUpdate.select('.channel-groups');
+
+        const channelGroup = channelGroupsUpdate.selectAll('.channel-group').data(d => d);
+        channelGroup.exit().remove();
+        const channelGroupEnter = channelGroup.enter().append('g')
           .classed('channel-group', true);
-        const channelGroupsUpdate = channelGroupsEnter.merge(channelGroups)
+        const channelGroupUpdate = channelGroupEnter.merge(channelGroup)
           .attr('transform', (d, i, channelGroupsSelection) => `translate(${channelX(i, d.channelWidth)}, 0)`);
 
-        const channelPath = channelGroupsUpdate.selectAll('.channel-path').data((d, i) => {
+        const channelPath = channelGroupUpdate.selectAll('.channel-path').data((d, i) => {
           const channelWidth = d.channelWidth;
           return d.channelGroup.map(d => { return { channelWidth: channelWidth, channelConnection: d }})
         });
@@ -143,7 +147,11 @@ export class LadderDiagramComponent implements OnInit {
           .attr('stroke', 'black')
           .attr('stroke-width', 2);
 
-        const rowInputChannel = channelsUpdate.selectAll('.row-input-channel').data(d => {
+        const rowChannelsEnter = channelsEnter.append('g')
+          .classed('row-channels', true);
+        const rowChannelsUpdate = channelsUpdate.select('.row-channels');
+
+        const rowInputChannel = rowChannelsUpdate.selectAll('.row-input-channel').data(d => {
           const rowInputChannels = d[0];
           if (!rowInputChannels) { return [] }
           const rowChannels = rowInputChannels.row.getInChannels(component.metadataService.metadata.getValue());
@@ -156,7 +164,7 @@ export class LadderDiagramComponent implements OnInit {
           .attr('transform', d => `translate(0,${d.location.startY + channelSpacing})`)
           .call(updateRowChannel);
 
-        const rowOutputChannel = channelsUpdate.selectAll('.row-output-channel').data(d => {
+        const rowOutputChannel = rowChannelsUpdate.selectAll('.row-output-channel').data(d => {
           if (!d.length) { return [] }
           const rowOutputChannels = d[d.length -1];
           const rowChannels = rowOutputChannels.row.getOutChannels(component.metadataService.metadata.getValue());
