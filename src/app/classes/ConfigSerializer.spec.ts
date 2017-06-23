@@ -47,7 +47,7 @@ describe('ConfigSerializer', () => {
 
   it('should handle an empty Config', () => {
     const result = configSerializer.toApama(testMetadata, new ConfigBuilder().build());
-    expect(result).toBe('\\\\ Version: 2.0.0.0\n')
+    expect(result).toBe('\/\/ Version: 2.0.0.0\n')
   });
 
   it('should correctly serialize name, description, and version', () => {
@@ -57,9 +57,9 @@ describe('ConfigSerializer', () => {
         .MetadataVersion(testMetadata.version).build()
       );
 
-      const names = TestUtils.findAll(/(\\\\ Name:\s)(.*)/g, result).map(match => match[1]);
-      const descriptions = TestUtils.findAll(/(\\\\ Description:\s)(.*)/g, result).map(match => match[1]);
-      const version = TestUtils.findAll(/(\\\\ Version:\s)(.*)/g, result).map(match => match[1]);
+      const names = TestUtils.findAll(/(\/\/ Name:\s)(.*)/g, result).map(match => match[1]);
+      const descriptions = TestUtils.findAll(/(\/\/ Description:\s)(.*)/g, result).map(match => match[1]);
+      const version = TestUtils.findAll(/(\/\/ Version:\s)(.*)/g, result).map(match => match[1]);
       expect(names).toEqual(["A config"]);
       expect(descriptions).toEqual(["Some text here"]);
       expect(version).toEqual([testMetadata.version]);
@@ -85,13 +85,13 @@ describe('ConfigSerializer', () => {
 
         const result: string = configSerializer.toApama(testMetadata, configBuilder.build());
 
-        const rowLines = result.split('\n').filter((line) => line.startsWith("\\\\ Row") || line.match(/([\.\w]*Analytic\()(.*)\)/));
+        const rowLines = result.split('\n').filter((line) => line.startsWith("\/\/ Row") || line.match(/([\.\w]*Analytic\()(.*)\)/));
         // once filtered the array should contain a row label followed by 2 analytic definitions
         const chunkedRows = _.chunk(rowLines, 3);
         expect(chunkedRows).toBeArrayOfSize(i);
         chunkedRows.forEach((rowLines, z)=> {
           expect(rowLines).toBeArrayOfSize(3);
-          expect((rowLines[0].match(/(\\\\ Row:\s)(.*)/) as RegExpMatchArray)[2]).toEqual(z.toString());
+          expect((rowLines[0].match(/(\/\/ Row:\s)(.*)/) as RegExpMatchArray)[2]).toEqual(z.toString());
           expect((rowLines[1].match(/([\.\w]*Analytic\()(.*)\)/) as RegExpMatchArray)[2]).toEqual(`"Analytic1",["Input Channel 1"],["Row${z}:Channel1.0"],{}`);
           expect((rowLines[2].match(/([\.\w]*Analytic\()(.*)\)/) as RegExpMatchArray)[2]).toEqual(`"Analytic2",["Row${z}:Channel1.0"],["Output Channel 1"],{}`);
         })

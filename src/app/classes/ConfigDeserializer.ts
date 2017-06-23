@@ -9,8 +9,10 @@ import {DataService} from "../services/DataService";
 
 @Injectable()
 export class ConfigDeserializer {
-  readonly commentPattern = /^\s*\\\\/;
-  readonly markerCommentPattern =/^\\\\\s*([^:]*)\s*:\s*(.*)\s*$/;
+
+  // Handles back slash and forward slash comments
+  readonly commentPattern = /^\s*(?:\/\/|\\\\)/;
+  readonly markerCommentPattern =/^(?:\/\/|\\\\)\s*([^:]*)\s*:\s*(.*)\s*$/;
   readonly analyticPattern = /^com.industry.analytics.Analytic/;
 
   constructor(private readonly rowDeserializer: RowDeserializer, private dataService: AbstractDataService) {}

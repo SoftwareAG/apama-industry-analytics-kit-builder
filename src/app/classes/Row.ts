@@ -168,7 +168,7 @@ export class RowSerializer {
       return "";
     }
 
-    return `\\\\ Row: ${rowIndex}\n` +
+    return `// Row: ${rowIndex}\n` +
       row.transformers.getValue().map((transformer: Transformer, transformerIndex: number) => this.transformerSerializer.toApama(transformer, metadata.getAnalytic(transformer.name), transformerIndex, row, rowIndex))
         .join('\n');
   }

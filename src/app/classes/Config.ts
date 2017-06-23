@@ -133,9 +133,9 @@ export class ConfigSerializer {
 
   toApama(metadata: Metadata, config: Config) {
     return "" +
-      (config.name.getValue()  ? `\\\\ Name: ${config.name.getValue()}\n` : '') +
-      (config.description.getValue()  ? `\\\\ Description: ${config.description.getValue()}\n` : '') +
-      `\\\\ Version: ${config.metadataVersion}\n` +
+      (config.name.getValue()  ? `// Name: ${config.name.getValue()}\n` : '') +
+      (config.description.getValue()  ? `// Description: ${config.description.getValue()}\n` : '') +
+      `// Version: ${config.metadataVersion}\n` +
       config.rows.getValue().map((row: Row, i: number) => this.rowSerializer.toApama(metadata, row, i)).join('\n\n');
   }
 }

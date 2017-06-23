@@ -65,7 +65,7 @@ describe('RowSerializer', () => {
         .build(),
       0);
 
-    const rows = TestUtils.findAll(/(\\\\ Row:\s)(.*)/g, result).map(match => match[1]);
+    const rows = TestUtils.findAll(/(\/\/ Row:\s)(.*)/g, result).map(match => match[1]);
     expect(rows).toEqual(["0"]);
 
     const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
@@ -82,7 +82,7 @@ describe('RowSerializer', () => {
         .build(),
       0);
 
-    const rows = TestUtils.findAll(/(\\\\ Row:\s)(.*)/g, result).map(match => match[1]);
+    const rows = TestUtils.findAll(/(\/\/ Row:\s)(.*)/g, result).map(match => match[1]);
     expect(rows).toEqual(["0"]);
 
     const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
@@ -103,7 +103,7 @@ describe('RowSerializer', () => {
         .build(),
       0);
 
-    const rows = TestUtils.findAll(/(\\\\ Row:\s)(.*)/g, result).map(match => match[1]);
+    const rows = TestUtils.findAll(/(\/\/ Row:\s)(.*)/g, result).map(match => match[1]);
     expect(rows).toEqual(["0"]);
 
     const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
@@ -122,7 +122,7 @@ describe('RowSerializer', () => {
         .build(),
       0);
 
-    const rows = TestUtils.findAll(/(\\\\ Row:\s)(.*)/g, result).map(match => match[1]);
+    const rows = TestUtils.findAll(/(\/\/ Row:\s)(.*)/g, result).map(match => match[1]);
     expect(rows).toEqual(["0"]);
 
     const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
@@ -145,7 +145,7 @@ describe('RowSerializer', () => {
             .build(),
           0);
 
-        const rows = TestUtils.findAll(/(\\\\ Row:\s)(.*)/g, result).map(match => match[1]);
+        const rows = TestUtils.findAll(/(\/\/ Row:\s)(.*)/g, result).map(match => match[1]);
         expect(rows).toEqual(["0"]);
 
         const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
