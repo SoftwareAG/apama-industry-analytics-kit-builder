@@ -365,6 +365,7 @@
                     "description": "The time window (in seconds) that moving average is calculated on",
                     "name": "timeWindow",
                     "type": "decimal",
+                    "optional": true,
                     "validator": "function(value) { return value > 0 || 'Value must be greater than 0' }"
                 },
                 {
@@ -373,6 +374,7 @@
                     "description": "Sets the width of the Nominal Range in STDDEV",
                     "name": "standardDeviationMultiple",
                     "type": "decimal",
+                    "optional": true,
                     "validator": "function(value) { return value > 0 || 'Value must be greater than 0' }"
                 },
                 {
@@ -380,6 +382,7 @@
                     "defaultValue": false,
                     "description": "Enables/Disables the verbose mode so that computed values are generated as well as anomaly values.",
                     "name": "verbose",
+                    "optional": true,
                     "type": "boolean"
                 }
             ]
