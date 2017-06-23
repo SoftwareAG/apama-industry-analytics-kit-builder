@@ -43,8 +43,8 @@ describe('TransformerSerializer', () => {
           expect(inputChannels).toEqual(['']);
           expect(outputChannels).toEqual(['']);
         } else {
-          expect(inputChannels).toEqual(new Array(i).fill(undefined).map((value, z) => `"Row0:Input${z}"`));
-          expect(outputChannels).toEqual(new Array(i).fill(undefined).map((value, z) => `"Row0:Output${z}"`));
+          expect(inputChannels).toEqual(new Array(i).fill(undefined).map((value, z) => `"InChannel${z+1}"`));
+          expect(outputChannels).toEqual(new Array(i).fill(undefined).map((value, z) => `"OutChannel${z+1}"`));
         }
       })
     }
@@ -90,16 +90,16 @@ describe('TransformerSerializer', () => {
       const result = transformerSerializer.toApama(row.transformers.getValue().first(), transformerDef, 0, row, 0);
       const [, inChan1, inChan2, inChan3] = result.match(inputChannelPattern) as RegExpMatchArray;
       expect(inChan1).toEqual("TestInputPrefix1:OverriddenInput");
-      expect(inChan2).toEqual("TestInputPrefix2:Row0:Input1");
-      expect(inChan3).toEqual("Row0:Input2");
+      expect(inChan2).toEqual("TestInputPrefix2:InChan2");
+      expect(inChan3).toEqual("InChan3");
     });
 
     it("row output channels", () => {
       const result = transformerSerializer.toApama(row.transformers.getValue().last(), transformerDef, 1, row, 0);
       const [, outChan1, outChan2, outChan3] = result.match(outputChannelPattern) as RegExpMatchArray;
       expect(outChan1).toEqual("TestOutputPrefix1:OverriddenOutput");
-      expect(outChan2).toEqual("TestOutputPrefix2:Row0:Output1");
-      expect(outChan3).toEqual("Row0:Output2");
+      expect(outChan2).toEqual("TestOutputPrefix2:OutChan2");
+      expect(outChan3).toEqual("OutChan3");
     });
   })
 

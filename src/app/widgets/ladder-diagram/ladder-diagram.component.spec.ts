@@ -12,13 +12,10 @@ import {TestUtils} from "../../services/TestUtil.spec";
 import {AbstractMetadataService, MetadataService} from "../../services/MetadataService";
 import {Metadata, MetadataBuilder} from "../../classes/Metadata";
 import {TransformerChannel} from "../../classes/TransformerChannel";
-import {Transformer} from "../../classes/Transformer";
+import {SelectionService} from "../../services/SelectionService";
 
 @Injectable()
 class DataServiceMock extends AbstractDataService {
-  addAnalyticChannelsToChannelsPanel(transformer: Transformer) {};
-  removeAnalyticChannelsFromChannelsPanel(transformer: Transformer) {};
-  addChannel(channelName: string) {};
   setModified(modifiedValue: boolean) {};
   isModified(): boolean { return false};
 }
@@ -70,6 +67,7 @@ describe('LadderDiagramComponent', () => {
         {provide: AbstractDataService, useClass: DataServiceMock},
         {provide: AbstractDragService, useClass: DragService},
         {provide: AbstractMetadataService, useClass: MetadataService},
+        SelectionService
       ]
     })
     .compileComponents();
@@ -218,8 +216,8 @@ describe('LadderDiagramComponent', () => {
           .withRow()
             .MaxTransformerCount(4)
             .pushTransformer(metadata.createAnalytic("Analytic1"))
-            .withInputChannel(i).Name('UserIn').endWith()
-            .withOutputChannel(i).Name('UserOut').endWith()
+            .withInputChannel(i).Name(`UserIn${i}`).endWith()
+            .withOutputChannel(i).Name(`UserOut${i}`).endWith()
             .endWith()
           .build();
 
@@ -230,15 +228,13 @@ describe('LadderDiagramComponent', () => {
         const inChannels = Array.from(el.querySelectorAll('.row-input-channel'));
         expect(inChannels).toBeArrayOfSize(5);
         inChannels.forEach((inChannel, z) => {
-          expect(d3.select(inChannel).classed('placeholder-channel')).toEqual(z != i);
-          expect(inChannel.querySelectorAll('text')[0].textContent).toEqual(z == i ? 'UserIn' : `InChannel${z}`);
+          expect(inChannel.querySelectorAll('text')[0].textContent).toEqual(z == i ? `UserIn${z}` : `InChannel${z}`);
         });
 
         const outChannels = Array.from(el.querySelectorAll('.row-output-channel'));
         expect(outChannels).toBeArrayOfSize(5);
         outChannels.forEach((outChannel, z) => {
-          expect(d3.select(outChannel).classed('placeholder-channel')).toEqual(z != i);
-          expect(outChannel.querySelectorAll('text')[0].textContent).toEqual(z == i ? 'UserOut' : `OutChannel${z}`);
+          expect(outChannel.querySelectorAll('text')[0].textContent).toEqual(z == i ? `UserOut${z}` : `OutChannel${z}`);
         });
       });
     }
@@ -296,7 +292,6 @@ describe('LadderDiagramComponent', () => {
 
     expect(Array.from(row0.querySelectorAll('.row-input-channel'))).toBeArrayOfSize(1);
     expect(Array.from(row0.querySelectorAll('.row-output-channel'))).toBeArrayOfSize(1);
-    expect(Array.from(row0.querySelectorAll('.placeholder-channel'))).toBeArrayOfSize(0);
 
     const row1 = rows[1];
     const row1transformers = Array.from(row1.querySelectorAll('.transformers > .transformer'));
@@ -306,8 +301,6 @@ describe('LadderDiagramComponent', () => {
 
     expect(Array.from(row1.querySelectorAll('.row-input-channel'))).toBeArrayOfSize(3);
     expect(Array.from(row1.querySelectorAll('.row-output-channel'))).toBeArrayOfSize(1);
-    expect(Array.from(row1.querySelectorAll('.row-input-channel.placeholder-channel'))).toBeArrayOfSize(2);
-    expect(Array.from(row1.querySelectorAll('.row-output-channel.placeholder-channel'))).toBeArrayOfSize(1);
   });
 
 
@@ -343,15 +336,11 @@ describe('LadderDiagramComponent', () => {
 
     const inChannels = Array.from(el.querySelectorAll('.row-input-channel'));
     expect(inChannels).toBeArrayOfSize(2);
-    expect(d3.select(inChannels[0]).classed('placeholder-channel')).toBeFalse();
-    expect(d3.select(inChannels[1]).classed('placeholder-channel')).toBeTrue();
     expect(inChannels[0].querySelectorAll('text')[0].textContent).toEqual(`OverriddenInput`);
     expect(inChannels[1].querySelectorAll('text')[0].textContent).toEqual(`Analytic5:In2`);
 
     const outChannels = Array.from(el.querySelectorAll('.row-output-channel'));
     expect(outChannels).toBeArrayOfSize(2);
-    expect(d3.select(outChannels[0]).classed('placeholder-channel')).toBeFalse();
-    expect(d3.select(outChannels[1]).classed('placeholder-channel')).toBeTrue();
     expect(outChannels[0].querySelectorAll('text')[0].textContent).toEqual(`OverriddenOutput`);
     expect(outChannels[1].querySelectorAll('text')[0].textContent).toEqual(`Analytic5:Out2`);
 

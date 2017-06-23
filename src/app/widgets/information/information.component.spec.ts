@@ -4,6 +4,7 @@ import { InformationComponent } from './information.component';
 import {AbstractDataService} from "../../services/AbstractDataService";
 import {DataService} from "../../services/DataService";
 import {AbstractMetadataService, MetadataService} from "../../services/MetadataService";
+import {SelectionService} from "../../services/SelectionService";
 
 describe('InformationComponent', () => {
   let component: InformationComponent;
@@ -13,7 +14,7 @@ describe('InformationComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ InformationComponent ],
       providers:  [
-        {provide: AbstractDataService, useClass: DataService},
+        SelectionService,
         {provide: AbstractMetadataService, useClass: MetadataService}
       ]
     })
