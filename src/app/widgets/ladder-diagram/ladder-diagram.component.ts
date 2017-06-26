@@ -469,18 +469,18 @@ export class LadderDiagramComponent implements OnInit {
             }
           });
 
-        rowPlaceholder.attr('transform', () => {
-          const rowNodes = rowUpdate.nodes() as SVGGraphicsElement[];
-          const lastRowNode = rowNodes[rowNodes.length - 1];
-          if (lastRowNode) {
-            const sizeAndPos = getSizeAndPos(lastRowNode);
-            return `translate(0, ${sizeAndPos.y + sizeAndPos.height + rowSpacing})`;
-          } else {
-            return 'translate(0,0)';
-          }
-        });
-
-        rowPlaceholder.attr('display', () => component.dragService.isDraggingClass(Transformer) || !component.dataService.hierarchy.getValue().rows.getValue().size ? null : 'none');
+        rowPlaceholder
+          .attr('transform', () => {
+            const rowNodes = rowUpdate.nodes() as SVGGraphicsElement[];
+            const lastRowNode = rowNodes[rowNodes.length - 1];
+            if (lastRowNode) {
+              const sizeAndPos = getSizeAndPos(lastRowNode);
+              return `translate(0, ${sizeAndPos.y + sizeAndPos.height + rowSpacing})`;
+            } else {
+              return 'translate(0,0)';
+            }
+          })
+          .attr('display', () => component.dragService.isDraggingClass(Transformer) || !component.dataService.hierarchy.getValue().rows.getValue().size ? null : 'none');
 
         // Get the full size
         const rowsBB = getSizeAndPos(rows.node() as SVGGraphicsElement);
