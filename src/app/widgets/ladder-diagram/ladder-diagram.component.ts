@@ -480,6 +480,8 @@ export class LadderDiagramComponent implements OnInit {
           }
         });
 
+        rowPlaceholder.attr('display', () => component.dragService.isDraggingClass(Transformer) || !component.dataService.hierarchy.getValue().rows.getValue().size ? null : 'none');
+
         // Get the full size
         const rowsBB = getSizeAndPos(rows.node() as SVGGraphicsElement);
         const finalHeight = rowsBB.height;
