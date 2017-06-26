@@ -20,6 +20,13 @@ $transformer-color: saturate($brand-primary, 20%);
       fill: black;
     }
   }
+
+  .grabbable {
+    cursor: move;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+    cursor: grab;
+  }
 }
 
 .card-img-top {

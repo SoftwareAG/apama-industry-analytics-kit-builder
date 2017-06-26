@@ -33,6 +33,7 @@ export class TransformerDefinitionComponent implements OnInit {
 
     const transformer = svg.append('g')
       .classed('transformer', true)
+      .classed('grabbable', true)
       .attr('transform', `translate(${
         padding},${padding})`)
       .on('mousedown', function() {
