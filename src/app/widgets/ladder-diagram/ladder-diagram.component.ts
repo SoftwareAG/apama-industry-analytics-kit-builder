@@ -335,7 +335,7 @@ export class LadderDiagramComponent implements OnInit {
           .on('mousedown', function(d) {
             const mousedownCallback = () => {
               d.mousedownHandler = undefined;
-              component.dragService.startDrag({sourceElement: this as SVGGraphicsElement, object: d.transformer});
+              component.dragService.startDrag({sourceElement: this as SVGGraphicsElement, object: d.transformer, offset: {x: -transformerWidth/2, y: -channelSpacing}});
             };
             d.mousedownHandler = {
               callback: mousedownCallback,

@@ -11,10 +11,12 @@ export class Dragged implements Draggable {
   readonly sourceElement: SVGGraphicsElement;
   readonly object: RowChannel | Transformer;
   readonly currentLocation: BehaviorSubject<Point>;
+  readonly offset: Point;
 
   constructor(draggable: Draggable) {
     this.sourceElement = draggable.sourceElement;
     this.object = draggable.object;
+    this.offset = draggable.offset || {x: 0, y: 0};
     this.currentLocation = new BehaviorSubject<Point>(this.getStartLocation());
   }
 
@@ -27,6 +29,7 @@ export class Dragged implements Draggable {
 export interface Draggable {
   sourceElement: SVGGraphicsElement;
   object: RowChannel|Transformer;
+  offset?: Point;
 }
 
 export abstract class AbstractDragService {

@@ -37,7 +37,7 @@ export class TransformerDefinitionComponent implements OnInit {
         padding},${padding})`)
       .on('mousedown', function() {
         const newAnalytic = component.metadataService.createAnalytic(component.analytic.name);
-        component.dragService.startDrag({sourceElement: this as SVGGElement, object: newAnalytic});
+        component.dragService.startDrag({sourceElement: this as SVGGElement, object: newAnalytic, offset: {x: -component.width/2, y: -component.height/2}});
         component.selectionService.selection.next(newAnalytic);
         d3.event.preventDefault();
       });

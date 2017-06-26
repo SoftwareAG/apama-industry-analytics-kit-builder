@@ -66,8 +66,7 @@ export class DragOverlayComponent implements OnInit {
   onMousemove(event: MouseEvent) {
     const dragging = this.dragService.dragging.getValue();
     if (dragging) {
-      const bbox = dragging.sourceElement.getBoundingClientRect();
-      this.dragService.drag({x: event.x - bbox.width / 2, y: event.y - bbox.height / 2});
+      this.dragService.drag({x: event.x + dragging.offset.x, y: event.y + dragging.offset.y});
     }
   }
 
