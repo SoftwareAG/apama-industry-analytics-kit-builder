@@ -1,4 +1,4 @@
-import {AfterViewInit, Component} from "@angular/core";
+import {AfterViewInit, Component, HostListener} from "@angular/core";
 import {AbstractDataService} from "./services/AbstractDataService";
 import {AbstractMetadataService} from "./services/MetadataService";
 import {ResizeEvent} from "angular-resizable-element";
@@ -29,6 +29,17 @@ export class AppComponent implements AfterViewInit {
   informationHeightStartPixels = 0;
 
   constructor(private dataService: AbstractDataService, private metadataService: AbstractMetadataService, public modalService: NgbModal, private http: Http, private cookieService: CookieService) { }
+
+  @HostListener('window:beforeunload', ['$event'])
+  checkforUnsavedConfiguration($event)
+  {
+    if (this.dataService.isModified()) {
+      $event = $event || window.event;
+      $event.preventDefault();
+      $event.cancelBubble = true;
+      $event.returnValue = 'Your configuration changes will be lost';
+    }
+}
 
   onValidateResize(event: ResizeEvent): boolean {
     if (event.rectangle) {

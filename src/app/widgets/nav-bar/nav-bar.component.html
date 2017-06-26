@@ -41,5 +41,6 @@
   </div>
   <div class="configurationTitle ellipsis">
     {{((dataService.hierarchy | async).name | async) || 'Untitled' }}
+    <span class="unsaved pl-2" *ngIf="dataService.isModified()">[Unsaved]</span>
   </div>
 </nav>

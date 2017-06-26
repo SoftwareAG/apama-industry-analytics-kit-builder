@@ -22,7 +22,9 @@ export class DataService extends AbstractDataService {
       setTimeout( () => {
         this.setModified(false);
       });
-    })
+    });
+
+    this.modified = false;
   }
 
   setModified(modifiedValue: boolean) {
