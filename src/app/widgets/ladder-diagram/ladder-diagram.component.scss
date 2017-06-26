@@ -21,6 +21,10 @@ $transformer-color: saturate($brand-primary, 20%);
         stroke: $orange;
         stroke-width: 3;
       }
+
+      .transformer-name {
+        font-style: italic;
+      }
     }
 
     text {
@@ -29,7 +33,6 @@ $transformer-color: saturate($brand-primary, 20%);
   }
 
   .row-channel {
-
     .channel-circle {
       stroke: $black;
       fill: $transformer-color;
@@ -44,7 +47,14 @@ $transformer-color: saturate($brand-primary, 20%);
         stroke: $orange;
         stroke-width: 3;
       }
+      text {
+        font-style: italic;
+      }
     }
+  }
+
+  .channel-drop-target {
+    fill: rgba($black, 0.3)
   }
 
   .drop-target {

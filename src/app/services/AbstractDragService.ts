@@ -40,8 +40,8 @@ export abstract class AbstractDragService {
     return this.dragging.getValue() !== undefined;
   }
 
-  isDraggingClass(clazz: any) {
+  isDraggingClass(clazz: any): boolean {
     const dragging = this.dragging.getValue();
-    return dragging && dragging.object instanceof clazz;
+    return !!dragging && dragging.object instanceof clazz;
   }
 }

@@ -235,6 +235,8 @@ export class LadderDiagramComponent implements OnInit {
                 clearTimeout(d.mousedownHandler.timeout);
                 d.mousedownHandler.callback();
               }
+              d3.select(this).select('.channel-circle')
+                .attr('r', 8);
             })
             .on('mousedown', function(d) {
               const channel = d.channel instanceof RowChannel ? d.channel.clone() : new RowChannelBuilder().Name(d.channel.name).build();
@@ -247,6 +249,10 @@ export class LadderDiagramComponent implements OnInit {
                 timeout: setTimeout(mousedownCallback, 250)
               };
               d3.event.preventDefault();
+            })
+            .on('mouseenter', function(d) {
+              d3.select(this).select('.channel-circle')
+                .attr('r', 10);
             });
 
           rowChannelEnter.append('rect')
@@ -255,6 +261,10 @@ export class LadderDiagramComponent implements OnInit {
             .attr('transform', `translate(${type === 'input' ? -290 : -10}, ${-channelSpacing/2})`)
             .attr('fill', 'rgba(0,0,0,0)')
             .attr('stroke', 'none');
+
+          rowChannelEnter.append('circle')
+            .classed('channel-drop-target', true)
+            .attr('r', channelSpacing/2);
 
           rowChannelEnter.append('circle')
             .classed('channel-circle', true)
@@ -273,6 +283,9 @@ export class LadderDiagramComponent implements OnInit {
         function updateRowChannel(rowChannelUpdate: Selection<BaseType, {type: 'input' | 'output', location: any, channel: RowChannel | TransformerChannel, row: Row}, any, any>) {
           rowChannelUpdate.select('.channel-name')
             .text(d => d.channel.toJson().name);
+
+          rowChannelUpdate.select('.channel-drop-target')
+            .style('display', () => component.dragService.isDraggingClass(RowChannel) ? null : 'none');
         }
 
         const transformersEnter = rowEnter.append('g')
