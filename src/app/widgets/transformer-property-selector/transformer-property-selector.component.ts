@@ -47,5 +47,19 @@ export class TransformerPropertySelectorComponent implements OnInit {
     });
   }
 
+  removeAllPropertyValues(propertyDef: PropertyDef) {
+    this.selectedTransformer.first().filter(selectedTransformer => !!selectedTransformer).subscribe((selectedTransformer: Transformer) => {
+      selectedTransformer.removePropertyValuesByDefName(propertyDef.name);
+    });
+  }
+
+  toggleOptional(propertyDef: PropertyDef, hasValue: boolean) {
+    if (hasValue) {
+      this.addPropertyValue(propertyDef);
+    } else {
+      this.removeAllPropertyValues(propertyDef);
+    }
+  }
+
   ngOnInit() { }
 }

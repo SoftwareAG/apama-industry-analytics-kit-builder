@@ -170,6 +170,13 @@ export class Transformer implements AbstractModel<TransformerJsonInterface, Tran
     return this;
   }
 
+  removePropertyValuesByDefName(defName: string): this {
+    this.propertyValuesByDefName.next(
+      this.propertyValuesByDefName.getValue().set(defName, List<Property>())
+    );
+    return this;
+  }
+
   getInputChannels(name: string): List<TransformerChannel> {
     return this.inputChannelsByDefName.getValue().get(name) || List()
   }

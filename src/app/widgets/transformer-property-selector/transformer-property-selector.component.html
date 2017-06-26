@@ -1,18 +1,18 @@
 <div class="content h-100">
   <div *ngFor="let transformerProperty of transformerProperties | async" class="w-100 container-fluid">
 
-    <div class="property">
-      <div class="row">
-        <i class="fa fa-question-circle mx-1" placement="left" ngbTooltip="{{transformerProperty.definition.description}}" container="body"></i>
+    <div class="property" >
+      <div class="row" placement="left" ngbTooltip="{{transformerProperty.definition.description}}" container="body">
+        <div *ngIf="transformerProperty.definition.optional" class="form-check"><label class="form-check-label"><input class="form-check-input" type="checkbox" [ngModel]="!transformerProperty.values.isEmpty()" (ngModelChange)="toggleOptional(transformerProperty.definition, $event)"/></label></div>
         <h6>{{transformerProperty.definition.name}}</h6>
       </div>
 
-      <div *ngFor="let prop of transformerProperty.values" class="row">
-        <div *ngIf="transformerProperty.definition.repeated || transformerProperty.definition.optional" class="col-1 px-0 mr-2">
+      <div *ngFor="let prop of transformerProperty.values" class="row pb-1">
+        <div *ngIf="transformerProperty.definition.repeated" class="col-1 px-0 mr-2">
           <input class="form-control" type="button" value="-" (click)="removePropertyValue(prop)">
         </div>
 
-        <div class="col px-0" *ngIf="transformerProperty.definition.repeated"><input class="form-control" type="text" placeholder="Name" [ngModel]="prop.name | async" (ngModelChange)="prop.name.next($event)"/></div>
+        <div class="col px-0 pr-1" *ngIf="transformerProperty.definition.repeated"><input class="form-control" type="text" placeholder="Name" [ngModel]="prop.name | async" (ngModelChange)="prop.name.next($event)"/></div>
         <div class="col px-0" [ngSwitch]="transformerProperty.definition.type" *ngIf="!transformerProperty.definition.validValues">
           <input *ngSwitchCase="'string'" class="form-control" type="text" [ngModel]="prop.value | async" (ngModelChange)="prop.value.next($event)"/>
           <input *ngSwitchCase="'decimal'" class="form-control" type="number" [ngModel]="prop.value | async" (ngModelChange)="prop.value.next($event)"/>
@@ -30,7 +30,13 @@
         </div>
       </div>
 
-      <div class="row" *ngIf="transformerProperty.definition.repeated || (transformerProperty.definition.optional && transformerProperty.values.isEmpty())">
+      <div class="row pb-1" *ngIf="transformerProperty.definition.optional && transformerProperty.values.isEmpty() && transformerProperty.definition.defaultValue != undefined">
+        <div class="col px-0">
+          <input class="form-control unselectable italics" type="text" value="Default: {{transformerProperty.definition.defaultValue}}" disabled (dblclick)="addPropertyValue(transformerProperty.definition)"/>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="transformerProperty.definition.repeated">
         <div class="col-1 px-0 mr-2">
           <input class="form-control" type="button" value="+" (click)="addPropertyValue(transformerProperty.definition)">
         </div>
