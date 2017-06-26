@@ -8,4 +8,8 @@ export class SelectionService {
   get isSelected(): boolean {
     return !!this.selection.getValue();
   }
+
+  get currentSelection(): RowChannel|Transformer|undefined {
+    return this.selection.getValue();
+  }
 }

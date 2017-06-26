@@ -104,6 +104,7 @@ export class LadderDiagramComponent implements OnInit {
       .combineLatest(
         this.dragService.dragging,
         this.metadataService.metadata,
+        this.selectionService.selection,
         (hierarchy) => hierarchy
       )
       .subscribe(data => {
@@ -161,6 +162,7 @@ export class LadderDiagramComponent implements OnInit {
         const rowInputChannelEnter = rowInputChannel.enter().append('g')
           .call(buildRowChannel, "input");
         const rowInputChannelUpdate = rowInputChannel.merge(rowInputChannelEnter)
+          .classed('selected', (d) => component.selectionService.currentSelection === d.channel)
           .attr('transform', d => `translate(0,${d.location.startY + channelSpacing})`)
           .call(updateRowChannel);
 
@@ -174,6 +176,7 @@ export class LadderDiagramComponent implements OnInit {
         const rowOutputChannelEnter = rowOutputChannel.enter().append('g')
           .call(buildRowChannel, "output");
         const rowOutputChannelUpdate = rowOutputChannel.merge(rowOutputChannelEnter)
+          .classed('selected', (d) => component.selectionService.currentSelection === d.channel)
           .attr('transform', d => `translate(${width},${d.location.endY + channelSpacing})`)
           .call(updateRowChannel);
 
@@ -328,6 +331,7 @@ export class LadderDiagramComponent implements OnInit {
             d3.event.preventDefault();
           });
         const transformerUpdate = transformer.merge(transformerEnter)
+          .classed('selected', (d) => component.selectionService.currentSelection === d.transformer)
           .attr('transform', (d, i, transformersSelection) => `translate(${transformerLocation(i, transformersSelection.length, d.channelWidth)},0)`);
 
         const transformerBgEnter = transformerEnter.append('path')

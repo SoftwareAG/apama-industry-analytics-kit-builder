@@ -16,6 +16,13 @@ $transformer-color: saturate($brand-primary, 20%);
       }
     }
 
+    &.selected {
+      .transformer-bg {
+        stroke: $orange;
+        stroke-width: 3;
+      }
+    }
+
     text {
       fill: black;
     }
@@ -30,6 +37,13 @@ $transformer-color: saturate($brand-primary, 20%);
 
     text {
       fill: $black;
+    }
+
+    &.selected {
+      .channel-circle {
+        stroke: $orange;
+        stroke-width: 3;
+      }
     }
   }
 
