@@ -1,4 +1,4 @@
-import {Component, ElementRef, HostListener, OnInit} from "@angular/core";
+import {AfterViewInit, Component, ElementRef, HostListener, OnInit} from "@angular/core";
 import * as d3 from "d3";
 import * as deepFreeze from "deep-freeze";
 import {AbstractDataService} from "../../services/AbstractDataService";
@@ -21,12 +21,23 @@ import * as _ from "lodash";
   templateUrl: './ladder-diagram.component.html',
   styleUrls: ['./ladder-diagram.component.scss']
 })
-export class LadderDiagramComponent implements OnInit {
+export class LadderDiagramComponent implements OnInit, AfterViewInit   {
   readonly nativeElement;
 
   constructor(myElement: ElementRef, private readonly dataService: AbstractDataService, private readonly selectionService: SelectionService, private readonly dragService: AbstractDragService, private readonly metadataService: AbstractMetadataService) {
     this.nativeElement = myElement.nativeElement;
   }
+
+  ngAfterViewInit() {
+    const el:Element | null = document.querySelector('#ladder-diagram-panel');
+    if (el) {
+      const htmlElement = (el as HTMLElement);
+      const outerWidth:number = htmlElement.offsetWidth;
+      const innerWidth:number = (htmlElement.children[0] as HTMLElement).offsetWidth;
+      htmlElement.scrollLeft = (innerWidth - outerWidth) / 2;
+    }
+  }
+
 
   ngOnInit() {
     const component = this;
