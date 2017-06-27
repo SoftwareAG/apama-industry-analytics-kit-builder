@@ -32,7 +32,7 @@ export class LadderDiagramComponent implements OnInit {
     const component = this;
 
     const maxTransformerCount = 4;
-    const padding = deepFreeze({top: 20, right: 200, bottom: 20, left: 200});
+    const padding = deepFreeze({top: 20, right: 150, bottom: 20, left: 150});
     const width = 1100 - padding.left - padding.right;
     const transformerWidth = 150;
     const dropTargetWidth = 40;
@@ -362,18 +362,31 @@ export class LadderDiagramComponent implements OnInit {
         const transformerOutChannelsUpdate = transformerUpdate.select('.transformer-outchannels')
           .attr('transform', `translate(${transformerWidth}, 0)`);
 
-        const transformerInChannel = transformerInChannelsUpdate.selectAll('.transformer-channel').data(d => getTransformerInputChannelConnections(d.transformer).map(channel => { return { transformer: d.transformer, channel: channel } }));
+        const transformerInChannel = transformerInChannelsUpdate.selectAll('.transformer-channel').data((d, i) => getTransformerInputChannelConnections(d.transformer).map((channel, i, channels) => { return { connected: isConnected(channel, d.row, d.transformer, channels, "input"), transformer: d.transformer, channel: channel } }));
         transformerInChannel.exit().remove();
         const transformerInChannelEnter = transformerInChannel.enter().append('g').call(buildTransformerChannel, "input");
         const transformerInChannelUpdate = transformerInChannel.merge(transformerInChannelEnter).call(updateTransformerChannel, "input");
-        const transformerOutChannel = transformerOutChannelsUpdate.selectAll('.transformer-channel').data(d => getTransformerOutputChannelConnections(d.transformer).map(channel => { return { transformer: d.transformer, channel: channel } }));
+        const transformerOutChannel = transformerOutChannelsUpdate.selectAll('.transformer-channel').data((d, i) => getTransformerOutputChannelConnections(d.transformer).map((channel, i, channels) => { return { connected: isConnected(channel, d.row, d.transformer, channels, "output"), transformer: d.transformer, channel: channel } }));
         transformerOutChannel.exit().remove();
         const transformerOutChannelEnter = transformerOutChannel.enter().append('g').call(buildTransformerChannel, "output");
         const transformerOutChannelUpdate = transformerOutChannel.merge(transformerOutChannelEnter).call(updateTransformerChannel, "output");
 
-        function buildTransformerChannel(transformerChannelEnter: Selection<SVGGElement, {transformer: Transformer, channel: TransformerChannel | TransformerChannelDef}, any, any>, type:"input" | "output"){
+        function buildTransformerChannel(transformerChannelEnter: Selection<SVGGElement, { connected: boolean, transformer: Transformer, channel: TransformerChannel | TransformerChannelDef}, any, any>, type:"input" | "output") {
           transformerChannelEnter
             .classed('transformer-channel', true);
+
+          const channelDisconnectedEnter = transformerChannelEnter.append('g')
+            .classed('channel-disconnected', true);
+
+          channelDisconnectedEnter.append('line')
+            .attr('x2', type === "input" ? -20 : + 20);
+
+          channelDisconnectedEnter.append('text')
+            .classed('fa', true)
+            .attr('dx', type === "input" ? -20 : 20)
+            .attr('dy', "0.3em")
+            .attr('text-anchor', type === "input" ? "end": "start")
+            .text('\uf00d'); // FontAwesome times symbol
 
           transformerChannelEnter.append('circle')
             .classed('channel-circle', true)
@@ -419,9 +432,12 @@ export class LadderDiagramComponent implements OnInit {
             .attr('font-weight', 'bold');
         }
 
-        function updateTransformerChannel(transformerChannelUpdate: Selection<SVGGElement, {transformer: Transformer, channel: TransformerChannel | TransformerChannelDef}, any, any>, type:"input" | "output"){
+        function updateTransformerChannel(transformerChannelUpdate: Selection<SVGGElement, { connected: boolean, transformer: Transformer, channel: TransformerChannel | TransformerChannelDef}, any, any>, type:"input" | "output"){
           transformerChannelUpdate
             .attr('transform', (d, i) => `translate(0, ${channelY(i) + channelSpacing})`);
+
+          const channelDisconnectedUpdate = transformerChannelUpdate.select('.channel-disconnected')
+            .style('display', (d) => d.connected ? 'none' : null);
 
           transformerChannelUpdate.select('.channel-name')
             .text(d => d.channel.name);
@@ -626,6 +642,27 @@ export class LadderDiagramComponent implements OnInit {
         return [];
       }
       return new Array(transformerCount + 1).fill(undefined).map((ignore, i) => (transformerWidth + channelWidth) * i)
+    }
+
+    function isConnected(channel: TransformerChannel | TransformerChannelDef, row: Row, transformer: Transformer, channels: Array<TransformerChannel | TransformerChannelDef>, type: "input" | "output") {
+      if (channel instanceof TransformerChannelDef) {
+        return true;
+      }
+      const rowTransformers = row.transformers.getValue();
+      const transformerIdx = rowTransformers.indexOf(transformer);
+      if (type === "input") {
+        if (transformerIdx === 0) {
+          return true;
+        } else {
+          return channels.filter(c => c instanceof TransformerChannel).indexOf(channel) < rowTransformers.get(transformerIdx - 1).outputChannels.size;
+        }
+      } else {
+        if (transformerIdx === rowTransformers.size - 1) {
+          return true;
+        } else {
+          return channels.filter(c => c instanceof TransformerChannel).indexOf(channel) < rowTransformers.get(transformerIdx + 1).inputChannels.size;
+        }
+      }
     }
   }
 

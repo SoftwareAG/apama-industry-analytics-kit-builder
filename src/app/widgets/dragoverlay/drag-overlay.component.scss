@@ -20,4 +20,8 @@ $transformer-color: saturate($brand-primary, 20%);
       fill: black;
     }
   }
+
+  .channel-disconnected {
+    display: none;
+  }
 }

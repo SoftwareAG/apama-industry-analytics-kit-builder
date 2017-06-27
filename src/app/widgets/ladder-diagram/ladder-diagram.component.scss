@@ -60,4 +60,15 @@ $transformer-color: saturate($brand-primary, 20%);
   .drop-target {
     fill: rgba($black, 0.3)
   }
+
+  .channel-disconnected {
+    line {
+      stroke: $black;
+      stroke-width: 2;
+    }
+
+    text {
+      fill: red;
+    }
+  }
 }
