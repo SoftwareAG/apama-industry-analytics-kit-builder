@@ -13,8 +13,8 @@ import {TransformerChannelDef} from "../../classes/TransformerChannelDef";
 import {List} from "immutable";
 import {Path} from "d3-path";
 import {BaseType, Selection} from "d3-selection";
-import {DataService} from "../../services/DataService";
 import {SelectionService} from "../../services/SelectionService";
+import * as _ from "lodash";
 
 @Component({
   selector: 'ladder-diagram',
@@ -107,7 +107,7 @@ export class LadderDiagramComponent implements OnInit {
         this.selectionService.selection,
         (hierarchy) => hierarchy
       )
-      .subscribe(data => {
+      .subscribe(_.debounce(data => {
 
         rows.datum(data);
 
@@ -535,7 +535,7 @@ export class LadderDiagramComponent implements OnInit {
         svg
           .attr('width', width + padding.left + padding.right)
           .attr('height', finalHeight + padding.top + padding.bottom)
-      });
+      }, 0));
 
     function transformerHeight(transformer: Transformer) {
       const inputs = getTransformerInputChannelConnections(transformer);
