@@ -23,7 +23,7 @@ export class NavBarComponent {
   readonly currentMetaVersion: Observable<string>;
   isNavbarCollapsed: boolean = true;
 
-  constructor(private dataService: AbstractDataService, private fileService: FileService, private readonly metadataService: AbstractMetadataService, public modalService: NgbModal, private selectionService: SelectionService) {
+  constructor(public dataService: AbstractDataService, private fileService: FileService, private readonly metadataService: AbstractMetadataService, public modalService: NgbModal, private selectionService: SelectionService) {
     this.configurations = this.dataService.configurations.asObservable();
     this.metadataVersions = new BehaviorSubject(Set.of("2.0.0.0"));
     this.currentMetaVersion = metadataService.metadata.map(metadata => metadata.version);
