@@ -109,6 +109,16 @@ export class LadderDiagramComponent implements OnInit, AfterViewInit   {
             d3.event.stopPropagation();
           }
         }
+      })
+      .on('mouseenter', function() {
+        if (component.dragService.isDragging()) {
+          d3.select(this)
+            .classed('hover', true)
+        }
+      })
+      .on('mouseleave', function() {
+        d3.select(this)
+          .classed('hover', false)
       });
 
     this.dataService.hierarchy
@@ -247,8 +257,10 @@ export class LadderDiagramComponent implements OnInit, AfterViewInit   {
                 clearTimeout(d.mousedownHandler.timeout);
                 d.mousedownHandler.callback();
               }
-              d3.select(this).select('.channel-circle')
-                .attr('r', 8);
+              d3.select(this)
+                .classed('hover', false)
+                .select('.channel-circle')
+                  .attr('r', 8);
             })
             .on('mousedown', function(d) {
               const channel = d.channel instanceof RowChannel ? d.channel.clone() : new RowChannelBuilder().Name(d.channel.name).build();
@@ -263,8 +275,10 @@ export class LadderDiagramComponent implements OnInit, AfterViewInit   {
               d3.event.preventDefault();
             })
             .on('mouseenter', function(d) {
-              d3.select(this).select('.channel-circle')
-                .attr('r', 10);
+              d3.select(this)
+                .classed('hover', true)
+                .select('.channel-circle')
+                  .attr('r', 10);
             });
 
           rowChannelEnter.append('rect')
@@ -495,6 +509,14 @@ export class LadderDiagramComponent implements OnInit, AfterViewInit   {
                 d3.event.stopPropagation();
               }
             }
+          })
+          .on('mouseenter', function() {
+            d3.select(this)
+              .classed('hover', true)
+          })
+          .on('mouseleave', function() {
+            d3.select(this)
+              .classed('hover', false)
           });
         const dropTargetUpdate = dropTarget.merge(dropTargetEnter)
           .attr('d', roundedRectangle(dropTargetWidth, channelSpacing * 2, 8))

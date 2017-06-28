@@ -32,6 +32,10 @@ $transformer-color: saturate($brand-primary, 20%);
     }
   }
 
+  .hover.drop-target {
+    fill: rgba($brand-primary, 0.3)
+  }
+
   .row-channel {
     .channel-circle {
       stroke: $black;
@@ -51,11 +55,17 @@ $transformer-color: saturate($brand-primary, 20%);
         font-style: italic;
       }
     }
+
+    &.hover .channel-drop-target {
+      fill: rgba($brand-primary, 0.3)
+    }
+
+    .channel-drop-target {
+      fill: rgba($black, 0.3)
+    }
   }
 
-  .channel-drop-target {
-    fill: rgba($black, 0.3)
-  }
+
 
   .drop-target {
     fill: rgba($black, 0.3)

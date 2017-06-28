@@ -15,7 +15,7 @@ h4 {
         padding: 3px;
       }
       th {
-        background-color: #CCCCFF;
+        background-color: desaturate(lighten($brand-primary, 20), 20);
       }
     }
   }
