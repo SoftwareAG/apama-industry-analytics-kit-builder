@@ -13,6 +13,7 @@ import {AbstractMetadataService, MetadataService} from "../../services/MetadataS
 import {Metadata, MetadataBuilder} from "../../classes/Metadata";
 import {TransformerChannel} from "../../classes/TransformerChannel";
 import {SelectionService} from "../../services/SelectionService";
+import * as _ from "lodash";
 
 @Injectable()
 class DataServiceMock extends AbstractDataService {
@@ -59,6 +60,13 @@ describe('LadderDiagramComponent', () => {
       .withOutputChannel().Name("Analytic5:Out2").endWith()
       .endWith()
     .build();
+
+  beforeAll(() => {
+    // Make rendering synchronous for the tests
+    spyOn(_, "debounce").and.callFake(function(cb) {
+      return cb;
+    });
+  });
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
