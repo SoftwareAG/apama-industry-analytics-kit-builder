@@ -8,4 +8,15 @@ h4 {
   overflow-y: auto;
   background-color: $white;
   border: 1px solid $gray-lighter;
+
+  /deep/ {
+    table {
+      td, th {
+        padding: 3px;
+      }
+      th {
+        background-color: #CCCCFF;
+      }
+    }
+  }
 }
