@@ -50,7 +50,8 @@ export class LadderDiagramComponent implements OnInit, AfterViewInit   {
     const rowSpacing = 10;
     const channelSpacing = 40;
 
-    const svg = d3.select(this.nativeElement).select('svg');
+    const svg = d3.select(this.nativeElement).select('svg')
+      .attr('width', width + padding.left + padding.right);
 
     function getSizeAndPos(element: SVGGraphicsElement): SVGRect {
       const bb = element.getBBox();
@@ -544,7 +545,6 @@ export class LadderDiagramComponent implements OnInit, AfterViewInit   {
 
         // Resize the svg so that everything fits, the parent element can deal with scrolling
         svg
-          .attr('width', width + padding.left + padding.right)
           .attr('height', finalHeight + padding.top + padding.bottom)
       }, 0));
 
