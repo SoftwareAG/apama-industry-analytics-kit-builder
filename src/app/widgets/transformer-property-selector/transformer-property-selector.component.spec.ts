@@ -8,12 +8,10 @@ import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {MetadataBuilder} from "../../classes/Metadata";
 import {AbstractMetadataService, MetadataService} from "../../services/MetadataService";
 import {SelectionService} from "../../services/SelectionService";
+import {HumanReadablePipe} from "../../pipes/HumanReadablePipe.pipe";
 
 @Injectable()
 class DataServiceMock extends AbstractDataService {
-  addAnalyticChannelsToChannelsPanel(transformer: Transformer) {};
-  removeAnalyticChannelsFromChannelsPanel(transformer: Transformer) {};
-  addChannel(channelName: string) {};
   setModified(modifiedValue: boolean) {};
   isModified(): boolean { return false};
 }
@@ -25,6 +23,7 @@ describe('TransformerPropertySelectorComponent', () => {
   let component: TransformerPropertySelectorComponent;
   let fixture: ComponentFixture<TransformerPropertySelectorComponent>;
   let el: HTMLElement;
+  const humanReadable = new HumanReadablePipe().transform;
 
   const testMetadata = new MetadataBuilder()
     .withAnalytic()
@@ -94,7 +93,7 @@ describe('TransformerPropertySelectorComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TransformerPropertySelectorComponent ],
+      declarations: [ TransformerPropertySelectorComponent, HumanReadablePipe ],
       providers: [
         {provide: AbstractDataService, useClass: DataServiceMock},
         {provide: AbstractMetadataService, useClass: MetadataService},
@@ -142,7 +141,7 @@ describe('TransformerPropertySelectorComponent', () => {
 
     // Get the data so we can compare it against the DOM elements
     Array.from(el.querySelectorAll('h6')).forEach((transformerPropertyEl, i) => {
-      expect(transformerPropertyEl.textContent).toEqual(testMetadata.getAnalytic("Analytic1").properties.get(i).name);
+      expect(transformerPropertyEl.textContent).toEqual(humanReadable(testMetadata.getAnalytic("Analytic1").properties.get(i).name));
     });
   });
 });

@@ -34,6 +34,7 @@ import {TransformerDeserializer} from "./classes/TransformerDeserializer";
 import {PropertySelectorComponent} from "./widgets/property-selector/property-selector.component";
 import {ChannelPropertySelectorComponent} from "./widgets/channel-property-selector/channel-property-selector.component";
 import {SelectionService} from "./services/SelectionService";
+import {HumanReadablePipe} from "./pipes/HumanReadablePipe.pipe";
 
 @NgModule({
   declarations: [
@@ -52,7 +53,8 @@ import {SelectionService} from "./services/SelectionService";
     LoginDialogComponent,
     NewConfigurationDialogComponent,
     PropertySelectorComponent,
-    ChannelPropertySelectorComponent
+    ChannelPropertySelectorComponent,
+    HumanReadablePipe
   ],
   imports: [
     BrowserModule,
