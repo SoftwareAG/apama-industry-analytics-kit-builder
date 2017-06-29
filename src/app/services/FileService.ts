@@ -3,12 +3,14 @@ import {Injectable} from "@angular/core";
 import {AbstractMetadataService} from "./MetadataService";
 import {validate} from "validate.js";
 import {ConfigDeserializer} from "../classes/ConfigDeserializer";
+import {Metadata, MetadataJsonInterface} from "../classes/Metadata";
 
 export class UserCancelled extends Error {}
 
 export abstract class AbstractFileService {
-  abstract serialize(config: Config);
-  abstract deserialize(epl: string);
+  abstract serializeConfig(config: Config);
+  abstract deserializeConfig(epl: string);
+  abstract serializeMetadata(metadata: Metadata);
 }
 
 @Injectable()
@@ -18,13 +20,17 @@ export class FileService extends AbstractFileService {
     super()
   }
 
-  serialize(config: Config) {
+  serializeConfig(config: Config) {
     return this.configSerializer.toApama(this.metadataService.metadata.getValue(), config);
   }
 
-  deserialize(epl: string) : Config {
+  deserializeConfig(epl: string) : Config {
     if (validate.isEmpty(epl)) { throw new Error('EPL string cannot be empty'); }
     return this.configDeserializer.fromApama(epl);
+  }
+
+  serializeMetadata(metadata: Metadata) : MetadataJsonInterface{
+    return metadata.toJson();
   }
 
   getAnalyticDefinitions(fileType:string) : Promise<Array<{file: File, analyticDefinition: string}>> {

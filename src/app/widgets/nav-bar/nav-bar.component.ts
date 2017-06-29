@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {Component} from "@angular/core";
 import {Config, ConfigBuilder} from "../../classes/Config";
 import {AbstractDataService} from "../../services/AbstractDataService";
 import {Observable} from "rxjs";
@@ -8,9 +8,9 @@ import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {AbstractMetadataService} from "../../services/MetadataService";
 import {SaveConfigurationComponent} from "app/widgets/save-configuration/save-configuration.component";
 import {ModalDismissReasons, NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {RowChannel} from "../../classes/Channel";
 import {NewConfigurationDialogComponent} from "../new-configuration-dialog/new-configuration-dialog.component";
 import {SelectionService} from "../../services/SelectionService";
+import {MetadataJsonInterface} from "app/classes/Metadata";
 
 @Component({
   selector: 'nav-bar',
@@ -58,7 +58,7 @@ export class NavBarComponent {
   loadDataFile() {
     this.fileService.getFileData(".evt")
       .then(result => result.fileContent)
-      .then(apamaEPL => this.fileService.deserialize(apamaEPL))
+      .then(apamaEPL => this.fileService.deserializeConfig(apamaEPL))
       .then(config => {
         this.dataService.hierarchy.next(config);
       })
@@ -126,7 +126,19 @@ export class NavBarComponent {
   }
 
   exportMetadata() {
+    let saveMetadataFile = document.createElement("a");
+    const metadata = this.metadataService.metadata.getValue();
 
+    try {
+      const data:MetadataJsonInterface = this.fileService.serializeMetadata(metadata);
+      data.version = `custom_metadata_${metadata.version}`;
+      saveMetadataFile.href = "data:application/octet-stream," + encodeURI( JSON.stringify(data));
+      saveMetadataFile.download = `custom_metadata_${metadata.version}.json`;
+      saveMetadataFile.click();
+    }
+    catch(error) {
+      alert(error.message);
+    }
   }
 
   isSelectedVersion(version) {

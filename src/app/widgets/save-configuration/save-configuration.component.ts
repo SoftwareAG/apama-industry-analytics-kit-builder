@@ -18,7 +18,7 @@ export class SaveConfigurationComponent {
     const config = this.dataService.hierarchy.getValue();
 
     try {
-      const data = this.fileService.serialize(config);
+      const data = this.fileService.serializeConfig(config);
       saveFile.href = "data:application/octet-stream," + encodeURI(data);
       saveFile.download = config.name.getValue().replace(/[ *]/g, "_") + ".evt";
       saveFile.click();

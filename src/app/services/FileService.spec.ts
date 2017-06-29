@@ -386,27 +386,27 @@ describe('FileService', () => {
   });
 
   it('should error if no EPL is provided', () => {
-    expect( () => { fileService.deserialize(""); }).toThrowError();
+    expect( () => { fileService.deserializeConfig(""); }).toThrowError();
   });
 
   it('should error if no name has been provided in the .evt file', () => {
     const apama = `\\\\ Description: Sample configuration description
 \\\\ Version: 2.0.0.0`;
-    expect( () => { fileService.deserialize(apama); }).toThrowError();
+    expect( () => { fileService.deserializeConfig(apama); }).toThrowError();
   });
 
   it('should error if empty Name is provided in the .evt file', () => {
     const apama = `\\\\ Name:  
 \\\\ Description: No Name data provided
 \\\\ Version: 2.0.0.0`;
-    expect( () => { fileService.deserialize(apama); }).toThrowError();
+    expect( () => { fileService.deserializeConfig(apama); }).toThrowError();
   });
 
   it('should parse if no rows exist in the .evt file', () => {
     const apama = `\\\\ Name: No Rows 
 \\\\ Description: Sample configuration description
 \\\\ Version: 2.0.0.0`;
-    const config: Config = fileService.deserialize(apama);
+    const config: Config = fileService.deserializeConfig(apama);
     expect(config.rows.getValue().size).toEqual(0);
   });
 
@@ -417,7 +417,7 @@ describe('FileService', () => {
 \\\\ Row: 0
 \\\\ Row: 1
 \\\\ Row: 2`;
-    const config: Config = fileService.deserialize(apama);
+    const config: Config = fileService.deserializeConfig(apama);
     expect(config.rows.getValue().size).toEqual(0);
   });
 
@@ -425,7 +425,7 @@ describe('FileService', () => {
     const apama = `\\\\ Name: No Description provided
 \\\\ Version: 2.0.0.0
 \\\\ Row: 0`;
-    const config: Config = fileService.deserialize(apama);
+    const config: Config = fileService.deserializeConfig(apama);
     expect(config.description.getValue()).toEqual("");
   });
 
@@ -437,7 +437,7 @@ describe('FileService', () => {
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
 com.industry.analytics.Analytic("Sorter",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
 com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})`;
-    const config: Config = fileService.deserialize(apama);
+    const config: Config = fileService.deserializeConfig(apama);
     expect(config.rows.getValue().size).toEqual(1);
     expect(config.rows.getValue().first().transformers.getValue().size).toEqual(3);
   });
@@ -450,7 +450,7 @@ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})`;
-    const config: Config = fileService.deserialize(apama);
+    const config: Config = fileService.deserializeConfig(apama);
     expect(config.rows.getValue().size).toEqual(1);
     expect(config.rows.getValue().first().transformers.getValue().size).toEqual(3);
   });
@@ -468,7 +468,7 @@ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
 com.industry.analytics.Analytic("Sorter",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
 com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})`;
-    const config: Config = fileService.deserialize(apama);
+    const config: Config = fileService.deserializeConfig(apama);
     expect(config.rows.getValue().size).toEqual(2);
     expect(config.rows.getValue().first().transformers.getValue().size).toEqual(3);
     expect(config.rows.getValue().last().transformers.getValue().size).toEqual(3);
@@ -484,7 +484,7 @@ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
 com.industry.analytics.Analytic("Sorter",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
 com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})`;
-    const config: Config = fileService.deserialize(apama);
+    const config: Config = fileService.deserializeConfig(apama);
     expect(config.rows.getValue().size).toEqual(1);
     expect(config.rows.getValue().first().transformers.getValue().size).toEqual(3);
   });
@@ -502,7 +502,7 @@ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
 com.industry.analytics.Analytic("Sorter",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
 com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})`;
-    const config: Config = fileService.deserialize(apama);
+    const config: Config = fileService.deserializeConfig(apama);
     expect(config.rows.getValue().size).toEqual(2);
     expect(config.rows.getValue().first().transformers.getValue().size).toEqual(3);
     expect(config.rows.getValue().last().transformers.getValue().size).toEqual(3);
@@ -521,7 +521,7 @@ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
 com.industry.analytics.Analytic("Sorter",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
 com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})`;
-    const config: Config = fileService.deserialize(apama);
+    const config: Config = fileService.deserializeConfig(apama);
     expect(config.rows.getValue().size).toEqual(2);
     expect(config.rows.getValue().first().transformers.getValue().size).toEqual(3);
     expect(config.rows.getValue().last().transformers.getValue().size).toEqual(3);
@@ -545,7 +545,7 @@ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1
 \\\\ com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
 \\\\com.industry.analytics.Analytic("Sorter",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
 \\\\com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})`;
-    const config: Config = fileService.deserialize(apama);
+    const config: Config = fileService.deserializeConfig(apama);
     expect(config.rows.getValue().size).toEqual(2);
     expect(config.rows.getValue().first().transformers.getValue().size).toEqual(1);
     expect(config.rows.getValue().last().transformers.getValue().size).toEqual(2);
@@ -558,7 +558,7 @@ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})
 \\\\ com.industry.analytics.Analytic("Sorter",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})
 \\\\ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1"],{"timeWindow":"10.0d"})`;
-    const config: Config = fileService.deserialize(apama);
+    const config: Config = fileService.deserializeConfig(apama);
     expect(config.rows.getValue().size).toEqual(1);
     expect(config.rows.getValue().first().transformers.getValue().size).toEqual(1);
   });
@@ -569,7 +569,7 @@ com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{
 \\\\ Version: 2.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("InvalidAnalyticName",["Input Channel 1"],["Row0:Channel1"],{"timeInterval":"10.0d"})`;
-  expect( () => { fileService.deserialize(apama); }).toThrowError("Analytic 'InvalidAnalyticName' not found in definitions");
+  expect( () => { fileService.deserializeConfig(apama); }).toThrowError("Analytic 'InvalidAnalyticName' not found in definitions");
   });
 
   it('should error if an Analytic is provided with an incorrect property name', () => {
@@ -578,7 +578,7 @@ com.industry.analytics.Analytic("InvalidAnalyticName",["Input Channel 1"],["Row0
 \\\\ Version: 2.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"invalidPropertyName":"10.0d"})`;
-    const config: Config = fileService.deserialize(apama);
+    const config: Config = fileService.deserializeConfig(apama);
     expect(config.rows.getValue().size).toEqual(1);
     expect(config.rows.getValue().first().transformers.getValue().size).toEqual(1);
   });
@@ -589,7 +589,7 @@ com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{
 \\\\ Version: 2.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{"invalidPropertyName"})`;
-  expect( () => { fileService.deserialize(apama); }).toThrowError('Properties in Slicer is not valid : {"invalidPropertyName"}');
+  expect( () => { fileService.deserializeConfig(apama); }).toThrowError('Properties in Slicer is not valid : {"invalidPropertyName"}');
   });
 
   it('should error if an Analytic is provided with an incorrect property string value for the decimal property type', () => {
@@ -598,7 +598,7 @@ com.industry.analytics.Analytic("Slicer",["Input Channel 1"],["Row0:Channel1"],{
 \\\\ Version: 2.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1"],{"timeWindow": "ABC"})`;
-  expect( () => { fileService.deserialize(apama); }).toThrowError(`Property value "ABC" cannot be converted to the required property decimal type`);
+  expect( () => { fileService.deserializeConfig(apama); }).toThrowError(`Property value "ABC" cannot be converted to the required property decimal type`);
   });
 
   it('should error if an Analytic is provided with an incorrect property value for the property type', () => {
@@ -607,7 +607,7 @@ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1
 \\\\ Version: 2.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1"],{"testBoolean": "ABC"})`;
-  expect( () => { fileService.deserialize(apama); }).toThrowError('Unable to parse "ABC" to boolean');
+  expect( () => { fileService.deserializeConfig(apama); }).toThrowError('Unable to parse "ABC" to boolean');
   });
 
   it('should pass even where no properties exist for an Analytic', () => {
@@ -616,7 +616,7 @@ com.industry.analytics.Analytic("Suppressor",["Input Channel 1"],["Row0:Channel1
 \\\\ Version: 2.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("Combiner",["Row0:Input0"],["Row0:Channel1"],{})`;
-    const config: Config = fileService.deserialize(apama);
+    const config: Config = fileService.deserializeConfig(apama);
     expect( config.rows.getValue().first().transformers.getValue().first().name).toEqual('Combiner');
     expect(config.rows.getValue().last().transformers.getValue().first().propertyValues.size).toEqual(0);
   });
@@ -627,7 +627,7 @@ com.industry.analytics.Analytic("Combiner",["Row0:Input0"],["Row0:Channel1"],{})
 \\\\ Version: 2.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("Corridor",["Row0:Channel1"],["Row0"],{"upperThreshold":"20.0d","lowerThreshold":"10.0d","zone":"outside","duration":"5.0d"})`;
-    const config: Config = fileService.deserialize(apama);
+    const config: Config = fileService.deserializeConfig(apama);
     expect(config.rows.getValue().size).toEqual(1);
     expect( config.rows.getValue().first().transformers.getValue().size).toEqual(1);
     expect(config.rows.getValue().last().transformers.getValue().first().propertyValues.size).toEqual(4);
@@ -646,7 +646,7 @@ com.industry.analytics.Analytic("Average",["Orders"],["Moving Average"],{"timeWi
 \\\\ Row: 1
 com.industry.analytics.Analytic("Spread",["Moving Average", "Orders"],["Row1:Channel1"],{"anomaliesOnly":"false","spreadThreshold":"0.0d"})
 com.industry.analytics.Analytic("Threshold",["Row1:Channel1","Row1:Channel1"],["Outliers"],{"threshold":"100.0d","direction":"crossing","duration":"10.0d"})`;
-    const config: Config = fileService.deserialize(apama);
+    const config: Config = fileService.deserializeConfig(apama);
     expect(config.rows.getValue().size).toEqual(2);
     expect( config.rows.getValue().first().transformers.getValue().size).toEqual(1);
     expect( config.rows.getValue().first().inputChannelOverrides.getValue().get(0).name.getValue()).toEqual('Orders');
@@ -662,7 +662,7 @@ com.industry.analytics.Analytic("Threshold",["Row1:Channel1","Row1:Channel1"],["
 \\\\ Version: 2.0.0.0
 \\\\ Row: 0
 com.industry.analytics.Analytic("Prediction",["setting1","setting2","s2"],["RUL_PREDICTION"],{"modelName":"principal_component_model","pmmlFileName":"osi_pca_model.pmml","synchronous":"true","pmmlFileDirectory":"./model","combineParams":"false","setting1":"setting1.DVALUE","setting2":"setting2.DVALUE","s2":"s2.DVALUE","Predicted_PC1":"RUL_PREDICTION.DVALUE"})`;
-    const config: Config = fileService.deserialize(apama);
+    const config: Config = fileService.deserializeConfig(apama);
     expect(config.rows.getValue().size).toEqual(1);
     expect( config.rows.getValue().first().transformers.getValue().size).toEqual(1);
 
