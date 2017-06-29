@@ -87,13 +87,13 @@ export class LadderDiagramComponent implements OnInit, AfterViewInit   {
       .classed('row-placeholder', true);
 
     rowPlaceholder.append('line')
+      .classed('channel-path', true)
       .attr('x1', 0)
       .attr('y1', 0)
       .attr('x2', width)
       .attr('y2', 0)
       .attr('transform', `translate(0, ${channelSpacing})`)
-      .attr('stroke-width', 2)
-      .attr('stroke', 'black');
+      .attr('stroke-width', 2);
 
     rowPlaceholder.append('path')
       .classed('drop-target', true)
@@ -142,7 +142,7 @@ export class LadderDiagramComponent implements OnInit, AfterViewInit   {
         const channelsEnter = rowEnter.append('g')
           .classed('channels', true);
         const channelsUpdate = rowUpdate.select('.channels').datum(d => {
-          return createChannelConnections(d.row).map((channelGroup, i, channelConnections) => { return { row: d.row, channelGroup:channelGroup, channelWidth: d.channelWidth } })
+          return createChannelConnections(d.row).map((channelGroup, i, channelConnections) => { return { row: d.row, channelGroup:channelGroup, channelGroupX: channelX(i, d.channelWidth), channelWidth: d.channelWidth } })
         });
 
         const channelGroupsEnter = channelsEnter.append('g')
@@ -154,20 +154,19 @@ export class LadderDiagramComponent implements OnInit, AfterViewInit   {
         const channelGroupEnter = channelGroup.enter().append('g')
           .classed('channel-group', true);
         const channelGroupUpdate = channelGroupEnter.merge(channelGroup)
-          .attr('transform', (d, i, channelGroupsSelection) => `translate(${channelX(i, d.channelWidth)}, 0)`);
+          .attr('transform', (d) => `translate(${d.channelGroupX}, 0)`);
 
         const channelPath = channelGroupUpdate.selectAll('.channel-path').data((d, i) => {
-          const channelWidth = d.channelWidth;
-          return d.channelGroup.map(d => { return { channelWidth: channelWidth, channelConnection: d }})
+          return d.channelGroup.map(channelConnection => { return { channelGroupX: d.channelGroupX, channelWidth: d.channelWidth, channelConnection: channelConnection }})
         });
         channelPath.exit().remove();
         const channelPathEnter = channelPath.enter().append('path')
-          .attr('transform', `translate(0,${channelSpacing})`)
           .classed('channel-path', true);
         const channelPathUpdate = channelPath.merge(channelPathEnter)
-          .attr('d', (d: any) => drawChannelConnection(d3.path(), {x: 0, y: d.channelConnection.startY }, { x: d.channelWidth, y: d.channelConnection.endY } ).toString())
+          // We have to cancel the parent transform and apply via the "d" attribute so that the flow-animation draws correctly
+          .attr('transform', d => `translate(${-d.channelGroupX}, ${channelSpacing})`)
+          .attr('d', (d: any) => drawChannelConnection(d3.path(), {x: d.channelGroupX, y: d.channelConnection.startY }, { x: d.channelGroupX + d.channelWidth, y: d.channelConnection.endY } ).toString())
           .attr('fill', 'none')
-          .attr('stroke', 'black')
           .attr('stroke-width', 2);
 
         const rowChannelsEnter = channelsEnter.append('g')
@@ -294,8 +293,10 @@ export class LadderDiagramComponent implements OnInit, AfterViewInit   {
 
           rowChannelEnter.append('circle')
             .classed('channel-circle', true)
+            // We have to cancel the parent transform and apply via "cx" so that the flow-animation draws correctly
+            .attr('transform', `translate(${type === 'input' ? 0 : -width},0)`)
+            .attr('cx', type === 'input' ? 0 : width)
             .attr('r', 8)
-            .attr('stroke', 'black')
             .attr('stroke-width', '2');
 
           rowChannelEnter.append('text')

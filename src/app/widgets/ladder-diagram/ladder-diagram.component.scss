@@ -38,7 +38,7 @@ $transformer-color: saturate($brand-primary, 20%);
 
   .row-channel {
     .channel-circle {
-      stroke: $black;
+      stroke: url("/#flow-animation");
       fill: $transformer-color;
     }
 
@@ -65,7 +65,9 @@ $transformer-color: saturate($brand-primary, 20%);
     }
   }
 
-
+  .channel-path {
+    stroke: url("/#flow-animation");
+  }
 
   .drop-target {
     fill: rgba($black, 0.3)
