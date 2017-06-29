@@ -6,12 +6,18 @@ import {AbstractMetadataService} from "../../services/MetadataService";
 import {MetadataBuilder, MetadataJsonInterface} from "../../classes/Metadata";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {TransformerDefinitionComponent} from "../transformer-definition/transformer-definition.component";
+import {TransformerDefJsonInterface} from "../../classes/TransformerDef";
 
 @Injectable()
 class MetadataServiceMock extends AbstractMetadataService {
   loadMetadata(json: MetadataJsonInterface) {
     throw new Error('Method not implemented.');
   }
+
+  loadAnalytic(json: TransformerDefJsonInterface) {
+    throw new Error('Method not implemented.');
+  };
+
 }
 
 @Injectable()

@@ -108,11 +108,25 @@ export class NavBarComponent {
   metadataVersionChange(value) {
   }
 
-  loadCustomMetadata() {
+  loadAnalytics() {
+    this.fileService.getAnalyticDefinitions(".mon")
+      .then(analytic => {
+        analytic.forEach(analytic => {
+          const jsonStr = JSON.parse(analytic.analyticDefinition);
+          this.metadataService.loadAnalytic(jsonStr);
+        });
+      })
+  }
+
+  importMetadata() {
     this.fileService.getFileData(".json")
       .then(result => result.fileContent)
       .then(jsonStr => JSON.parse(jsonStr))
       .then(json => this.metadataService.loadMetadata(json))
+  }
+
+  exportMetadata() {
+
   }
 
   isSelectedVersion(version) {

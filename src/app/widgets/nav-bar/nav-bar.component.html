@@ -31,9 +31,14 @@
           <div class="dropdown-menu dropdown-menu-right">
             <h6 class="dropdown-header">Default</h6>
             <button class="dropdown-item" *ngFor="let version of metadataVersions | async" [ngClass]="{'selected': isSelectedVersion(version)}" (click)="metadataVersionChange(version)">{{version}}</button>
+
             <div class="dropdown-divider"></div>
-            <h6 class="dropdown-header">Custom</h6>
-            <div class="px-2 w-100"><button class="btn btn-secondary w-100" (click)="loadCustomMetadata()">Upload...</button></div>
+            <h6 class="dropdown-header">Custom Analytics</h6>
+            <div class="px-2 w-100"><button class="btn btn-secondary w-100" (click)="loadAnalytics()">Load Analytics...</button></div>
+            <div class="dropdown-divider"></div>
+            <h6 class="dropdown-header">Metadata</h6>
+            <div class="px-2 w-100"><button class="btn btn-secondary w-100" (click)="importMetadata()">Import Metadata...</button></div>
+            <div class="px-2 w-100"><button class="btn btn-secondary w-100" (click)="exportMetadata()">Export Metadata...</button></div>
           </div>
         </div>
       </div>

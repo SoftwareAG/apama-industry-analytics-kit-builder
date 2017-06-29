@@ -27,6 +27,62 @@ export class FileService extends AbstractFileService {
     return this.configDeserializer.fromApama(epl);
   }
 
+  getAnalyticDefinitions(fileType:string) : Promise<Array<{file: File, analyticDefinition: string}>> {
+    return new Promise<FileList>((resolve, reject) => {
+      let loadAnalyticFiles = document.createElement("INPUT") as HTMLInputElement;
+      loadAnalyticFiles.type = "file";
+      loadAnalyticFiles.accept = fileType;
+      loadAnalyticFiles.onerror = reject;
+      loadAnalyticFiles.onabort = reject;
+      loadAnalyticFiles.multiple = true;
+      loadAnalyticFiles.onchange = () => {
+        if (loadAnalyticFiles.files) {
+          resolve(loadAnalyticFiles.files);
+        } else {
+          reject(new UserCancelled());
+        }
+      };
+      loadAnalyticFiles.click();
+    })
+    .then((analyticsFiles: FileList) => {
+      return new Promise<Array<{ file: File, analyticDefinition: string }>>((resolve, reject) => {
+        const analyticDefinitionPattern = /\/\*\s*@AnalyticDefinition\s*({[\s\S]*})\s*\*\//;
+        const analyticDefinitions = Array<{file: File, analyticDefinition: string}>();
+
+        let filesProcessed = 0;
+        function analyticDefinitionsLoadComplete() {
+          if (filesProcessed === analyticsFiles.length) {
+            resolve(analyticDefinitions);
+          }
+        }
+        Array.from(analyticsFiles).forEach((analyticFile: File) => {
+          const fileReader = new FileReader();
+          fileReader.onload = function () {
+            // Parse the analyticDefinition out of the Analytic file
+            const analyticDefinition = fileReader.result.match(analyticDefinitionPattern);
+            if (analyticDefinition) {
+              analyticDefinitions.push({
+                file: analyticFile,
+                analyticDefinition: analyticDefinition[1]
+              });
+            }
+            filesProcessed++;
+            analyticDefinitionsLoadComplete();
+          };
+          fileReader.onerror = reject;
+          fileReader.onabort = reject;
+          fileReader.readAsText(analyticFile);
+          setTimeout(() => {
+            reject(new Error("Timed out while reading file"));
+            fileReader.abort();
+            filesProcessed++;
+            analyticDefinitionsLoadComplete();
+          }, 2000);
+        });
+      });
+    })
+  }
+
   getFileData(fileType:string) : Promise<{file: File, fileContent: string}> {
     return new Promise<File>((resolve, reject) => {
       let loadFile = document.createElement("INPUT") as HTMLInputElement;
@@ -47,7 +103,6 @@ export class FileService extends AbstractFileService {
       return new Promise<{file: File, fileContent: string}>((resolve, reject) => {
         const fileReader = new FileReader();
         fileReader.onload = function () {
-          fileReader.result;
           resolve({
             file: file,
             fileContent: fileReader.result
