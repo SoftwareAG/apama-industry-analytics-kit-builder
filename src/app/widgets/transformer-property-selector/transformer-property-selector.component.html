@@ -4,7 +4,7 @@
     <div class="property" >
       <div class="row" placement="left" ngbTooltip="{{transformerProperty.definition.description}}" container="body">
         <div *ngIf="transformerProperty.definition.optional" class="form-check"><label class="form-check-label"><input class="form-check-input" type="checkbox" [ngModel]="!transformerProperty.values.isEmpty()" (ngModelChange)="toggleOptional(transformerProperty.definition, $event)"/></label></div>
-        <h6>{{transformerProperty.definition.name | humanReadable}}</h6>
+        <h6>{{transformerProperty.definition.name | humanReadable}}<ng-container *ngIf="transformerProperty.definition.postfix"> {{transformerProperty.definition.postfix}}</ng-container></h6>
       </div>
 
       <div *ngFor="let prop of transformerProperty.values" class="row pb-1">

@@ -13,18 +13,20 @@ export interface PropertyDefJsonInterface {
   validator?: string;
   repeated?: boolean;
   advanced?: boolean;
+  postfix?: string;
 }
 
 export interface PropertyDefInterface {
   name: string;
   description: string;
   type: "integer" | "string" | "float" | "decimal" | "boolean";
-  optional?: boolean;
+  optional: boolean;
   defaultValue?: string | number | boolean;
   validValues?: string[] | number[] | boolean[];
   validator?: string;
-  repeated?: boolean;
-  advanced?: boolean;
+  repeated: boolean;
+  advanced: boolean;
+  postfix: string;
 }
 
 export class PropertyDef extends AbstractModel<PropertyDefJsonInterface, never> {
@@ -37,6 +39,7 @@ export class PropertyDef extends AbstractModel<PropertyDefJsonInterface, never> 
   readonly validator?: string;
   readonly repeated: boolean;
   readonly advanced: boolean;
+  readonly postfix: string;
 
   constructor(obj: PropertyDefInterface) {
     super();
@@ -51,6 +54,7 @@ export class PropertyDef extends AbstractModel<PropertyDefJsonInterface, never> 
     //noinspection PointlessBooleanExpressionJS
     this.repeated = !!obj.repeated;
     this.advanced = !!obj.advanced;
+    this.postfix = obj.postfix;
   }
 
   validate(): this {
@@ -70,7 +74,6 @@ export class PropertyDef extends AbstractModel<PropertyDefJsonInterface, never> 
     }
 
     // validate optional
-    // If the optional element has been provided, it must contain boolean data
     if (!validate.isBoolean(this.optional) && !isFunctionString(this.optional)) { throw new Error('optional must be a boolean or a function string') }
 
     // validate defaultValue
@@ -97,11 +100,9 @@ export class PropertyDef extends AbstractModel<PropertyDefJsonInterface, never> 
     if (this.validator  !== undefined && !isFunctionString(this.validator)) { throw new Error('Must be a function string') }
 
     // validate repeated
-    // If the repeated element has been provided, it must contain boolean data
     if (this.repeated !== undefined && !validate.isBoolean(this.repeated)) { throw new Error('repeated must contain Boolean data'); }
 
     // validate advanced
-    // If the advanced element has been provided, it must contain boolean data
     if (this.advanced !== undefined && !validate.isBoolean(this.advanced)) { throw new Error('advanced must contain Boolean data'); }
     return this;
   }
@@ -117,6 +118,7 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
   validator?: string;
   repeated: boolean = false;
   advanced: boolean = false;
+  postfix: string = "";
 
   Name(name: string): this {
     this.name = name;
@@ -154,6 +156,10 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
     this.advanced = advanced;
     return this;
   }
+  Postfix(postfix: string): this {
+    this.postfix = postfix;
+    return this;
+  }
   build(): PropertyDef {
     return new PropertyDef(this);
   }
@@ -166,16 +172,7 @@ export class PropertyDefBuilder extends ClassBuilder<PropertyDef> implements Pro
     if (!validate.contains(jsonData, 'type')) { throw new Error('jsonData does not contain the "type" element'); }
 
     //noinspection PointlessBooleanExpressionJS
-    return new PropertyDefBuilder()
-      .Name(jsonData.name)
-      .Description(jsonData.description)
-      .Type(jsonData.type)
-      .Optional(!!jsonData.optional)
-      .DefaultValue(jsonData.defaultValue)
-      .ValidValues(jsonData.validValues)
-      .Validator(jsonData.validator)
-      .Repeated(!!jsonData.repeated)
-      .Advanced(!!jsonData.advanced);
+    return Object.assign(new PropertyDefBuilder(), jsonData);
   }
 }
 

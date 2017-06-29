@@ -47,6 +47,7 @@
                     "defaultValue": 0,
                     "description": "Defines how long (in seconds) the threshold may be breached before an Anomaly Data is generated. If the value is 0.0d then the Anomaly Data is generated immediately.",
                     "name": "duration",
+                    "postfix": "(Seconds)",
                     "optional": true,
                     "type": "decimal",
                     "validator": "function(value) { return value >= 0 || 'Value must be greater than or equal to 0' }"
