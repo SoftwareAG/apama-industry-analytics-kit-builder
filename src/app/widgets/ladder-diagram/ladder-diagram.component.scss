@@ -5,7 +5,10 @@ $transformer-color: saturate($brand-primary, 20%);
 * /deep/ {
   .transformer {
     fill: $transformer-color;
-    filter: url('/#dropshadow');
+
+    .transformer-bg {
+      filter: url('/#dropshadow');
+    }
 
     .channel-circle {
       stroke: $black;
