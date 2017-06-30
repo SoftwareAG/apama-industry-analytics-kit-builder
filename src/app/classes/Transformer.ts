@@ -55,6 +55,10 @@ export class Transformer implements AbstractModel<TransformerJsonInterface, Tran
     return this.outputChannelsByDefName.map(channelsByDefName => List(channelsByDefName.valueSeq().flatten(true)));
   }
 
+  clone(): Transformer {
+    return TransformerBuilder.fromJson(this.toJson()).build();
+  }
+
   constructor(obj: TransformerInterface) {
     this.name = obj.name;
     // Group all of the property values by their definitionName

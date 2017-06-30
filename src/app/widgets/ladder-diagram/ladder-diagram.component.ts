@@ -352,16 +352,24 @@ export class LadderDiagramComponent implements OnInit, AfterViewInit   {
             transformer.selectAll('.channel-circle').transition().attr('r', 3);
             const dragging = component.dragService.dragging.getValue();
             if (dragging && d.transformer === dragging.object) {
-              d.row.removeTransformer(d.transformer);
+              if (!dragging.cloneAnalytic) {
+                d.row.removeTransformer(d.transformer);
+              }
               if (d.row.transformers.getValue().size === 0) {
                 component.dataService.hierarchy.getValue().removeRow(d.row);
               }
             }
           })
           .on('mousedown', function(d) {
+            let cloneAnalytic = false;
+            let analytic = d.transformer;
+            if (d3.event.ctrlKey) {
+              cloneAnalytic = true;
+              analytic = d.transformer.clone();
+            }
             const mousedownCallback = () => {
               d.mousedownHandler = undefined;
-              component.dragService.startDrag({sourceElement: this as SVGGraphicsElement, object: d.transformer, offset: {x: -transformerWidth/2, y: -channelSpacing}});
+              component.dragService.startDrag({sourceElement: this as SVGGraphicsElement, object: analytic, cloneAnalytic: cloneAnalytic, offset: {x: -transformerWidth/2, y: -channelSpacing}});
             };
             d.mousedownHandler = {
               callback: mousedownCallback,

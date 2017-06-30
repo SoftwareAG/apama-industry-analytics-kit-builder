@@ -12,12 +12,14 @@ export class Dragged implements Draggable {
   readonly object: RowChannel | Transformer;
   readonly currentLocation: BehaviorSubject<Point>;
   readonly offset: Point;
+  readonly cloneAnalytic: boolean;
 
   constructor(draggable: Draggable) {
     this.sourceElement = draggable.sourceElement;
     this.object = draggable.object;
     this.offset = draggable.offset || {x: 0, y: 0};
     this.currentLocation = new BehaviorSubject<Point>(this.getStartLocation());
+    this.cloneAnalytic = draggable.cloneAnalytic || false;
   }
 
   getStartLocation(): Point {
@@ -30,6 +32,7 @@ export interface Draggable {
   sourceElement: SVGGraphicsElement;
   object: RowChannel|Transformer;
   offset?: Point;
+  cloneAnalytic?: boolean;
 }
 
 export abstract class AbstractDragService {
