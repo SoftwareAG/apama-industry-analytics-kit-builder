@@ -2,8 +2,8 @@ import {TransformerBuilder, TransformerSerializer} from "app/classes/Transformer
 import {PropertySerializer} from "./Property";
 import {TestBed} from "@angular/core/testing";
 import {RowBuilder} from "./Row";
-import {TestUtils} from "../services/TestUtil.spec";
 import {TransformerDefBuilder} from "./TransformerDef";
+import {Utils} from "../Utils";
 
 describe('TransformerSerializer', () => {
 
@@ -37,8 +37,8 @@ describe('TransformerSerializer', () => {
           .build();
 
         const result = transformerSerializer.toApama(row.transformers.getValue().toArray()[0], transformerDef, 0, row, 0);
-        const inputChannels = TestUtils.findAll(/[\.\w]*Analytic\(.*?\[(.*?)\]/g, result).map(match => match[0])[0].split(",");
-        const outputChannels = TestUtils.findAll(/[\.\w]*Analytic\(.*?\[.*?\[(.*?)\]/g, result).map(match => match[0])[0].split(",");
+        const inputChannels = Utils.findAll(/[\.\w]*Analytic\(.*?\[(.*?)\]/g, result).map(match => match[0])[0].split(",");
+        const outputChannels = Utils.findAll(/[\.\w]*Analytic\(.*?\[.*?\[(.*?)\]/g, result).map(match => match[0])[0].split(",");
         if (i === 0) {
           expect(inputChannels).toEqual(['']);
           expect(outputChannels).toEqual(['']);

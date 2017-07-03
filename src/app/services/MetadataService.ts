@@ -6,7 +6,7 @@ import {TransformerDefBuilder, TransformerDefJsonInterface} from "../classes/Tra
 export abstract class AbstractMetadataService {
   readonly metadata: BehaviorSubject<Metadata> = new BehaviorSubject(new MetadataBuilder().build());
   abstract loadMetadata(json: MetadataJsonInterface);
-  abstract loadAnalytic(json: TransformerDefJsonInterface);
+  abstract loadAnalytic(...json: TransformerDefJsonInterface[]);
 
   getMetadata(): Metadata {
     return this.metadata.getValue();
@@ -27,13 +27,11 @@ export class MetadataService extends AbstractMetadataService {
     this.metadata.next(MetadataBuilder.fromJson(json).build());
   }
 
-  loadAnalytic(analyticJSONData: TransformerDefJsonInterface) {
-    const currentMetaData = this.metadata.getValue().toJson();
-    const customAnalytic = TransformerDefBuilder.fromJson(analyticJSONData).build();
-    if (currentMetaData.analytics) {
-      currentMetaData.analytics.push(customAnalytic.toJson());
-    }
-    this.metadata.next(MetadataBuilder.fromJson(currentMetaData).build());
+  loadAnalytic(...analyticJSONData: TransformerDefJsonInterface[]) {
+    const currentMetaDataJson = this.metadata.getValue().toJson();
+    // This cast is safe because calling toJson will never give undefined for analytics array
+    (currentMetaDataJson.analytics as TransformerDefJsonInterface[]).push(...analyticJSONData);
+    this.metadata.next(MetadataBuilder.fromJson(currentMetaDataJson).build());
   }
 }
 

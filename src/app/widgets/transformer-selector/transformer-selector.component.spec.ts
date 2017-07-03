@@ -14,7 +14,7 @@ class MetadataServiceMock extends AbstractMetadataService {
     throw new Error('Method not implemented.');
   }
 
-  loadAnalytic(json: TransformerDefJsonInterface) {
+  loadAnalytic(...json: TransformerDefJsonInterface[]) {
     throw new Error('Method not implemented.');
   };
 

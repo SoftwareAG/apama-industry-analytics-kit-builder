@@ -3,11 +3,10 @@ import {TransformerSerializer} from "app/classes/Transformer";
 import {RowSerializer} from "./Row";
 import {PropertySerializer} from "./Property";
 import {TestBed} from "@angular/core/testing";
-import {TestUtils} from "../services/TestUtil.spec";
 import {Metadata, MetadataBuilder} from "./Metadata";
 import * as _ from "lodash";
 import {AbstractMetadataService, MetadataService} from "../services/MetadataService";
-import {TransformerDefBuilder} from "./TransformerDef";
+import {Utils} from "../Utils";
 
 describe('ConfigSerializer', () => {
 
@@ -57,9 +56,9 @@ describe('ConfigSerializer', () => {
         .MetadataVersion(testMetadata.version).build()
       );
 
-      const names = TestUtils.findAll(/(\/\/ Name:\s)(.*)/g, result).map(match => match[1]);
-      const descriptions = TestUtils.findAll(/(\/\/ Description:\s)(.*)/g, result).map(match => match[1]);
-      const version = TestUtils.findAll(/(\/\/ Version:\s)(.*)/g, result).map(match => match[1]);
+      const names = Utils.findAll(/(\/\/ Name:\s)(.*)/g, result).map(match => match[1]);
+      const descriptions = Utils.findAll(/(\/\/ Description:\s)(.*)/g, result).map(match => match[1]);
+      const version = Utils.findAll(/(\/\/ Version:\s)(.*)/g, result).map(match => match[1]);
       expect(names).toEqual(["A config"]);
       expect(descriptions).toEqual(["Some text here"]);
       expect(version).toEqual([testMetadata.version]);

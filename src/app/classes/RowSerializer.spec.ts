@@ -1,9 +1,9 @@
-import {TransformerBuilder, TransformerSerializer} from "app/classes/Transformer";
+import {TransformerSerializer} from "app/classes/Transformer";
 import {RowBuilder, RowSerializer} from "./Row";
 import {PropertySerializer} from "./Property";
 import {TestBed} from "@angular/core/testing";
-import {TestUtils} from "../services/TestUtil.spec";
 import {Metadata, MetadataBuilder} from "./Metadata";
+import {Utils} from "../Utils";
 
 describe('RowSerializer', () => {
 
@@ -65,10 +65,10 @@ describe('RowSerializer', () => {
         .build(),
       0);
 
-    const rows = TestUtils.findAll(/(\/\/ Row:\s)(.*)/g, result).map(match => match[1]);
+    const rows = Utils.findAll(/(\/\/ Row:\s)(.*)/g, result).map(match => match[1]);
     expect(rows).toEqual(["0"]);
 
-    const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
+    const analytics = Utils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
     expect(analytics).toEqual(['"Analytic1",["Analytic1:Input1"],["Analytic1:Output1"],{}']);
   });
 
@@ -82,10 +82,10 @@ describe('RowSerializer', () => {
         .build(),
       0);
 
-    const rows = TestUtils.findAll(/(\/\/ Row:\s)(.*)/g, result).map(match => match[1]);
+    const rows = Utils.findAll(/(\/\/ Row:\s)(.*)/g, result).map(match => match[1]);
     expect(rows).toEqual(["0"]);
 
-    const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
+    const analytics = Utils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
     expect(analytics).toEqual([
       '"Analytic1",["Analytic1:Input1"],["Row0:Channel1.0"],{}',
       '"Analytic2",["Row0:Channel1.0"],["Analytic2:Output1"],{}',
@@ -103,10 +103,10 @@ describe('RowSerializer', () => {
         .build(),
       0);
 
-    const rows = TestUtils.findAll(/(\/\/ Row:\s)(.*)/g, result).map(match => match[1]);
+    const rows = Utils.findAll(/(\/\/ Row:\s)(.*)/g, result).map(match => match[1]);
     expect(rows).toEqual(["0"]);
 
-    const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
+    const analytics = Utils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
     expect(analytics).toEqual(['"Analytic1",["OverriddenInput"],["OverriddenOutput"],{}']);
   });
 
@@ -122,10 +122,10 @@ describe('RowSerializer', () => {
         .build(),
       0);
 
-    const rows = TestUtils.findAll(/(\/\/ Row:\s)(.*)/g, result).map(match => match[1]);
+    const rows = Utils.findAll(/(\/\/ Row:\s)(.*)/g, result).map(match => match[1]);
     expect(rows).toEqual(["0"]);
 
-    const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
+    const analytics = Utils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
     expect(analytics).toEqual([
       '"Analytic1",["OverriddenInput"],["Row0:Channel1.0"],{}',
       '"Analytic2",["Row0:Channel1.0"],["OverriddenOutput"],{}',
@@ -145,10 +145,10 @@ describe('RowSerializer', () => {
             .build(),
           0);
 
-        const rows = TestUtils.findAll(/(\/\/ Row:\s)(.*)/g, result).map(match => match[1]);
+        const rows = Utils.findAll(/(\/\/ Row:\s)(.*)/g, result).map(match => match[1]);
         expect(rows).toEqual(["0"]);
 
-        const analytics = TestUtils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
+        const analytics = Utils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
         const expectedInputChannels = [
           "Analytic3:Input1",
           "Analytic3:Input2",

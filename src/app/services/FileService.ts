@@ -4,6 +4,9 @@ import {AbstractMetadataService} from "./MetadataService";
 import {validate} from "validate.js";
 import {ConfigDeserializer} from "../classes/ConfigDeserializer";
 import {Metadata, MetadataJsonInterface} from "../classes/Metadata";
+import * as Promise from "bluebird";
+import {Utils} from "../Utils";
+import {TransformerDefBuilder, TransformerDefJsonInterface} from "../classes/TransformerDef";
 
 export class UserCancelled extends Error {}
 
@@ -33,7 +36,8 @@ export class FileService extends AbstractFileService {
     return metadata.toJson();
   }
 
-  getAnalyticDefinitions(fileType:string) : Promise<Array<{file: File, analyticDefinition: string}>> {
+  getAnalyticDefinitions(fileType:string) : Promise<Array<{file: File, analyticDefinition: TransformerDefJsonInterface}>> {
+    // Create the load file dialog
     return new Promise<FileList>((resolve, reject) => {
       let loadAnalyticFiles = document.createElement("INPUT") as HTMLInputElement;
       loadAnalyticFiles.type = "file";
@@ -50,30 +54,15 @@ export class FileService extends AbstractFileService {
       };
       loadAnalyticFiles.click();
     })
-    .then((analyticsFiles: FileList) => {
-      return new Promise<Array<{ file: File, analyticDefinition: string }>>((resolve, reject) => {
-        const analyticDefinitionPattern = /\/\*\s*@AnalyticDefinition\s*({[\s\S]*})\s*\*\//;
-        const analyticDefinitions = Array<{file: File, analyticDefinition: string}>();
-
-        let filesProcessed = 0;
-        function analyticDefinitionsLoadComplete() {
-          if (filesProcessed === analyticsFiles.length) {
-            resolve(analyticDefinitions);
-          }
-        }
-        Array.from(analyticsFiles).forEach((analyticFile: File) => {
+      // Read the file(s)
+      .map((analyticFile: File) => {
+        return new Promise<{ file: File, content: string }>((resolve, reject) => {
           const fileReader = new FileReader();
           fileReader.onload = function () {
-            // Parse the analyticDefinition out of the Analytic file
-            const analyticDefinition = fileReader.result.match(analyticDefinitionPattern);
-            if (analyticDefinition) {
-              analyticDefinitions.push({
-                file: analyticFile,
-                analyticDefinition: analyticDefinition[1]
-              });
-            }
-            filesProcessed++;
-            analyticDefinitionsLoadComplete();
+            resolve({
+              file: analyticFile,
+              content: fileReader.result
+            });
           };
           fileReader.onerror = reject;
           fileReader.onabort = reject;
@@ -81,12 +70,33 @@ export class FileService extends AbstractFileService {
           setTimeout(() => {
             reject(new Error("Timed out while reading file"));
             fileReader.abort();
-            filesProcessed++;
-            analyticDefinitionsLoadComplete();
           }, 2000);
-        });
-      });
-    })
+        })
+      })
+      // Find the @AnalyticDefinition's
+      .map((analyticFile: {file: File, content: string}) => {
+        const analyticDefinitionPattern = /\/\*\s*@AnalyticDefinition\s*({(.|[\n\r])*?})\s*\*\//g;
+        const analyticDefinitions = Utils.findAll(analyticDefinitionPattern, analyticFile.content).map(groups => groups[0]);
+        return {file: analyticFile.file, analyticDefs: analyticDefinitions};
+      })
+      // Flatmap to get a single (non-nested) array of all of the analyticDefinitions
+      .reduce((acc, fileAnalytics: {file: File, analyticDefs: string[]}) => {
+        acc.push(...fileAnalytics.analyticDefs.map(analyticDef => { return {file: fileAnalytics.file, analyticDefinition: analyticDef} }));
+        return acc;
+      }, Array<{ file: File, analyticDefinition: string }>())
+      // Convert the text analyticDefinition to Json
+      .map((fileAnalytic: {file: File, analyticDefinition: string}) => {
+        return {file: fileAnalytic.file, analyticDefinition: JSON.parse(fileAnalytic.analyticDefinition)}
+      })
+      // Validate it
+      .map((fileAnalytic: {file: File, analyticDefinition: TransformerDefJsonInterface}) => {
+        try {
+          TransformerDefBuilder.fromJson(fileAnalytic.analyticDefinition).build().validate();
+        } catch(e) {
+          throw new Error(`Invalid @AnalyticDefinition in file: ${fileAnalytic.file.name}`);
+        }
+        return fileAnalytic;
+      })
   }
 
   getFileData(fileType:string) : Promise<{file: File, fileContent: string}> {
@@ -124,5 +134,4 @@ export class FileService extends AbstractFileService {
       });
     });
   }
-
 }

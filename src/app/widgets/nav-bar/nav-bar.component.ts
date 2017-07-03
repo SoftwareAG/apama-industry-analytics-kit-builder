@@ -11,6 +11,7 @@ import {ModalDismissReasons, NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {NewConfigurationDialogComponent} from "../new-configuration-dialog/new-configuration-dialog.component";
 import {SelectionService} from "../../services/SelectionService";
 import {MetadataJsonInterface} from "app/classes/Metadata";
+import {TransformerDefJsonInterface} from "../../classes/TransformerDef";
 
 @Component({
   selector: 'nav-bar',
@@ -110,12 +111,8 @@ export class NavBarComponent {
 
   loadAnalytics() {
     this.fileService.getAnalyticDefinitions(".mon")
-      .then(analytic => {
-        analytic.forEach(analytic => {
-          const jsonStr = JSON.parse(analytic.analyticDefinition);
-          this.metadataService.loadAnalytic(jsonStr);
-        });
-      })
+      .map((fileAnalytic: {file: File, analyticDefinition: TransformerDefJsonInterface}) => fileAnalytic.analyticDefinition)
+      .then(analytics => this.metadataService.loadAnalytic(...analytics))
   }
 
   importMetadata() {
