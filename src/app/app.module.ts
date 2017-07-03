@@ -25,7 +25,6 @@ import {InformationComponent} from "./widgets/information/information.component"
 import {TransformerDefinitionComponent} from "./widgets/transformer-definition/transformer-definition.component";
 import {ResizableModule} from "angular-resizable-element";
 import {TransformerChannelDeserializer} from "./classes/TransformerChannel";
-import {RowChannelComponent} from "./widgets/row-channel/row-channel.component";
 import {RowDeserializer} from "./classes/RowDeserializer";
 import {ConfigDeserializer} from "./classes/ConfigDeserializer";
 import {LoginDialogComponent} from "./widgets/login-dialog/login-dialog.component";
@@ -49,7 +48,6 @@ import {HumanReadablePipe} from "./pipes/HumanReadablePipe.pipe";
     FocusDirective,
     InformationComponent,
     TransformerDefinitionComponent,
-    RowChannelComponent,
     LoginDialogComponent,
     NewConfigurationDialogComponent,
     PropertySelectorComponent,
