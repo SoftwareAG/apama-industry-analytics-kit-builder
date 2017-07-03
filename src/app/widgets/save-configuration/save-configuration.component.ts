@@ -14,17 +14,14 @@ export class SaveConfigurationComponent {
 
   saveConfig() {
     this.activeModal.close('SaveConfiguration');
-    let saveFile = document.createElement("a");
-    const config = this.dataService.hierarchy.getValue();
 
+    const config = this.dataService.hierarchy.getValue();
+    const content = this.fileService.serializeConfig(config);
+    const fileName = config.name.getValue().replace(/[ *]/g, "_") + ".evt";
     try {
-      const data = this.fileService.serializeConfig(config);
-      saveFile.href = "data:application/octet-stream," + encodeURI(data);
-      saveFile.download = config.name.getValue().replace(/[ *]/g, "_") + ".evt";
-      saveFile.click();
+      this.fileService.saveFile(fileName, JSON.stringify(content));
       this.dataService.setModified(false);
-    }
-    catch(error) {
+    } catch(error) {
       alert(error.message);
     }
   }

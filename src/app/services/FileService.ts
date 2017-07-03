@@ -36,6 +36,13 @@ export class FileService extends AbstractFileService {
     return metadata.toJson();
   }
 
+  saveFile(fileName: string, content: string) {
+    const saveFile = document.createElement("a");
+    saveFile.href = "data:application/octet-stream," + encodeURI(content);
+    saveFile.download = fileName;
+    saveFile.click();
+  }
+
   getAnalyticDefinitions(fileType:string) : Promise<Array<{file: File, analyticDefinition: TransformerDefJsonInterface}>> {
     // Create the load file dialog
     return new Promise<FileList>((resolve, reject) => {

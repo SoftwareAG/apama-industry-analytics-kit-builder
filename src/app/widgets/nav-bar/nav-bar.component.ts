@@ -123,17 +123,12 @@ export class NavBarComponent {
   }
 
   exportMetadata() {
-    let saveMetadataFile = document.createElement("a");
     const metadata = this.metadataService.metadata.getValue();
-
+    const content = this.fileService.serializeMetadata(metadata);
+    const fileName = `metadata-${metadata.version}.json`;
     try {
-      const data:MetadataJsonInterface = this.fileService.serializeMetadata(metadata);
-      data.version = `custom_metadata_${metadata.version}`;
-      saveMetadataFile.href = "data:application/octet-stream," + encodeURI( JSON.stringify(data));
-      saveMetadataFile.download = `custom_metadata_${metadata.version}.json`;
-      saveMetadataFile.click();
-    }
-    catch(error) {
+      this.fileService.saveFile(fileName, JSON.stringify(content));
+    } catch(error) {
       alert(error.message);
     }
   }
