@@ -96,7 +96,9 @@ export class Transformer implements AbstractModel<TransformerJsonInterface, Tran
   toJson(): TransformerJsonInterface {
     return {
       name: this.name,
-      propertyValues: this.propertyValues.toArray().map(propertyVal => propertyVal.toJson())
+      propertyValues: this.propertyValues.toArray().map(propertyVal => propertyVal.toJson()),
+      inputChannels: this.inputChannels.toArray().map(chan => chan.toJson()),
+      outputChannels: this.outputChannels.toArray().map(chan => chan.toJson())
     }
   }
 
