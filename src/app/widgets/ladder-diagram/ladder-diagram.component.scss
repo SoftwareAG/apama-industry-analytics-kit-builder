@@ -20,6 +20,8 @@ $transformer-color: saturate($brand-primary, 20%);
     }
 
     &.selected {
+      outline: none;
+
       .transformer-bg {
         stroke: $orange;
         stroke-width: 3;

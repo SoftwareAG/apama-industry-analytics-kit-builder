@@ -332,6 +332,7 @@ export class LadderDiagramComponent implements OnInit, AfterViewInit   {
               clearTimeout(d.mousedownHandler.timeout);
               d.mousedownHandler = undefined;
             }
+            (this as {focus: () => void} & SVGGElement).focus();
             component.selectionService.selection.next(d.transformer);
           })
           .on('mouseenter', function(d) {
@@ -373,7 +374,13 @@ export class LadderDiagramComponent implements OnInit, AfterViewInit   {
           });
         const transformerUpdate = transformer.merge(transformerEnter)
           .classed('selected', (d) => component.selectionService.currentSelection === d.transformer)
-          .attr('transform', (d, i, transformersSelection) => `translate(${transformerLocation(i, transformersSelection.length, d.channelWidth)},0)`);
+          .attr('transform', (d, i, transformersSelection) => `translate(${transformerLocation(i, transformersSelection.length, d.channelWidth)},0)`)
+          .attr('tabindex', (d) => component.selectionService.currentSelection === d.transformer ? '0' : null)
+          .on('keydown', (d) => {
+            if (component.selectionService.currentSelection === d.transformer && d3.event.key === 'Delete') {
+              d.row.removeAnalytic(d.transformer);
+            }
+          });
 
         const transformerBgEnter = transformerEnter.append('path')
           .classed('transformer-bg', true);
