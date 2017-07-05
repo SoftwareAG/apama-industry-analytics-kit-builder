@@ -34,6 +34,8 @@ import {PropertySelectorComponent} from "./widgets/property-selector/property-se
 import {ChannelPropertySelectorComponent} from "./widgets/channel-property-selector/channel-property-selector.component";
 import {SelectionService} from "./services/SelectionService";
 import {HumanReadablePipe} from "./pipes/HumanReadablePipe.pipe";
+import {SandboxEvalComponent} from "./widgets/sandbox-eval/sandbox-eval.component";
+import {SandboxEvalService} from "./services/SandboxEvalService";
 
 @NgModule({
   declarations: [
@@ -52,7 +54,8 @@ import {HumanReadablePipe} from "./pipes/HumanReadablePipe.pipe";
     NewConfigurationDialogComponent,
     PropertySelectorComponent,
     ChannelPropertySelectorComponent,
-    HumanReadablePipe
+    HumanReadablePipe,
+    SandboxEvalComponent
   ],
   imports: [
     BrowserModule,
@@ -75,7 +78,8 @@ import {HumanReadablePipe} from "./pipes/HumanReadablePipe.pipe";
     RowDeserializer,
     TransformerDeserializer,
     TransformerChannelDeserializer,
-    PropertyDeserializer
+    PropertyDeserializer,
+    SandboxEvalService
   ],
   entryComponents: [
     SaveConfigurationComponent,

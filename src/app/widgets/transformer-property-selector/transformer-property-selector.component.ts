@@ -1,26 +1,25 @@
-import {Component, OnInit} from "@angular/core";
+import {ChangeDetectionStrategy, Component, OnInit} from "@angular/core";
 import {Observable} from "rxjs";
 import {AbstractDataService} from "../../services/AbstractDataService";
 import {Property, PropertyBuilder} from "app/classes/Property";
 import {List} from "immutable";
 import {PropertyDef} from "../../classes/PropertyDef";
 import {Transformer} from "../../classes/Transformer";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {AbstractMetadataService} from "../../services/MetadataService";
 import {SelectionService} from "../../services/SelectionService";
-import {selection} from "d3-selection";
+import {SandboxEvalService} from "../../services/SandboxEvalService";
 
 @Component({
   selector: 'transformer-property-selector',
   templateUrl: './transformer-property-selector.component.html',
-  styleUrls: ['./transformer-property-selector.component.scss']
+  styleUrls: ['./transformer-property-selector.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransformerPropertySelectorComponent implements OnInit {
-
   readonly transformerProperties: Observable<List<{definition: PropertyDef, values: List<Property>}>>;
   readonly selectedTransformer: Observable<Transformer | undefined>;
 
-  constructor(selectionService: SelectionService, dataService: AbstractDataService, metadataService: AbstractMetadataService) {
+  constructor(selectionService: SelectionService, dataService: AbstractDataService, metadataService: AbstractMetadataService, private sandboxEvalService: SandboxEvalService) {
     this.selectedTransformer = selectionService.selection.map(selection => selection instanceof Transformer ? selection : undefined);
     const metadata = metadataService.metadata;
 
@@ -58,6 +57,16 @@ export class TransformerPropertySelectorComponent implements OnInit {
       this.addPropertyValue(propertyDef);
     } else {
       this.removeAllPropertyValues(propertyDef);
+    }
+  }
+
+  valueChange(property: Property, definition: PropertyDef, newValue) {
+    property.value.next(newValue);
+    property.invalid.next(undefined);
+    if (definition.validator) {
+      this.sandboxEvalService.eval(definition.validator, property.value.getValue())
+        .then(result => result === false || typeof result === "string")
+        .then(result => property.invalid.next(result));
     }
   }
 

@@ -30,18 +30,21 @@ export class Property extends AbstractModel<PropertyJsonInterface, PropertyDef> 
   readonly name: BehaviorSubject<string>;
   readonly definitionName: string;
   readonly value: BehaviorSubject<number | string | boolean>;
+  readonly invalid: BehaviorSubject<boolean | undefined>;
 
   constructor(obj: PropertyInterface) {
     super();
     this.name = new BehaviorSubject(obj.name);
     this.definitionName = obj.definitionName;
     this.value = new BehaviorSubject(obj.value);
+    this.invalid = new BehaviorSubject(undefined);
   }
 
   asObservable(): Observable<this> {
     return Observable.merge(
       this.name,
-      this.value
+      this.value,
+      this.invalid
     ).mapTo(this);
   }
 

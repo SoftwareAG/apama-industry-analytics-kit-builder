@@ -9,6 +9,7 @@ import {MetadataBuilder} from "../../classes/Metadata";
 import {AbstractMetadataService, MetadataService} from "../../services/MetadataService";
 import {SelectionService} from "../../services/SelectionService";
 import {HumanReadablePipe} from "../../pipes/HumanReadablePipe.pipe";
+import {SandboxEvalService} from "../../services/SandboxEvalService";
 
 @Injectable()
 class DataServiceMock extends AbstractDataService {
@@ -97,7 +98,8 @@ describe('TransformerPropertySelectorComponent', () => {
       providers: [
         {provide: AbstractDataService, useClass: DataServiceMock},
         {provide: AbstractMetadataService, useClass: MetadataService},
-        SelectionService
+        SelectionService,
+        SandboxEvalService
       ],
       imports: [
         FormsModule,

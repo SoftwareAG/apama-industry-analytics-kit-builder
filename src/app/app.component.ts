@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, HostListener} from "@angular/core";
+import {AfterViewInit, Component, HostListener, ViewChild} from "@angular/core";
 import {AbstractDataService} from "./services/AbstractDataService";
 import {AbstractMetadataService} from "./services/MetadataService";
 import {ResizeEvent} from "angular-resizable-element";
@@ -6,6 +6,8 @@ import {LoginDialogComponent} from "./widgets/login-dialog/login-dialog.componen
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {Http} from "@angular/http";
 import {CookieService} from "ng2-cookies";
+import {SandboxEvalComponent} from "./widgets/sandbox-eval/sandbox-eval.component";
+import {SandboxEvalService} from "./services/SandboxEvalService";
 
 @Component({
   selector: 'app-root',
@@ -14,6 +16,7 @@ import {CookieService} from "ng2-cookies";
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements AfterViewInit {
+  @ViewChild(SandboxEvalComponent) sandboxEvalComponent: SandboxEvalComponent;
 
   private readonly _informationHeightMax = 85;
   private readonly _informationHeightMin = 15;
@@ -28,7 +31,7 @@ export class AppComponent implements AfterViewInit {
 
   informationHeightStartPixels = 0;
 
-  constructor(private dataService: AbstractDataService, private metadataService: AbstractMetadataService, public modalService: NgbModal, private http: Http, private cookieService: CookieService) { }
+  constructor(private dataService: AbstractDataService, private metadataService: AbstractMetadataService, public modalService: NgbModal, private http: Http, private cookieService: CookieService, private sandboxEvalService: SandboxEvalService) { }
 
   @HostListener('window:beforeunload', ['$event'])
   checkforUnsavedConfiguration($event)
@@ -87,5 +90,6 @@ export class AppComponent implements AfterViewInit {
       this.loadDefaultMetadata();
       this.openLoginDialog()
     });
+    this.sandboxEvalService.registerComponent(this.sandboxEvalComponent);
   }
 }

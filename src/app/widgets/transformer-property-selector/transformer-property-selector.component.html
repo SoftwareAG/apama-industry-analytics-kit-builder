@@ -13,18 +13,18 @@
         </div>
 
         <div class="col px-0 pr-1" *ngIf="transformerProperty.definition.repeated"><input class="form-control" type="text" placeholder="Name" [ngModel]="prop.name | async" (ngModelChange)="prop.name.next($event)"/></div>
-        <div class="col px-0" [ngSwitch]="transformerProperty.definition.type" *ngIf="!transformerProperty.definition.validValues">
-          <input *ngSwitchCase="'string'" class="form-control" type="text" [ngModel]="prop.value | async" (ngModelChange)="prop.value.next($event)"/>
-          <input *ngSwitchCase="'decimal'" class="form-control" type="number" [ngModel]="prop.value | async" (ngModelChange)="prop.value.next($event)"/>
-          <input *ngSwitchCase="'integer'" class="form-control" type="number" [ngModel]="prop.value | async" (ngModelChange)="prop.value.next($event)"/>
-          <input *ngSwitchCase="'float'" class="form-control" type="number" [ngModel]="prop.value | async" (ngModelChange)="prop.value.next($event)"/>
-          <select *ngSwitchCase="'boolean'" class="form-control" [ngModel]="prop.value | async" (ngModelChange)="prop.value.next($event === 'true')">
+        <div class="col px-0" [ngSwitch]="transformerProperty.definition.type" *ngIf="!transformerProperty.definition.validValues" [class.has-danger]="prop.invalid | async">
+          <input *ngSwitchCase="'string'" class="form-control" [class.form-control-danger]="prop.invalid | async" type="text" [ngModel]="prop.value | async" (ngModelChange)="valueChange(prop, transformerProperty.definition, $event)"/>
+          <input *ngSwitchCase="'decimal'" class="form-control" [class.form-control-danger]="prop.invalid | async" type="number" [ngModel]="prop.value | async" (ngModelChange)="valueChange(prop, transformerProperty.definition, $event)"/>
+          <input *ngSwitchCase="'integer'" class="form-control" [class.form-control-danger]="prop.invalid | async" type="number" [ngModel]="prop.value | async" (ngModelChange)="valueChange(prop, transformerProperty.definition, $event)"/>
+          <input *ngSwitchCase="'float'" class="form-control" [class.form-control-danger]="prop.invalid | async" type="number" [ngModel]="prop.value | async" (ngModelChange)="valueChange(prop, transformerProperty.definition, $event)"/>
+          <select *ngSwitchCase="'boolean'" class="form-control" [class.form-control-danger]="prop.invalid | async" [ngModel]="prop.value | async" (ngModelChange)="valueChange(prop, transformerProperty.definition, $event === 'true')">
             <option value="true">True</option>
             <option value="false">False</option>
           </select>
         </div>
-        <div class="col px-0" *ngIf="transformerProperty.definition.validValues">
-          <select class="form-control" [ngModel]="prop.value | async" (ngModelChange)="prop.value.next($event)">
+        <div class="col px-0" *ngIf="transformerProperty.definition.validValues" [class.has-danger]="prop.invalid | async">
+          <select class="form-control" [class.form-control-danger]="prop.invalid | async" [ngModel]="prop.value | async" (ngModelChange)="valueChange(prop, transformerProperty.definition, $event)">
             <option *ngFor="let validValue of transformerProperty.definition.validValues" [value]="validValue" >{{validValue}}</option>
           </select>
         </div>
