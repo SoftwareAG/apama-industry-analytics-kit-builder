@@ -10,8 +10,8 @@ import {SaveConfigurationComponent} from "app/widgets/save-configuration/save-co
 import {ModalDismissReasons, NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {NewConfigurationDialogComponent} from "../new-configuration-dialog/new-configuration-dialog.component";
 import {SelectionService} from "../../services/SelectionService";
-import {MetadataJsonInterface} from "app/classes/Metadata";
 import {TransformerDefJsonInterface} from "../../classes/TransformerDef";
+import {HistoryService} from "../../services/HistoryService";
 
 @Component({
   selector: 'nav-bar',
@@ -24,7 +24,8 @@ export class NavBarComponent {
   readonly currentMetaVersion: Observable<string>;
   isNavbarCollapsed: boolean = true;
 
-  constructor(public dataService: AbstractDataService, private fileService: FileService, private readonly metadataService: AbstractMetadataService, public modalService: NgbModal, private selectionService: SelectionService) {
+  constructor(public dataService: AbstractDataService, private fileService: FileService, private readonly metadataService: AbstractMetadataService,
+              public modalService: NgbModal, private selectionService: SelectionService, private historyService: HistoryService) {
     this.configurations = this.dataService.configurations.asObservable();
     this.metadataVersions = new BehaviorSubject(Set.of("2.0.0.0"));
     this.currentMetaVersion = metadataService.metadata.map(metadata => metadata.version);
@@ -40,6 +41,7 @@ export class NavBarComponent {
       .build();
     this.dataService.hierarchy.next(config);
     this.selectionService.selection.next(undefined);
+    this.historyService.reset();
   }
 
   newConfig() {
@@ -62,6 +64,7 @@ export class NavBarComponent {
       .then(apamaEPL => this.fileService.deserializeConfig(apamaEPL))
       .then(config => {
         this.dataService.hierarchy.next(config);
+        this.historyService.reset();
       })
       .catch(error => {
         if (error instanceof UserCancelled) {

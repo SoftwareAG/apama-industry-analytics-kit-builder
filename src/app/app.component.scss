@@ -15,30 +15,14 @@
   border-left: 1px solid $gray-lighter;
 }
 
-.icon::before {
-  display: inline-block;
-  margin-right: .5em;
-  font: normal normal normal 14px/1 FontAwesome;
-  font-size: inherit;
-  text-rendering: auto;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  transform: translate(0, 0);
-}
-
-.information:hover:before{
-  color:grey;
-
-}
-
-.information::before {
-  content: "\f141";
-  font-family: "FontAwesome";
+.information-panel::before {
+  content: "\F141";
+  font-family: FontAwesome;
   text-align: center;
-}
-
-.information {
-  margin-top: -9px;
+  position: absolute;
+  left: 50%;
+  right: 50%;
+  margin-top: -0.8em;
 }
 
 .information-panel {
@@ -48,9 +32,5 @@
 }
 
 transformer-selector {
-  background-color: $gray-lightest;
-}
-
-channel-selector {
   background-color: $gray-lightest;
 }

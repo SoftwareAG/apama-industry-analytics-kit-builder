@@ -1,6 +1,6 @@
 import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 import {TransformerPropertySelectorComponent} from "./transformer-property-selector.component";
-import {Transformer, TransformerBuilder} from "../../classes/Transformer";
+import {TransformerBuilder} from "../../classes/Transformer";
 import {Injectable} from "@angular/core";
 import {AbstractDataService} from "../../services/AbstractDataService";
 import {FormsModule} from "@angular/forms";

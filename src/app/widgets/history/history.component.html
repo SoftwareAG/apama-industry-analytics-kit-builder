@@ -1,0 +1,6 @@
+<div class="history-panel">
+  <div class="history-buttons">
+    <button class="btn" [ngClass]="(historyService.canUndo() | async) ? 'btn-primary-secondary' : 'btn-outline-secondary'" [disabled]="!(historyService.canUndo() | async)" (click)="onUndoClick()">Undo <i class="fa fa-undo"></i></button>
+    <button class="btn" [ngClass]="(historyService.canRedo() | async) ? 'btn-primary-secondary' : 'btn-outline-secondary'" [disabled]="!(historyService.canRedo() | async)" (click)="onRedoClick()">Redo <i class="fa fa-repeat"></i></button>
+  </div>
+</div>

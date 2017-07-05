@@ -18,6 +18,7 @@ import {ConfigDeserializer} from "../../classes/ConfigDeserializer";
 import {RowDeserializer} from "../../classes/RowDeserializer";
 import {TransformerDeserializer} from "../../classes/TransformerDeserializer";
 import {SelectionService} from "../../services/SelectionService";
+import {HistoryService} from "../../services/HistoryService";
 
 @Injectable()
 class DataServiceMock extends AbstractDataService {
@@ -64,6 +65,7 @@ describe('NavBarComponent', () => {
       providers: [
         {provide: AbstractDataService, useClass: DataServiceMock},
         {provide: AbstractMetadataService, useClass: MetadataService},
+        HistoryService,
         SelectionService,
         FileService,
         ConfigSerializer,

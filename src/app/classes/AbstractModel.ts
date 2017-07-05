@@ -1,5 +1,5 @@
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {List} from "immutable";
+import {List, Map} from "immutable";
 
 export abstract class AbstractModel<JsonModel, Definition> {
   toJson(): JsonModel {
@@ -8,14 +8,10 @@ export abstract class AbstractModel<JsonModel, Definition> {
       if (value instanceof BehaviorSubject) {
         value = value.getValue();
       }
-      if (List.isList(value)) {
-        result[key] = value.toArray().map((val) => {
-          if (val instanceof AbstractModel) {
-            return val.toJson();
-          } else {
-            return val;
-          }
-        })
+      if (Map.isMap(value)) {
+        result[key] = value.mapKeys(ifAbstractThenToJson).mapEntries(ifAbstractThenToJson).toJSON();
+      } else if (List.isList(value)) {
+        result[key] = value.toArray().map(ifAbstractThenToJson)
       } else {
         result[key] = value;
       }
@@ -24,4 +20,12 @@ export abstract class AbstractModel<JsonModel, Definition> {
   }
 
   abstract validate(def?: Definition): this;
+}
+
+function ifAbstractThenToJson(obj: any): any {
+  if (obj instanceof AbstractModel) {
+    return obj.toJson();
+  } else {
+    return obj;
+  }
 }

@@ -36,6 +36,8 @@ import {SelectionService} from "./services/SelectionService";
 import {HumanReadablePipe} from "./pipes/HumanReadablePipe.pipe";
 import {SandboxEvalComponent} from "./widgets/sandbox-eval/sandbox-eval.component";
 import {SandboxEvalService} from "./services/SandboxEvalService";
+import {HistoryService} from "./services/HistoryService";
+import { HistoryComponent } from './widgets/history/history.component';
 
 @NgModule({
   declarations: [
@@ -55,7 +57,8 @@ import {SandboxEvalService} from "./services/SandboxEvalService";
     PropertySelectorComponent,
     ChannelPropertySelectorComponent,
     HumanReadablePipe,
-    SandboxEvalComponent
+    SandboxEvalComponent,
+    HistoryComponent
   ],
   imports: [
     BrowserModule,
@@ -68,6 +71,7 @@ import {SandboxEvalService} from "./services/SandboxEvalService";
     {provide: AbstractDataService, useClass: DataService},
     {provide: AbstractDragService, useClass: DragService},
     {provide: AbstractMetadataService, useClass: MetadataService},
+    HistoryService,
     SelectionService,
     FileService,
     ConfigSerializer,

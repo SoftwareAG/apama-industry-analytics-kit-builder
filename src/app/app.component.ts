@@ -31,7 +31,8 @@ export class AppComponent implements AfterViewInit {
 
   informationHeightStartPixels = 0;
 
-  constructor(private dataService: AbstractDataService, private metadataService: AbstractMetadataService, public modalService: NgbModal, private http: Http, private cookieService: CookieService, private sandboxEvalService: SandboxEvalService) { }
+  constructor(private dataService: AbstractDataService, private metadataService: AbstractMetadataService, public modalService: NgbModal,
+              private http: Http, private cookieService: CookieService, private sandboxEvalService: SandboxEvalService) { }
 
   @HostListener('window:beforeunload', ['$event'])
   checkforUnsavedConfiguration($event)
