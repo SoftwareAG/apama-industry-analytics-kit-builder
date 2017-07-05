@@ -15,6 +15,32 @@
   border-left: 1px solid $gray-lighter;
 }
 
+.icon::before {
+  display: inline-block;
+  margin-right: .5em;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform: translate(0, 0);
+}
+
+.information:hover:before{
+  color:grey;
+
+}
+
+.information::before {
+  content: "\f141";
+  font-family: "FontAwesome";
+  text-align: center;
+}
+
+.information {
+  margin-top: -9px;
+}
+
 .information-panel {
   border-top: 1px solid $gray-lighter;
   background-color: $gray-lightest;
