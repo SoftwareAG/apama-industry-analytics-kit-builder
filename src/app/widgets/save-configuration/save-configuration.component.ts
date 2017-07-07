@@ -19,7 +19,7 @@ export class SaveConfigurationComponent {
     const content = this.fileService.serializeConfig(config);
     const fileName = config.name.getValue().replace(/[ *]/g, "_") + ".evt";
     try {
-      this.fileService.saveFile(fileName, JSON.stringify(content));
+      this.fileService.saveFile(fileName, content);
       this.dataService.setModified(false);
     } catch(error) {
       alert(error.message);
