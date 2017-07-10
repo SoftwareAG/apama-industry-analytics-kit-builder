@@ -19,6 +19,7 @@ import {RowDeserializer} from "../../classes/RowDeserializer";
 import {TransformerDeserializer} from "../../classes/TransformerDeserializer";
 import {SelectionService} from "../../services/SelectionService";
 import {HistoryService} from "../../services/HistoryService";
+import {Observable} from "rxjs/Observable";
 
 @Injectable()
 class DataServiceMock extends AbstractDataService {
@@ -48,7 +49,7 @@ class DataServiceMock extends AbstractDataService {
   ));
 
   setModified(modifiedValue: boolean) {};
-  isModified(): boolean { return false};
+  isModified(): Observable<boolean> { return new BehaviorSubject<boolean>(false)};
 }
 
 describe('NavBarComponent', () => {

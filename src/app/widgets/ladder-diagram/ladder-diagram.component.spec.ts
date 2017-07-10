@@ -13,11 +13,13 @@ import {AbstractMetadataService, MetadataService} from "../../services/MetadataS
 import {Metadata, MetadataBuilder} from "../../classes/Metadata";
 import {TransformerChannel} from "../../classes/TransformerChannel";
 import {SelectionService} from "../../services/SelectionService";
+import {Observable} from "rxjs/Observable";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
 @Injectable()
 class DataServiceMock extends AbstractDataService {
   setModified(modifiedValue: boolean) {};
-  isModified(): boolean { return false};
+  isModified(): Observable<boolean> { return new BehaviorSubject<boolean>(false)};
 }
 
 describe('LadderDiagramComponent', () => {

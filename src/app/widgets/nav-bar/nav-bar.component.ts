@@ -40,22 +40,25 @@ export class NavBarComponent {
     const config = new ConfigBuilder()
       .build();
     this.dataService.hierarchy.next(config);
+    this.dataService.setModified(false);
     this.selectionService.selection.next(undefined);
     this.historyService.reset();
   }
 
   newConfig() {
-    if (this.dataService.isModified()) {
-      this.modalService.open(NewConfigurationDialogComponent, {size: "lg"}).result
-        .then(result => {
-          if (result === "Yes") {
-           this.clearConfiguration();
-          }
-        }, () => {
-        })
-    } else {
-      this.clearConfiguration();
-    }
+    this.dataService.isModified().first().subscribe(modified => {
+      if (modified) {
+        this.modalService.open(NewConfigurationDialogComponent, {size: "lg"}).result
+          .then(result => {
+            if (result === "Yes") {
+              this.clearConfiguration();
+            }
+          }, () => {
+          })
+      } else {
+        this.clearConfiguration();
+      }
+    })
   }
 
   loadDataFile() {
@@ -64,6 +67,7 @@ export class NavBarComponent {
       .then(apamaEPL => this.fileService.deserializeConfig(apamaEPL))
       .then(config => {
         this.dataService.hierarchy.next(config);
+        this.dataService.setModified(false);
         this.historyService.reset();
       })
       .catch(error => {
@@ -76,17 +80,19 @@ export class NavBarComponent {
   }
 
   loadConfig() {
-    if (this.dataService.isModified()) {
-      this.modalService.open(NewConfigurationDialogComponent, {size: "lg"}).result
-        .then(result => {
-          if (result === "Yes") {
-            this.loadDataFile();
-          };
-        }, () => {
-        })
-    } else {
-      this.loadDataFile();
-    }
+    this.dataService.isModified().first().subscribe(modified => {
+      if (modified) {
+        this.modalService.open(NewConfigurationDialogComponent, {size: "lg"}).result
+          .then(result => {
+            if (result === "Yes") {
+              this.loadDataFile();
+            }
+          }, () => {
+          })
+      } else {
+        this.loadDataFile();
+      }
+    });
   }
 
   openSaveConfigurationDialog() {

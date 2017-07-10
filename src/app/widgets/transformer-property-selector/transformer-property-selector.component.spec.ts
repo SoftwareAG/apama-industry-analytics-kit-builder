@@ -10,11 +10,13 @@ import {AbstractMetadataService, MetadataService} from "../../services/MetadataS
 import {SelectionService} from "../../services/SelectionService";
 import {HumanReadablePipe} from "../../pipes/HumanReadablePipe.pipe";
 import {SandboxEvalService} from "../../services/SandboxEvalService";
+import {Observable} from "rxjs/Observable";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
 @Injectable()
 class DataServiceMock extends AbstractDataService {
   setModified(modifiedValue: boolean) {};
-  isModified(): boolean { return false};
+  isModified(): Observable<boolean> { return new BehaviorSubject<boolean>(false)};
 }
 
 describe('TransformerPropertySelectorComponent', () => {

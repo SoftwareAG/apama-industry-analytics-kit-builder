@@ -30,7 +30,7 @@ describe('AppComponent', () => {
     const dataService = TestBed.get(AbstractDataService) as DataService;
     const fixture = TestBed.createComponent(AppComponent);
     const el = fixture.debugElement.nativeElement;
-    expect(dataService.isModified()).toBeFalse();
+    dataService.isModified().subscribe(modified => expect(modified).toBeFalse());
     expect(el.querySelector('.unsaved')).toBeNull();
   });
 
@@ -59,12 +59,9 @@ describe('AppComponent', () => {
 
     metadataService.metadata.next(metadata);
     dataService.hierarchy.next(config);
-
     fixture.detectChanges();
-
-    expect(dataService.isModified()).toBeFalse();
     expect(el.querySelector('.unsaved')).toBeNull();
-
+    dataService.isModified().subscribe(modified => expect(modified).toBeFalse());
   });
 
   it('should display [Unsaved] when the configuration has been updated', () => {
@@ -82,13 +79,10 @@ describe('AppComponent', () => {
       .build();
 
     metadataService.metadata.next(metadata);
-
     dataService.hierarchy.getValue().addRow(TransformerBuilder.fromTransformerDef(metadata.getAnalytic('Analytic1')).build());
-
     fixture.detectChanges();
-
-    expect(dataService.isModified()).toBeTrue();
     expect(el.querySelector('.unsaved')).toBeDefined();
+    dataService.isModified().subscribe(modified => expect(modified).toBeTrue());
   });
 });
 
