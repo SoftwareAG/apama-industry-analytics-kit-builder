@@ -8,6 +8,8 @@ import {Injectable} from "@angular/core";
 import {Metadata} from "./Metadata";
 import {validate} from "validate.js";
 import {AbstractMetadataService} from "../services/MetadataService";
+import {Utils} from "../Utils";
+import {Transformer} from "./Transformer";
 
 export interface ConfigJsonInterface {
   name: string;
@@ -43,12 +45,12 @@ export class Config extends AbstractModel<ConfigJsonInterface, never> implements
   }
 
   asObservable(): Observable<this> {
-    return Observable.merge(
+    return Utils.hotObservable(Observable.merge(
       this.name,
       this.description,
       this.rows,
       this.rows.switchMap(rows => Observable.merge(...rows.toArray().map(row => row.asObservable())))
-    ).mapTo(this);
+    ).mapTo(this));
   }
 
   validate(): this {
@@ -56,6 +58,10 @@ export class Config extends AbstractModel<ConfigJsonInterface, never> implements
     if (validate.isEmpty(this.name.getValue())) { throw new Error('Name cannot be empty'); }
     if (validate.isEmpty(this.metadataVersion)) { throw new Error('Version cannot be empty'); }
     return this;
+  }
+
+  addRow(...analytic: Transformer[]) {
+    this.rows.next(this.rows.getValue().push(new RowBuilder().pushTransformer(...analytic).build()));
   }
 
   removeRow(row: Row) {

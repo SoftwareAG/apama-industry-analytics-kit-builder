@@ -16,6 +16,7 @@ import {Metadata} from "./Metadata";
 import * as _ from "lodash";
 import {TransformerChannel} from "app/classes/TransformerChannel";
 import {TransformerChannelDef} from "./TransformerChannelDef";
+import {Utils} from "app/Utils";
 
 export interface RowJsonInterface {
   maxTransformerCount: number;
@@ -51,7 +52,7 @@ export class Row extends AbstractModel<RowJsonInterface, never> implements AsObs
   }
 
   asObservable(): Observable<this> {
-    return Observable.merge(
+    return Utils.hotObservable(Observable.merge(
       this.maxTransformerCount,
       this.transformers,
       this.inputChannelOverrides,
@@ -59,7 +60,7 @@ export class Row extends AbstractModel<RowJsonInterface, never> implements AsObs
       this.transformers.switchMap(transformers => Observable.merge(...transformers.toArray().map(transformer => transformer.asObservable()))),
       this.inputChannelOverrides.switchMap(inChannels => Observable.merge(...inChannels.toArray().map(inChan => inChan ? inChan.asObservable() : Observable.of(undefined)))),
       this.outputChannelOverrides.switchMap(outChannels => Observable.merge(...outChannels.toArray().map(outChan => outChan ? outChan.asObservable() : Observable.of(undefined)))),
-    ).mapTo(this);
+    ).mapTo(this));
   }
 
   getInChannels(metadata: Metadata): List<RowChannel | TransformerChannel> {

@@ -2,12 +2,13 @@ import {AsObservable, BehaviorSubjectify} from "./interfaces";
 import {BehaviorSubject, Observable, Subject} from "rxjs";
 import * as Promise from "bluebird";
 import {List} from "immutable";
+import {Utils} from "../Utils";
 
 class TestAsObservable implements AsObservable {
   constructor(private readonly subject: Subject<TestAsObservable>) {}
 
   asObservable(): Observable<this> {
-    return this.subject.asObservable();
+    return Utils.hotObservable(this.subject.asObservable()) as Observable<this>;
   }
 }
 
@@ -15,8 +16,7 @@ export class AsObservableTest<ClassToTest extends AsObservable & BehaviorSubject
   test(classInstance: ClassToTest, done: DoneFn): Promise.Thenable<any> {
     const behaviorSubjectProps = Object.keys(classInstance).filter((key: string) => classInstance[key] instanceof BehaviorSubject);
 
-    const observable = classInstance.asObservable().publish();
-    observable.connect(); // Connect to drain the previousValue so that we can safely do .first()
+    const observable = classInstance.asObservable();
 
     return Promise.mapSeries(behaviorSubjectProps, prop => {
       const currentValue = classInstance[prop] as BehaviorSubject<any>;

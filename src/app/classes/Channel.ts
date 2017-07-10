@@ -3,6 +3,7 @@ import {BehaviorSubject, Observable} from "rxjs";
 import {AsObservable, BehaviorSubjectify} from "../interfaces/interfaces";
 import {AbstractModel} from "./AbstractModel";
 import {validate} from "validate.js";
+import {Utils} from "../Utils";
 
 export interface ChannelJsonInterface {
   name: string;
@@ -21,9 +22,9 @@ export class RowChannel extends AbstractModel<ChannelJsonInterface, never> imple
   }
 
   asObservable(): Observable<this> {
-    return Observable.merge(
+    return Utils.hotObservable(Observable.merge(
       this.name
-    ).mapTo(this);
+    ).mapTo(this));
   }
 
   validate(): this {

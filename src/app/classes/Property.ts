@@ -8,6 +8,7 @@ import {validate} from "validate.js";
 import {TransformerDef} from "./TransformerDef";
 import * as _ from "lodash";
 import {IgnoreableDeserializationError} from "./Errors";
+import {Utils} from "../Utils";
 
 export interface PropertyJsonInterface {
   name: string;
@@ -41,11 +42,11 @@ export class Property extends AbstractModel<PropertyJsonInterface, PropertyDef> 
   }
 
   asObservable(): Observable<this> {
-    return Observable.merge(
+    return Utils.hotObservable(Observable.merge(
       this.name,
       this.value,
       this.invalid
-    ).mapTo(this);
+    ).mapTo(this));
   }
 
   validate(propertyDef: PropertyDef): this {

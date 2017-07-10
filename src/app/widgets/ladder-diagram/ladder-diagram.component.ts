@@ -103,8 +103,7 @@ export class LadderDiagramComponent implements OnInit, AfterViewInit   {
         const dragging = component.dragService.dragging.getValue();
         if (dragging) {
           if (dragging.object instanceof Transformer) {
-            const rows = this.dataService.hierarchy.getValue().rows;
-            rows.next(rows.getValue().push(new RowBuilder().pushTransformer(dragging.object).build()));
+            this.dataService.hierarchy.getValue().addRow(dragging.object);
             this.dragService.stopDrag();
             d3.event.stopPropagation();
           }
@@ -122,14 +121,14 @@ export class LadderDiagramComponent implements OnInit, AfterViewInit   {
       });
 
     this.dataService.hierarchy
-      .switchMap(hierarchy => hierarchy.asObservable()) // subscribe to all of the sub-tree changes too
+      .merge(this.dataService.hierarchy.switchMap(hierarchy => hierarchy.asObservable()))
       .combineLatest(
         this.dragService.dragging,
         this.metadataService.metadata,
         this.selectionService.selection,
         (hierarchy) => hierarchy
       )
-      .subscribe(_.debounce(data => {
+      .subscribe(data => {
 
         rows.datum(data);
 
@@ -142,7 +141,7 @@ export class LadderDiagramComponent implements OnInit, AfterViewInit   {
         const channelsEnter = rowEnter.append('g')
           .classed('channels', true);
         const channelsUpdate = rowUpdate.select('.channels').datum(d => {
-          return createChannelConnections(d.row).map((channelGroup, i, channelConnections) => { return { row: d.row, channelGroup:channelGroup, channelGroupX: channelX(i, d.channelWidth), channelWidth: d.channelWidth } })
+          return createChannelConnections(d.row).map((channelGroup, i) => { return { row: d.row, channelGroup:channelGroup, channelGroupX: channelX(i, d.channelWidth), channelWidth: d.channelWidth } })
         });
 
         const channelGroupsEnter = channelsEnter.append('g')
@@ -577,7 +576,7 @@ export class LadderDiagramComponent implements OnInit, AfterViewInit   {
         // Resize the svg so that everything fits, the parent element can deal with scrolling
         svg
           .attr('height', finalHeight + padding.top + padding.bottom)
-      }, 0));
+      });
 
     function transformerHeight(transformer: Transformer) {
       const inputs = getTransformerInputChannelConnections(transformer);

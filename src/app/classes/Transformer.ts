@@ -16,6 +16,7 @@ import {
 } from "./TransformerChannel";
 import {validate} from "validate.js";
 import {TransformerChannelDef} from "./TransformerChannelDef";
+import {Utils} from "../Utils";
 
 export interface TransformerJsonInterface {
   name: string;
@@ -85,12 +86,12 @@ export class Transformer implements AbstractModel<TransformerJsonInterface, Tran
   }
 
   asObservable(): Observable<this> {
-    return Observable.merge(
+    return Utils.hotObservable(Observable.merge(
       this.propertyValuesByDefName,
       this.observableInputChannels,
       this.observableOutputChannels,
       this.observablePropertyValues.switchMap(properties => Observable.merge(...properties.map((property: Property) => property.asObservable()).toArray()))
-    ).mapTo(this);
+    ).mapTo(this));
   }
 
   toJson(): TransformerJsonInterface {

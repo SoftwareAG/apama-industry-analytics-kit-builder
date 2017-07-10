@@ -6,6 +6,7 @@ import {Config, ConfigBuilder} from "./classes/Config";
 import {AbstractMetadataService, MetadataService} from "./services/MetadataService";
 import {DataService} from "./services/DataService";
 import {AbstractDataService} from "./services/AbstractDataService";
+import {TransformerBuilder} from "./classes/Transformer";
 
 describe('AppComponent', () => {
 
@@ -33,7 +34,7 @@ describe('AppComponent', () => {
     expect(el.querySelector('.unsaved')).toBeNull();
   });
 
-  it('should display [Unsaved] when the configuration has been updated but not saved', () => {
+  it('should not display [Unsaved] when the configuration has been replaced', () => {
     const dataService = TestBed.get(AbstractDataService) as DataService;
     const metadataService = TestBed.get(AbstractMetadataService) as MetadataService;
     const fixture = TestBed.createComponent(AppComponent);
@@ -61,11 +62,34 @@ describe('AppComponent', () => {
 
     fixture.detectChanges();
 
-    expect(dataService.isModified()).toBeTrue();
-    expect(el.querySelector('.unsaved')).toBeDefined();
+    expect(dataService.isModified()).toBeFalse();
+    expect(el.querySelector('.unsaved')).toBeNull();
 
   });
 
+  it('should display [Unsaved] when the configuration has been updated', () => {
+    const dataService = TestBed.get(AbstractDataService) as DataService;
+    const metadataService = TestBed.get(AbstractMetadataService) as MetadataService;
+    const fixture = TestBed.createComponent(AppComponent);
+    const el = fixture.debugElement.nativeElement;
+
+    const metadata = new MetadataBuilder()
+      .withAnalytic()
+      .Name('Analytic1')
+      .withInputChannel().Name('InChannel0').endWith()
+      .withOutputChannel().Name('OutChannel0').endWith()
+      .endWith()
+      .build();
+
+    metadataService.metadata.next(metadata);
+
+    dataService.hierarchy.getValue().addRow(TransformerBuilder.fromTransformerDef(metadata.getAnalytic('Analytic1')).build());
+
+    fixture.detectChanges();
+
+    expect(dataService.isModified()).toBeTrue();
+    expect(el.querySelector('.unsaved')).toBeDefined();
+  });
 });
 
 

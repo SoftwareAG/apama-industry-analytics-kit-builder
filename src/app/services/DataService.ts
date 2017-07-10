@@ -1,11 +1,5 @@
-import {RowChannel, RowChannelBuilder} from "../classes/Channel";
 import {AbstractDataService} from "./AbstractDataService";
 import {Injectable} from "@angular/core";
-import {List} from "immutable";
-import {Transformer} from "../classes/Transformer";
-import {TransformerChannel} from "../classes/TransformerChannel";
-import {Row} from "../classes/Row";
-import {Data} from "@angular/router";
 
 @Injectable()
 export class DataService extends AbstractDataService {
@@ -19,9 +13,7 @@ export class DataService extends AbstractDataService {
     });
 
     this.hierarchy.subscribe( () => {
-      setTimeout( () => {
-        this.setModified(false);
-      });
+      this.setModified(false);
     });
 
     this.modified = false;
