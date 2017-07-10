@@ -5,6 +5,7 @@ h4 {
 }
 
 .content {
+  flex: 1 1 0;
   overflow-y: auto;
   background-color: $white;
   border: 1px solid $gray-lighter;

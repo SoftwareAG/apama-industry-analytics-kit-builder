@@ -1,4 +1,4 @@
 <h4>Documentation</h4>
-<div class="content h-100 px-2" *ngIf="transformerDocumentation | async">
+<div class="content px-2" *ngIf="transformerDocumentation | async">
   <div [innerHTML]="transformerDocumentation | async"></div>
 </div>

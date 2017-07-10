@@ -3,9 +3,7 @@
   <drag-overlay></drag-overlay>
   <nav-bar></nav-bar>
   <div class="w-100 h-100 d-flex justify-content-around">
-    <div class="d-flex flex-column left-panel p-0 h-100">
-      <transformer-selector class="h-100 p-2 d-flex flex-column"></transformer-selector>
-    </div>
+    <transformer-selector class="left-panel h-100 p-2 d-flex flex-column"></transformer-selector>
     <div class="p-0 h-100 middle-panel w-100">
       <div id="ladder-diagram-panel" class="scroll" [style.height]="ladderDiagramHeightPercentString">
         <ladder-diagram class="w-100" ></ladder-diagram>
@@ -18,7 +16,7 @@
            (resizeStart)="onResizeStart($event)"
            [validateResize]="onValidateResize"
            [style.height]="informationHeightPercentString">
-        <information class="w-100 d-flex flex-column"></information>
+        <information class="w-100 h-100 d-flex flex-column"></information>
       </div>
     </div>
     <property-selector class="p-2 right-panel d-flex flex-column"></property-selector>
