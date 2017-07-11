@@ -32,7 +32,7 @@ export interface TransformerInterface {
   outputChannels: TransformerChannel[];
 }
 
-export class Transformer implements AbstractModel<TransformerJsonInterface, TransformerDef>, AsObservable {
+export class Transformer extends AbstractModel<TransformerJsonInterface, TransformerDef> implements AsObservable {
   readonly name: string;
   readonly propertyValuesByDefName: BehaviorSubject<Map<string, List<Property>>>;
   get propertyValues(): List<Property> {
@@ -61,6 +61,7 @@ export class Transformer implements AbstractModel<TransformerJsonInterface, Tran
   }
 
   constructor(obj: TransformerInterface) {
+    super();
     this.name = obj.name;
     // Group all of the property values by their definitionName
     this.propertyValuesByDefName = new BehaviorSubject(

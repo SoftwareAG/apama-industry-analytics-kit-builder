@@ -13,9 +13,7 @@ export class HistoryService {
   constructor(private dataService: AbstractDataService) {
     this.undoStack = new BehaviorSubject(Stack.of(dataService.hierarchy.getValue().toJson()));
 
-    this.dataService.hierarchy.switchMap(config => {
-      return config.asObservable()
-    })
+    this.dataService.hierarchy.switchMap(config => config.asObservable())
       .debounceTime(500)
       .subscribe((config) => {
         this.undoStack.next(this.undoStack.getValue().push(config.toJson()));

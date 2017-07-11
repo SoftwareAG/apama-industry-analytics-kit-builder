@@ -9,7 +9,7 @@ export abstract class AbstractModel<JsonModel, Definition> {
         value = value.getValue();
       }
       if (Map.isMap(value)) {
-        result[key] = value.mapKeys(ifAbstractThenToJson).mapEntries(ifAbstractThenToJson).toJSON();
+        result[key] = value.mapKeys(ifAbstractThenToJson).map(ifAbstractThenToJson).toJSON();
       } else if (List.isList(value)) {
         result[key] = value.toArray().map(ifAbstractThenToJson)
       } else {

@@ -377,7 +377,10 @@ export class LadderDiagramComponent implements OnInit, AfterViewInit   {
           .attr('tabindex', (d) => component.selectionService.currentSelection === d.transformer ? '0' : null)
           .on('keydown', (d) => {
             if (component.selectionService.currentSelection === d.transformer && d3.event.key === 'Delete') {
-              d.row.removeAnalytic(d.transformer);
+              d.row.removeTransformer(d.transformer);
+              if (d.row.transformers.getValue().size === 0) {
+                component.dataService.hierarchy.getValue().removeRow(d.row);
+              }
             }
           });
 

@@ -46,11 +46,6 @@ export class Row extends AbstractModel<RowJsonInterface, never> implements AsObs
     this.outputChannelOverrides = new BehaviorSubject(Map<number, RowChannel>(_.map(obj.outputChannelOverrides, (chan, i: string) => [Math.round(parseFloat(i)), chan])));
   }
 
-  removeAnalytic(analytic: Transformer) : this {
-    this.transformers.next(List<Transformer>(this.transformers.getValue().filter(_analytic => _analytic !== analytic)));
-    return this;
-  }
-
   asObservable(): Observable<this> {
     return Utils.hotObservable(Observable.merge(
       this.maxTransformerCount,

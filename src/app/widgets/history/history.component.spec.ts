@@ -4,6 +4,7 @@ import { HistoryComponent } from './history.component';
 import {HistoryService} from "../../services/HistoryService";
 import {AbstractDataService} from "app/services/AbstractDataService";
 import {DataService} from "app/services/DataService";
+import {SelectionService} from "../../services/SelectionService";
 
 describe('HistoryComponent', () => {
   let component: HistoryComponent;
@@ -16,7 +17,8 @@ describe('HistoryComponent', () => {
       ],
       providers: [
         {provide: AbstractDataService, useClass: DataService},
-        HistoryService
+        HistoryService,
+        SelectionService
       ]
     })
     .compileComponents();
