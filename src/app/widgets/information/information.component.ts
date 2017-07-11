@@ -1,6 +1,5 @@
 import {Component} from "@angular/core";
 import {AbstractMetadataService} from "../../services/MetadataService";
-import {AbstractDataService} from "../../services/AbstractDataService";
 import {Transformer} from "../../classes/Transformer";
 import {Observable} from "rxjs/Observable";
 import {SelectionService} from "../../services/SelectionService";

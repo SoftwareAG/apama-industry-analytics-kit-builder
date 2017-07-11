@@ -331,8 +331,8 @@ export class LadderDiagramComponent implements OnInit, AfterViewInit   {
               clearTimeout(d.mousedownHandler.timeout);
               d.mousedownHandler = undefined;
             }
-            (this as {focus: () => void} & SVGGElement).focus();
             component.selectionService.selection.next(d.transformer);
+            (this as {focus: () => void} & SVGGElement).focus();
           })
           .on('mouseenter', function(d) {
             const transformer = d3.select(this);
