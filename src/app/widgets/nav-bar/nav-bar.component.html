@@ -19,7 +19,7 @@
       <li *ngIf="(configurations | async).size > 0" class="nav-item examples" ngbDropdown>
         <a class="nav-link text-uppercase" href="javascript:void(0)" ngbDropdownToggle>Samples</a>
         <div class="dropdown-menu">
-          <a *ngFor="let configuration of configurations | async" class="dropdown-item ellipsis" href="javascript:void(0)" (click)="onConfigurationClick(configuration)">{{configuration.name}}</a>
+            <a *ngFor="let configuration of configurations | async" class="dropdown-item ellipsis" href="javascript:void(0)" (click)="onConfigurationClick(configuration)" ngbTooltip="{{configuration.description}}" container="body" placement="right">{{configuration.name}}</a>
         </div>
       </li>
     </ul>
@@ -49,7 +49,7 @@
       </div>
     </div>
   </div>
-  <div class="configurationTitle ellipsis">
+  <div class="configurationTitle ellipsis" ngbTooltip="{{((dataService.hierarchy | async).description | async)}}" container="body" placement="bottom">
     {{((dataService.hierarchy | async).name | async) || 'Untitled' }}
     <span class="unsaved pl-2" *ngIf="(dataService.isModified()| async)">[Unsaved]</span>
   </div>
