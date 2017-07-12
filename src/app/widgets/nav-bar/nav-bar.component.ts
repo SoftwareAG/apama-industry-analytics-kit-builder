@@ -1,5 +1,5 @@
 import {Component} from "@angular/core";
-import {Config, ConfigBuilder} from "../../classes/Config";
+import {ConfigBuilder, ConfigJsonInterface} from "../../classes/Config";
 import {AbstractDataService} from "../../services/AbstractDataService";
 import {Observable} from "rxjs";
 import {List, Set} from "immutable";
@@ -19,21 +19,21 @@ import {HistoryService} from "../../services/HistoryService";
   styleUrls: ['./nav-bar.component.scss']
 })
 export class NavBarComponent {
-  readonly configurations: Observable<List<() => Config>>;
+  readonly configurations: Observable<List<ConfigJsonInterface>>;
   readonly metadataVersions: BehaviorSubject<Set<string>>;
   readonly currentMetaVersion: Observable<string>;
   isNavbarCollapsed: boolean = true;
 
   constructor(public dataService: AbstractDataService, private fileService: FileService, private readonly metadataService: AbstractMetadataService,
               public modalService: NgbModal, private selectionService: SelectionService, private historyService: HistoryService) {
-    this.configurations = this.dataService.configurations.asObservable();
     this.metadataVersions = new BehaviorSubject(Set.of("2.0.0.0"));
     this.currentMetaVersion = metadataService.metadata.map(metadata => metadata.version);
     this.currentMetaVersion.subscribe(version => this.metadataVersions.next(this.metadataVersions.getValue().add(version)));
+    this.configurations = metadataService.metadata.map(metadata => metadata.samples.map((sample:string) => fileService.deserializeConfig(sample).toJson()));
   }
 
-  onConfigurationClick(config: () => Config) {
-    this.dataService.hierarchy.next(config());
+  onConfigurationClick(config: ConfigJsonInterface) {
+    this.dataService.hierarchy.next(ConfigBuilder.fromJson(config).build());
   }
 
   clearConfiguration() {
@@ -128,7 +128,9 @@ export class NavBarComponent {
     this.fileService.getFileData(".json")
       .then(result => result.fileContent)
       .then(jsonStr => JSON.parse(jsonStr))
-      .then(json => this.metadataService.loadMetadata(json))
+      .then(json => {
+        this.metadataService.loadMetadata(json);
+      })
   }
 
   exportMetadata() {
@@ -136,7 +138,7 @@ export class NavBarComponent {
     const content = this.fileService.serializeMetadata(metadata);
     const fileName = `metadata-${metadata.version}.json`;
     try {
-      this.fileService.saveFile(fileName, JSON.stringify(content));
+      this.fileService.saveFile(fileName, JSON.stringify(content, null, 4));
     } catch(error) {
       alert(error.message);
     }

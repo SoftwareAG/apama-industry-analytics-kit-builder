@@ -1,4 +1,4 @@
-import {Config, ConfigSerializer} from "../classes/Config";
+import {Config, ConfigJsonInterface, ConfigSerializer} from "../classes/Config";
 import {Injectable} from "@angular/core";
 import {AbstractMetadataService} from "./MetadataService";
 import {validate} from "validate.js";
@@ -7,7 +7,8 @@ import {Metadata, MetadataJsonInterface} from "../classes/Metadata";
 import * as Promise from "bluebird";
 import {Utils} from "../Utils";
 import {TransformerDefBuilder, TransformerDefJsonInterface} from "../classes/TransformerDef";
-import * as FileSaver from 'file-saver';
+import * as FileSaver from "file-saver";
+import {List} from "immutable";
 
 export class UserCancelled extends Error {}
 

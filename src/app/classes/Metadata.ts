@@ -7,18 +7,21 @@ import {Transformer, TransformerBuilder} from "./Transformer";
 export interface MetadataJsonInterface {
   version: string;
   groupOrder?: string[];
+  samples?: string[];
   analytics?: TransformerDefJsonInterface[]
 }
 
 export interface MetadataInterface {
   version: string
   groupOrder: string[],
+  samples: string[];
   analytics: TransformerDef[]
 }
 
 export class Metadata extends AbstractModel<MetadataJsonInterface, never> {
   readonly version: string;
   readonly groupOrder: List<string>;
+  readonly samples: List<string>;
   readonly analyticsByName: OrderedMap<string, TransformerDef>;
   get analytics() { return List(this.analyticsByName.valueSeq()) }
 
@@ -26,6 +29,7 @@ export class Metadata extends AbstractModel<MetadataJsonInterface, never> {
     super();
     this.version = obj.version;
     this.groupOrder = List(obj.groupOrder);
+    this.samples = List(obj.samples);
     this.analyticsByName = OrderedMap<string, TransformerDef>((obj.analytics.map(analytic => [analytic.name, analytic])));
   }
 
@@ -33,6 +37,7 @@ export class Metadata extends AbstractModel<MetadataJsonInterface, never> {
     return {
       version: this.version,
       groupOrder: this.groupOrder.toArray(),
+      samples: this.samples.toArray(),
       analytics: this.analytics.toArray().map(analytic => analytic.toJson())
     }
   }
@@ -53,6 +58,7 @@ export class Metadata extends AbstractModel<MetadataJsonInterface, never> {
 export class MetadataBuilder extends ClassBuilder<Metadata> implements MetadataInterface {
   version: string = "2.0.0.0";
   groupOrder: string[] = [];
+  samples: string[] = [];
   analytics: TransformerDef[] = [];
 
   Version(version: string): this {
@@ -61,6 +67,10 @@ export class MetadataBuilder extends ClassBuilder<Metadata> implements MetadataI
   }
   GroupOrder(groupOrder: string[]) : this {
     this.groupOrder = groupOrder;
+    return this;
+  }
+  SampleConfigurations(samples: string[]) : this {
+    this.samples = samples;
     return this;
   }
   pushGroupOrder(...group: string[]): this {
@@ -87,6 +97,7 @@ export class MetadataBuilder extends ClassBuilder<Metadata> implements MetadataI
     return new MetadataBuilder()
       .Version(json.version)
       .GroupOrder(json.groupOrder || [])
+      .SampleConfigurations(json.samples || [])
       .Analytics((json.analytics || []).map((transformer) => TransformerDefBuilder.fromJson(transformer).build()))
   }
 }

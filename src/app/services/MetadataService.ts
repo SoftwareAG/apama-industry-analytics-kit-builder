@@ -1,7 +1,7 @@
 import {Metadata, MetadataBuilder, MetadataJsonInterface} from "../classes/Metadata";
 import {Injectable} from "@angular/core";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {TransformerDefBuilder, TransformerDefJsonInterface} from "../classes/TransformerDef";
+import {TransformerDefJsonInterface} from "../classes/TransformerDef";
 
 export abstract class AbstractMetadataService {
   readonly metadata: BehaviorSubject<Metadata> = new BehaviorSubject(new MetadataBuilder().build());

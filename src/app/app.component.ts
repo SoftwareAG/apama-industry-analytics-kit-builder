@@ -8,6 +8,7 @@ import {Http} from "@angular/http";
 import {CookieService} from "ng2-cookies";
 import {SandboxEvalComponent} from "./widgets/sandbox-eval/sandbox-eval.component";
 import {SandboxEvalService} from "./services/SandboxEvalService";
+import {FileService} from "./services/FileService";
 
 @Component({
   selector: 'app-root',
@@ -32,7 +33,7 @@ export class AppComponent implements AfterViewInit {
   informationHeightStartPixels = 0;
 
   constructor(private dataService: AbstractDataService, private metadataService: AbstractMetadataService, public modalService: NgbModal,
-              private http: Http, private cookieService: CookieService, private sandboxEvalService: SandboxEvalService) { }
+              private http: Http, private cookieService: CookieService, private sandboxEvalService: SandboxEvalService, private fileService: FileService) { }
 
   @HostListener('window:beforeunload', ['$event'])
   checkforUnsavedConfiguration($event)
@@ -81,7 +82,7 @@ export class AppComponent implements AfterViewInit {
     this.http.get('assets/metadata.json')
       .toPromise()
       .then( (result => {
-          this.metadataService.loadMetadata(result.json())
+          this.metadataService.loadMetadata(result.json());
       }))
       .catch(err => console.log(err));
   }

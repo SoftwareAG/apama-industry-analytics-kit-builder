@@ -1,7 +1,7 @@
 import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 import {NavBarComponent} from "./nav-bar.component";
 import {AbstractDataService} from "../../services/AbstractDataService";
-import {Config, ConfigArrayBuilder, ConfigSerializer} from "../../classes/Config";
+import {Config, ConfigArrayBuilder, ConfigJsonInterface, ConfigSerializer} from "../../classes/Config";
 import {BehaviorSubject} from "rxjs";
 import {List} from "immutable";
 import {Injectable} from "@angular/core";
@@ -28,7 +28,7 @@ class DataServiceMock extends AbstractDataService {
   removeAnalyticChannelsFromChannelsPanel(transformer: Transformer) {};
   addChannel(channelName: string) {};
 
-  readonly configurations: BehaviorSubject<List<() => Config>> = new BehaviorSubject(List<() => Config>(()=>new ConfigArrayBuilder()
+  readonly configurations: BehaviorSubject<List<ConfigJsonInterface>> = new BehaviorSubject(List<ConfigJsonInterface>(()=> new ConfigArrayBuilder()
     .with()
       .Name("Config1")
       .Description("Config1Desc")
