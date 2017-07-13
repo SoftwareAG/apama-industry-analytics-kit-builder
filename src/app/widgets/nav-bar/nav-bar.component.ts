@@ -33,9 +33,23 @@ export class NavBarComponent {
   }
 
   onConfigurationClick(config: ConfigJsonInterface) {
-    this.dataService.hierarchy.next(ConfigBuilder.fromJson(config).build());
-    this.dataService.setModified(false);
-    this.historyService.reset();
+    this.dataService.isModified().first().subscribe(modified => {
+      if (modified) {
+        this.modalService.open(NewConfigurationDialogComponent, {size: "lg"}).result
+          .then(result => {
+            if (result === "Yes") {
+              this.dataService.hierarchy.next(ConfigBuilder.fromJson(config).build());
+              this.dataService.setModified(false);
+              this.historyService.reset();
+            }
+          }, () => {
+          })
+      } else {
+        this.dataService.hierarchy.next(ConfigBuilder.fromJson(config).build());
+        this.dataService.setModified(false);
+        this.historyService.reset();
+      }
+    });
   }
 
   clearConfiguration() {
