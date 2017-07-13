@@ -34,6 +34,8 @@ export class NavBarComponent {
 
   onConfigurationClick(config: ConfigJsonInterface) {
     this.dataService.hierarchy.next(ConfigBuilder.fromJson(config).build());
+    this.dataService.setModified(false);
+    this.historyService.reset();
   }
 
   clearConfiguration() {
