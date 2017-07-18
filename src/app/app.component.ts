@@ -35,15 +35,16 @@ export class AppComponent implements AfterViewInit {
               private http: Http, private cookieService: CookieService, private sandboxEvalService: SandboxEvalService, private fileService: FileService) { }
 
   @HostListener('window:beforeunload', ['$event'])
-  checkforUnsavedConfiguration($event)
-  {
-    if (this.dataService.isModified()) {
-      $event = $event || window.event;
-      $event.preventDefault();
-      $event.cancelBubble = true;
-      $event.returnValue = 'Your configuration changes will be lost';
-    }
-}
+  checkforUnsavedConfiguration($event) {
+    this.dataService.isModified().first().subscribe(modified => {
+      if (modified) {
+        $event = $event || window.event;
+        $event.preventDefault();
+        $event.cancelBubble = true;
+        $event.returnValue = 'Your configuration changes will be lost';
+      }
+    })
+  }
 
   onValidateResize(event: ResizeEvent): boolean {
     if (event.rectangle) {
