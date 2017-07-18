@@ -27,7 +27,6 @@ import {ResizableModule} from "angular-resizable-element";
 import {TransformerChannelDeserializer} from "./classes/TransformerChannel";
 import {RowDeserializer} from "./classes/RowDeserializer";
 import {ConfigDeserializer} from "./classes/ConfigDeserializer";
-import {LoginDialogComponent} from "./widgets/login-dialog/login-dialog.component";
 import {NewConfigurationDialogComponent} from "./widgets/new-configuration-dialog/new-configuration-dialog.component";
 import {TransformerDeserializer} from "./classes/TransformerDeserializer";
 import {PropertySelectorComponent} from "./widgets/property-selector/property-selector.component";
@@ -37,7 +36,7 @@ import {HumanReadablePipe} from "./pipes/HumanReadablePipe.pipe";
 import {SandboxEvalComponent} from "./widgets/sandbox-eval/sandbox-eval.component";
 import {SandboxEvalService} from "./services/SandboxEvalService";
 import {HistoryService} from "./services/HistoryService";
-import { HistoryComponent } from './widgets/history/history.component';
+import {HistoryComponent} from "./widgets/history/history.component";
 
 @NgModule({
   declarations: [
@@ -52,7 +51,6 @@ import { HistoryComponent } from './widgets/history/history.component';
     FocusDirective,
     InformationComponent,
     TransformerDefinitionComponent,
-    LoginDialogComponent,
     NewConfigurationDialogComponent,
     PropertySelectorComponent,
     ChannelPropertySelectorComponent,
@@ -87,7 +85,6 @@ import { HistoryComponent } from './widgets/history/history.component';
   ],
   entryComponents: [
     SaveConfigurationComponent,
-    LoginDialogComponent,
     NewConfigurationDialogComponent
   ],
   bootstrap: [AppComponent]

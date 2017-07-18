@@ -2,7 +2,6 @@ import {AfterViewInit, Component, HostListener, ViewChild} from "@angular/core";
 import {AbstractDataService} from "./services/AbstractDataService";
 import {AbstractMetadataService} from "./services/MetadataService";
 import {ResizeEvent} from "angular-resizable-element";
-import {LoginDialogComponent} from "./widgets/login-dialog/login-dialog.component";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {Http} from "@angular/http";
 import {CookieService} from "ng2-cookies";
@@ -72,12 +71,6 @@ export class AppComponent implements AfterViewInit {
     }
   }
 
-  openLoginDialog() {
-    if (!this.cookieService.check('loggedIn')) {
-      this.modalService.open(LoginDialogComponent, {size: "lg", backdrop: "static", keyboard: false});
-    }
-  }
-
   loadDefaultMetadata() {
     this.http.get('assets/metadata.json')
       .toPromise()
@@ -90,7 +83,6 @@ export class AppComponent implements AfterViewInit {
   ngAfterViewInit() {
     setTimeout(() => {
       this.loadDefaultMetadata();
-      this.openLoginDialog()
     });
     this.sandboxEvalService.registerComponent(this.sandboxEvalComponent);
   }
