@@ -49,6 +49,9 @@
       </div>
     </div>
   </div>
+  <div class="information">
+    <i class="btn btn-outline-primary mx-2" (click)="onClickInformation()">?</i>
+  </div>
   <div class="configurationTitle ellipsis" ngbTooltip="{{((dataService.hierarchy | async).description | async)}}" container="body" placement="bottom">
     {{((dataService.hierarchy | async).name | async) || 'Untitled' }}
     <span class="unsaved pl-2" *ngIf="(dataService.isModified()| async)">[Unsaved]</span>

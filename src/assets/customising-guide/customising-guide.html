@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type">
+    <title>Analytics Builder Customising Guide</title>
+    <base href="/">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="assets/css/styles.css">
+  </head>
+  <body><u><b></b></u>
+    <h1>Analytics Builder Customising Guide</h1>
+    <br>
+    The Analytics Panel contains the analytics which have been provided with the
+    Industry Analytics Kit. Where required, end users are also able to extend their
+    Analytics Builder by adding their own custom analytics. <br>
+    <br>
+    <br>
+    <b> <u> Custom Analytics&nbsp; </u> <br>
+      <br>
+    </b>
+    <ul>
+      <li> Writing a custom analytic </li>
+    </ul>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The Industry
+    Analytics Kit provides an analytic template which can be used as a starting
+    point for writing a custom analytic. The analytic template is available
+    inside the Industry Analytics Kit under the samples folder. <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <img alt="Analytic Definition" src="assets/customising-guide/images/analytic-definition.png">
+    <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Inside the
+    AnalyticTemplate.mon file is an @AnalyticDefinitions section which is read
+    by the Analytics Builder when a custom analytic is loaded. <br>
+    &nbsp;&nbsp;&nbsp; &nbsp; <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; This section
+    provides the Analytics Builder with details such as the name of the
+    analytic, the input and output channels and the analytic properties.
+    <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; When the user is
+    building the custom analytic, it is important that the details inside the
+    @AnalyticDefinition correctly reflect the channels and properties which are
+    used by the analytic. <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Also, to ensure
+    that the custom analytics are displayed separately from the default
+    analytics, set the group in the @AnalyticDefinition to something like
+    ‘Custom’. <br>
+    <br>
+    <b><i>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Note that the
+        custom analytics can be displayed separately by using different group
+        names in the @AnalyticDefinitions </i></b><br>
+    <br>
+    <ul>
+      <li> Loading custom analytics into the Analytics Builder </li>
+    </ul>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Once the custom
+    analytic has been written, it can be loaded into the Analytic Builder. <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To load a custom analytic
+    into the Analytics Builder, click on the right most dropdown in the
+    navigation bar. Under 'Custom Analytic', click on the 'Load' button <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Select one or more
+    custom analytic .mon files. <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The
+    @AnalyticDefinition definition from each of these files will be read and the
+    custom analytics will now be displayed at the bottom of the Analytics Panel
+    under the group you have defined in the @AnalyticDefinition <br>
+    <br>
+    <i> <b> &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Note:
+        &nbsp; When you load custom analytics into the Analytics Builder, this
+        information is not sent outside of your local browser. <br>
+        &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; If the browser
+        window is refreshed, the custom analytics you have loaded will be lost
+        and the original default analytics will be displayed. </b> </i> <br>
+    <br>
+    <br>
+    <u><b>Custom Metadata</b></u> <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To prevent having to select and load
+    all of your custom analytics each time the Analytics Builder web page is
+    loaded, metadata export and import functionality has been provided. <br>
+    <br>
+    <ul>
+      <li><b>Exporting Metadata </b></li>
+    </ul>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Once you have
+    imported all of your custom analytics, you can export all of the metadata
+    into a custom metadata file. This file will contain the metadata for all of
+    the supplied Analytics, plus the metadata for the custom analytics you have
+    manually loaded using your .mon files. <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To export the
+    metadata, click on the right most drop-down in the navigation bar. Under
+    'Metadata', click on the 'Export' button. This will immediately create a
+    metadata.json file in your download folder. This file can be renamed to
+    whatever you want to call your custom metadata. <br>
+    <br>
+    <ul>
+      <li><b>Importing Metadata </b></li>
+    </ul>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To reset the
+    Analytics Builder back to the list of default analytics, we will need to
+    press F5 <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Now, to load your
+    custom metadata, click on the right most drop-down in the navigation bar.
+    Under 'Metadata', click on the 'Import' button. <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Select the
+    metadata.json file you saved earlier and click on 'Open' <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The Analytics Panel
+    will now display the analytics and custom analytics from the metadata file <br>
+    <br>
+    <ul>
+    </ul>
+    <b> <u>Changing the Sample Metadata </u></b>
+    <ul>
+    </ul>
+    <br>
+    &nbsp;&nbsp;&nbsp; When you export the metadata to the metadata.json file,
+    the samples which are displayed in the 'SAMPLE' menu option in the menu bar
+    are also stored into this file. These can be amended to display different
+    samples. <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; To change the samples : <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 1. Find the .evt files (configuration
+    files that you have saved previously) that you want to display in your
+    Analytic Builder SAMPLES dropdown <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 2. Open the metadata.json file which
+    you have created using 'Exporting Metadata' above <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 3. Before adding the sample to the
+    metadata.json, you will need to escape the .evt data using a website such as
+    <a href="https://www.freeformatter.com/json-escape.html">https://www.freeformatter.com/json-escape.html</a>
+    <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 4. Replace the existing sample data in
+    the metadata.json file with your own escaped samples <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 5. Save the metadata.json file <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 6. When you import the metadata using
+    the 'Import Metadata' above, the samples in the SAMPLES drop-down will now
+    contain your custom list of samples <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+  </body>
+</html>

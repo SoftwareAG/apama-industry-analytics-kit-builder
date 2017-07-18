@@ -38,7 +38,6 @@ export class AppComponent implements AfterViewInit {
   checkforUnsavedConfiguration($event) {
     this.dataService.isModified().first().subscribe(modified => {
       if (modified) {
-        $event = $event || window.event;
         $event.preventDefault();
         $event.cancelBubble = true;
         $event.returnValue = 'Your configuration changes will be lost';

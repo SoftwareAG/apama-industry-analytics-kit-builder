@@ -163,4 +163,8 @@ export class NavBarComponent {
   isSelectedVersion(version) {
     return this.metadataService.metadata.getValue().version === version;
   }
+
+  onClickInformation() {
+    window.open("/assets/index.html", "_blank");
+  }
 }

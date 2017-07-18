@@ -22,6 +22,18 @@
   }
 }
 
+.information .btn-outline-primary {
+  font-size: medium;
+  color: white;
+  background-color: transparent;
+  border-color: #ccc;
+}
+
+.information .btn-outline-primary:hover{
+  cursor: pointer;
+  background-color: #ccc;
+}
+
 .navbar-brand {
   margin-right: 0.5rem;
 }
