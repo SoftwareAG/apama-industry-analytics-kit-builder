@@ -74,7 +74,7 @@ export class ConfigDeserializer {
         if (analyticLines.length === 0 ) {
           return [];
         }
-        return [this.rowDeserializer.buildRow(List(analyticLines))];
+        return [this.rowDeserializer.buildRow(configBuilder.name, List(analyticLines))];
       } catch(e) {
         if (e instanceof IgnoreableDeserializationError) {
           console.error(e);

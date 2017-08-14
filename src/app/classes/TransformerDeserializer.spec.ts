@@ -201,7 +201,7 @@ describe('TransformerDeserializer', () => {
       const metadata = (testCase.setup(new MetadataBuilder().withAnalytic().Name('MyAnalytic') as TransformerDefBuilder) as NestedTransformerDefBuilder<MetadataBuilder>).endWith().build();
       metadataService.metadata.next(metadata);
 
-      const {analytic, inChannels, outChannels} = transformerDeserializer.buildAnalytic(testCase.analyticString);
+      const {analytic, inChannels, outChannels} = transformerDeserializer.buildAnalytic("testConfig", testCase.analyticString);
       expect(analytic.inputChannels.toArray().map(chan => chan.name)).toEqual(testCase.expectedInputs);
       expect(analytic.outputChannels.toArray().map(chan => chan.name)).toEqual(testCase.expectedOutputs);
     })

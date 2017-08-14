@@ -4,10 +4,13 @@ import {PropertySerializer} from "./Property";
 import {TestBed} from "@angular/core/testing";
 import {Metadata, MetadataBuilder} from "./Metadata";
 import {Utils} from "../Utils";
+import {Config, ConfigBuilder} from "./Config";
 
 describe('RowSerializer', () => {
 
   let rowSerializer: RowSerializer;
+
+  const config: Config = new ConfigBuilder().Name("test").build();
 
   const testMetadata: Metadata = new MetadataBuilder()
   .Version("0.0")
@@ -47,6 +50,7 @@ describe('RowSerializer', () => {
 
   it('should serialize a row with no analytics', () => {
     const result = rowSerializer.toApama(
+      config,
       testMetadata,
       new RowBuilder()
         .MaxTransformerCount(3)
@@ -58,6 +62,7 @@ describe('RowSerializer', () => {
 
   it('should serialize a row with 1 analytic', () => {
     const result = rowSerializer.toApama(
+      config,
       testMetadata,
       new RowBuilder()
         .MaxTransformerCount(3)
@@ -74,6 +79,7 @@ describe('RowSerializer', () => {
 
   it('should serialize a row with 2 analytics', () => {
     const result = rowSerializer.toApama(
+      config,
       testMetadata,
       new RowBuilder()
         .MaxTransformerCount(3)
@@ -87,13 +93,14 @@ describe('RowSerializer', () => {
 
     const analytics = Utils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
     expect(analytics).toEqual([
-      '"Analytic1",["Analytic1:Input1"],["Row0:Channel1.0"],{}',
-      '"Analytic2",["Row0:Channel1.0"],["Analytic2:Output1"],{}',
+      `"Analytic1",["Analytic1:Input1"],["${config.name.getValue()}:Row0:Channel1.0"],{}`,
+      `"Analytic2",["${config.name.getValue()}:Row0:Channel1.0"],["Analytic2:Output1"],{}`,
     ]);
   });
 
   it('should serialize a row with 1 analytic and overridden input and output channels', () => {
     const result = rowSerializer.toApama(
+      config,
       testMetadata,
       new RowBuilder()
         .MaxTransformerCount(3)
@@ -112,6 +119,7 @@ describe('RowSerializer', () => {
 
   it('should serialize a row with 2 analytics and overridden input and output channels', () => {
     const result = rowSerializer.toApama(
+      config,
       testMetadata,
       new RowBuilder()
         .MaxTransformerCount(3)
@@ -127,8 +135,8 @@ describe('RowSerializer', () => {
 
     const analytics = Utils.findAll(/([\.\w]*Analytic\()(.*)\)/g, result).map(match => match[1]);
     expect(analytics).toEqual([
-      '"Analytic1",["OverriddenInput"],["Row0:Channel1.0"],{}',
-      '"Analytic2",["Row0:Channel1.0"],["OverriddenOutput"],{}',
+      `"Analytic1",["OverriddenInput"],["${config.name.getValue()}:Row0:Channel1.0"],{}`,
+      `"Analytic2",["${config.name.getValue()}:Row0:Channel1.0"],["OverriddenOutput"],{}`,
     ]);
   });
 
@@ -136,6 +144,7 @@ describe('RowSerializer', () => {
     for(let i = 0; i < 4; i++) {
       it(`OverriddenChannelNumber: ${i}`, () => {
         const result = rowSerializer.toApama(
+          config,
           testMetadata,
           new RowBuilder()
             .MaxTransformerCount(3)

@@ -17,6 +17,7 @@ import * as _ from "lodash";
 import {TransformerChannel} from "app/classes/TransformerChannel";
 import {TransformerChannelDef} from "./TransformerChannelDef";
 import {Utils} from "app/Utils";
+import {Config} from "./Config";
 
 export interface RowJsonInterface {
   maxTransformerCount: number;
@@ -178,7 +179,7 @@ export class RowSerializer {
 
   constructor(private transformerSerializer: TransformerSerializer) {}
 
-  toApama(metadata: Metadata, row: Row, rowIndex: number) {
+  toApama(config: Config, metadata: Metadata, row: Row, rowIndex: number) {
     row.validate();
 
     if (!row.transformers.getValue().size) {
@@ -186,7 +187,7 @@ export class RowSerializer {
     }
 
     return `// Row: ${rowIndex}\n` +
-      row.transformers.getValue().map((transformer: Transformer, transformerIndex: number) => this.transformerSerializer.toApama(transformer, metadata.getAnalytic(transformer.name), transformerIndex, row, rowIndex))
+      row.transformers.getValue().map((transformer: Transformer, transformerIndex: number) => this.transformerSerializer.toApama(config, transformer, metadata.getAnalytic(transformer.name), transformerIndex, row, rowIndex))
         .join('\n');
   }
 }

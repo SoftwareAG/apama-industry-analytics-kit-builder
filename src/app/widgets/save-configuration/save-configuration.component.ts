@@ -14,12 +14,10 @@ export class SaveConfigurationComponent {
 
   saveConfig() {
     this.activeModal.close('SaveConfiguration');
-
     const config = this.dataService.hierarchy.getValue();
     const content = this.fileService.serializeConfig(config);
-    const fileName = config.name.getValue().replace(/[ *]/g, "_") + ".evt";
     try {
-      this.fileService.saveFile(fileName, content);
+      this.fileService.saveFile(config.fileName(), content);
       this.dataService.setModified(false);
     } catch(error) {
       alert(error.message);

@@ -10,8 +10,8 @@ export class RowDeserializer {
 
   constructor(private readonly transformerDeserializer: TransformerDeserializer) {}
 
-  buildRow(analyticLines: List<string>): Row {
-    const analytics = analyticLines.map((analyticLine:string) => this.transformerDeserializer.buildAnalytic(analyticLine)) as List<{analytic: Transformer, inChannels: Map<number, string>, outChannels: Map<number, string>}>;
+  buildRow(configName: string, analyticLines: List<string>): Row {
+    const analytics = analyticLines.map((analyticLine:string) => this.transformerDeserializer.buildAnalytic(configName, analyticLine)) as List<{analytic: Transformer, inChannels: Map<number, string>, outChannels: Map<number, string>}>;
     if (analytics.size > 0) {
       const rowBuilder = new RowBuilder()
         .pushTransformer(...analytics.toArray().map(a => a.analytic));

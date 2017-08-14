@@ -67,6 +67,10 @@ export class Config extends AbstractModel<ConfigJsonInterface, never> implements
   removeRow(row: Row) {
     this.rows.next(List<Row>(this.rows.getValue().filter(_row => _row !== row)));
   }
+
+  fileName() : string {
+    return this.name.getValue().replace(/[ *]/g, "_") + ".evt";
+  }
 }
 
 export class ConfigBuilder extends ClassBuilder<Config> implements ConfigInterface {
@@ -142,7 +146,7 @@ export class ConfigSerializer {
       (config.name.getValue()  ? `// Name: ${config.name.getValue()}\n` : '') +
       (config.description.getValue()  ? `// Description: ${config.description.getValue()}\n` : '') +
       `// Version: ${config.metadataVersion}\n` +
-      config.rows.getValue().map((row: Row, i: number) => this.rowSerializer.toApama(metadata, row, i)).join('\n\n');
+      config.rows.getValue().map((row: Row, i: number) => this.rowSerializer.toApama(config, metadata, row, i)).join('\n\n');
   }
 }
 

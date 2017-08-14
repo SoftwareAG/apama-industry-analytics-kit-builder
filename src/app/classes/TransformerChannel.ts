@@ -45,10 +45,18 @@ export class TransformerChannelBuilder extends ClassBuilder<TransformerChannel> 
 }
 
 export class TransformerChannelDeserializer {
-  buildChannels(analyticChannels: string) : List<string> {
+  buildChannels(configName: string, analyticChannels: string) : List<string> {
     const channelsPattern = /"([^"]*)"/g;
     return List(Array.from(analyticChannels.match(channelsPattern) || [])
-      .map(c => c.replace(/"/g, '')))
+      .map(c => this.removeConfigName(configName, c.replace(/"/g, ''))))
+  }
+
+  private removeConfigName(configName: string, channelName: string): string {
+    if (channelName.indexOf(configName + ":") === 0) {
+      return channelName.replace(configName + ":", "");
+    } else {
+      return channelName;
+    }
   }
 }
 

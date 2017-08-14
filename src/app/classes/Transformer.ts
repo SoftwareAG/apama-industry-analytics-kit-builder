@@ -17,6 +17,7 @@ import {
 import {validate} from "validate.js";
 import {TransformerChannelDef} from "./TransformerChannelDef";
 import {Utils} from "../Utils";
+import {Config} from "./Config";
 
 export interface TransformerJsonInterface {
   name: string;
@@ -341,7 +342,7 @@ export class NestedTransformerBuilder<Parent> extends TransformerBuilder impleme
 export class TransformerSerializer {
   constructor(private propertySerializer: PropertySerializer) {}
 
-  toApama(transformer: Transformer, transformerDef: TransformerDef, transformerIndex: number, row: Row, rowIndex: number): string {
+  toApama(config: Config, transformer: Transformer, transformerDef: TransformerDef, transformerIndex: number, row: Row, rowIndex: number): string {
     const namespace  = 'com.industry.analytics';
 
     transformer.validate(transformerDef);
@@ -349,10 +350,10 @@ export class TransformerSerializer {
     return `${namespace}.Analytic(` +
       `"${transformer.name}",` +
       "[" +
-        TransformerSerializer.getInChannels(transformerDef, transformer, transformerIndex, row, rowIndex) +
+        TransformerSerializer.getInChannels(config, transformerDef, transformer, transformerIndex, row, rowIndex) +
       "]," +
       "[" +
-        TransformerSerializer.getOutChannels(transformerDef, transformer, transformerIndex, row, rowIndex) +
+        TransformerSerializer.getOutChannels(config, transformerDef, transformer, transformerIndex, row, rowIndex) +
       "]," +
       "{" +
         transformer.propertyValues.map((propertyVal: Property) => this.propertySerializer.toApama(propertyVal, transformerDef.getProperty(propertyVal.definitionName))).join(",") +
@@ -360,7 +361,7 @@ export class TransformerSerializer {
     ")";
   }
 
-  private static getInChannels(transformerDef: TransformerDef, transformer: Transformer, transformerIndex: number, row: Row, rowIndex: number) : string {
+  private static getInChannels(config: Config, transformerDef: TransformerDef, transformer: Transformer, transformerIndex: number, row: Row, rowIndex: number) : string {
     if (!transformer.inputChannels.size) {
       return "";
     }
@@ -373,12 +374,12 @@ export class TransformerSerializer {
           return `${channelDef.prefix}${channelDef.name}`;
         }
       } else {
-        return `${channelDef.prefix}Row${rowIndex}:Channel${transformerIndex}.${channelIndex}`
+        return `${config.name.getValue()}:${channelDef.prefix}Row${rowIndex}:Channel${transformerIndex}.${channelIndex}`
       }
     }).join("\",\"") + "\""
   }
 
-  private static getOutChannels(transformerDef: TransformerDef, transformer: Transformer, transformerIndex: number, row: Row, rowIndex: number) : string {
+  private static getOutChannels(config: Config, transformerDef: TransformerDef, transformer: Transformer, transformerIndex: number, row: Row, rowIndex: number) : string {
     if (!transformer.outputChannels.size) {
       return "";
     }
@@ -391,7 +392,7 @@ export class TransformerSerializer {
           return `${channelDef.prefix}${channelDef.name}`;
         }
       } else {
-        return `${channelDef.prefix}Row${rowIndex}:Channel${transformerIndex+1}.${channelIndex}`
+        return `${config.name.getValue()}:${channelDef.prefix}Row${rowIndex}:Channel${transformerIndex+1}.${channelIndex}`
       }
     }).join("\",\"") + "\""
   }

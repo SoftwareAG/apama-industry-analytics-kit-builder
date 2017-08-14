@@ -120,7 +120,7 @@ export class TransformerDeserializer {
       .channelDefToNames;
   }
 
-  buildAnalytic(analyticLine: string): {analytic: Transformer, inChannels: Map<number, string>, outChannels: Map<number, string>} {
+  buildAnalytic(configName: string, analyticLine: string): {analytic: Transformer, inChannels: Map<number, string>, outChannels: Map<number, string>} {
     const analyticMatch = analyticLine.match(this.analyticPattern);
     if (analyticMatch && analyticMatch.length) {
       const [, analyticName, analyticInChannels, analyticOutChannels, analyticProperties] = analyticMatch;
@@ -135,8 +135,8 @@ export class TransformerDeserializer {
           );
 
         // Channels
-        const inChannelNames = this.channelDeserializer.buildChannels(analyticInChannels);
-        const outChannelNames = this.channelDeserializer.buildChannels(analyticOutChannels);
+        const inChannelNames = this.channelDeserializer.buildChannels(configName, analyticInChannels);
+        const outChannelNames = this.channelDeserializer.buildChannels(configName, analyticOutChannels);
 
         const inputChannelMappings = this.applyChannelRules(inChannelNames, transformerDef.inputChannels);
         const outputChannelMappings = this.applyChannelRules(outChannelNames, transformerDef.outputChannels);
