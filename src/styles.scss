@@ -32,3 +32,7 @@ html,body {
   cursor: -webkit-grab;
   cursor: grab;
 }
+
+.tooltip-inner {
+  max-width: 400px;
+}
