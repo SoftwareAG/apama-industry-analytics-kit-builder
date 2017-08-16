@@ -309,9 +309,7 @@ describe('FileService', () => {
               "type": "boolean"
             }
           ]
-        },
-
-        {
+        }, {
           "description": "Connect to PMML predictive model.",
           "documentation": "Prediction Documentation",
           "group": "Extensions",
@@ -378,6 +376,135 @@ describe('FileService', () => {
               "description": "The mapping of an input and output parameters for the PMML model to a value within one of the input or output Data events. See documentation for further details on the syntax.",
               "name": "input / output parameter name",
               "repeated": true,
+              "type": "string"
+            }
+          ]
+        }, {
+          "description": "Filter events by a condition.",
+          "documentation": "Filter Documentation",
+          "group": "Flow Manipulation",
+          "inputChannels": [
+            {
+              "description": "The channel to filter",
+              "name": "Data"
+            }
+          ],
+          "name": "Filter",
+          "outputChannels": [
+            {
+              "description": "The channel on which to output filtered data",
+              "name": "Filtered"
+            }
+          ],
+          "properties": [
+            {
+              "description": "Event must have any of these sourceIds. eg. [\"sourceId1\"]",
+              "name": "sourceId",
+              "optional": true,
+              "type": "string",
+              "validator": "function(value) { return value.match(/^\\[\\s*((\"[^\"]*\"\\s*,\\s*)*(\"[^\"]*\"))?\\s*\\]$/g) || 'Value must be a stringified sequence eg. [\"abc\"]' }"
+            },
+            {
+              "description": "Event must not have any of these sourceIds. eg. [\"sourceId1\"]",
+              "name": "!sourceId",
+              "optional": true,
+              "type": "string",
+              "validator": "function(value) { return value.match(/^\\[\\s*((\"[^\"]*\"\\s*,\\s*)*(\"[^\"]*\"))?\\s*\\]$/g) || 'Value must be a stringified sequence eg. [\"abc\"]' }"
+            },
+            {
+              "description": "Event must have any of these params. eg. [\"param1\"]",
+              "name": "hasParam",
+              "optional": true,
+              "type": "string",
+              "validator": "function(value) { return value.match(/^\\[\\s*((\"[^\"]*\"\\s*,\\s*)*(\"[^\"]*\"))?\\s*\\]$/g) || 'Value must be a stringified sequence eg. [\"abc\"]' }"
+            },
+            {
+              "description": "Event must not have any of these params. eg. [\"param1\"]",
+              "name": "!hasParam",
+              "optional": true,
+              "type": "string",
+              "validator": "function(value) { return value.match(/^\\[\\s*((\"[^\"]*\"\\s*,\\s*)*(\"[^\"]*\"))?\\s*\\]$/g) || 'Value must be a stringified sequence eg. [\"abc\"]' }"
+            },
+            {
+              "description": "Event must have any of these string values. eg. [\"abc\"]",
+              "name": "sValue",
+              "optional": true,
+              "type": "string",
+              "validator": "function(value) { return value.match(/^\\[\\s*((\"[^\"]*\"\\s*,\\s*)*(\"[^\"]*\"))?\\s*\\]$/g) || 'Value must be a stringified sequence eg. [\"abc\"]' }"
+            },
+            {
+              "description": "Event must not have any of these string values. eg. [\"abc\"]",
+              "name": "!sValue",
+              "optional": true,
+              "type": "string",
+              "validator": "function(value) { return value.match(/^\\[\\s*((\"[^\"]*\"\\s*,\\s*)*(\"[^\"]*\"))?\\s*\\]$/g) || 'Value must be a stringified sequence eg. [\"abc\"]' }"
+            },
+            {
+              "description": "Event must have any of these types. (Raw, Computed, Anomaly) eg. [\"r\", \"c\", \"a\"]",
+              "name": "type",
+              "optional": true,
+              "type": "string",
+              "validator": "function(value) { return value.match(/^\\s*\\[((\"[rca]\"\\s*,\\s*)*(\"[rca]\"))?\\s*\\]$/g) || 'Value must be a stringified sequence of r (Raw), c (Computed), or a (Anomaly) eg. [\"r\"]' }"
+            },
+            {
+              "description": "Event must not have any of these types. (Raw, Computed, Anomaly) eg. [\"r\", \"c\", \"a\"]",
+              "name": "!type",
+              "optional": true,
+              "type": "string",
+              "validator": "function(value) { return value.match(/^\\s*\\[((\"[rca]\"\\s*,\\s*)*(\"[rca]\"))?\\s*\\]$/g) || 'Value must be a stringified sequence of r (Raw), c (Computed), or a (Anomaly) eg. [\"r\"]' }"
+            },
+            {
+              "description": "Check that the event's dValue meets a condition. Eg. '> 5.0'",
+              "name": "dValue",
+              "optional": true,
+              "type": "string",
+              "validator": "function(value) { return value.match(/^(((<|>)=?|=)( +\\d+(\\.\\d+)?)|(<=?>|>=?<) +\\d+(\\.\\d+)?( +| *, *)\\d+(\\.\\d+)?)$/g) || 'Value must be a valid condition eg. >= 5.0' }"
+            },
+            {
+              "advanced": true,
+              "description": "Check that the event's xValue meets a condition. Eg. '> 5.0'",
+              "name": "xValue",
+              "optional": true,
+              "type": "string",
+              "validator": "function(value) { return value.match(/^(((<|>)=?|=)( +\\d+(\\.\\d+)?)|(<=?>|>=?<) +\\d+(\\.\\d+)?( +| *, *)\\d+(\\.\\d+)?)$/g) || 'Value must be a valid condition eg. >= 5.0' }"
+            },
+            {
+              "advanced": true,
+              "description": "Check that the event's yValue meets a condition. Eg. '> 5.0'",
+              "name": "yValue",
+              "optional": true,
+              "type": "string",
+              "validator": "function(value) { return value.match(/^(((<|>)=?|=)( +\\d+(\\.\\d+)?)|(<=?>|>=?<) +\\d+(\\.\\d+)?( +| *, *)\\d+(\\.\\d+)?)$/g) || 'Value must be a valid condition eg. >= 5.0' }"
+            },
+            {
+              "advanced": true,
+              "description": "Check that the event's zValue meets a condition. Eg. '> 5.0'",
+              "name": "zValue",
+              "optional": true,
+              "type": "string",
+              "validator": "function(value) { return value.match(/^(((<|>)=?|=)( +\\d+(\\.\\d+)?)|(<=?>|>=?<) +\\d+(\\.\\d+)?( +| *, *)\\d+(\\.\\d+)?)$/g) || 'Value must be a valid condition eg. >= 5.0' }"
+            },
+            {
+              "advanced": true,
+              "description": "Check that the event's sourceId is a leaf node (in the DataSource hierarchy) of one of these dataSources. Eg. [\"ParentSource1\"]",
+              "name": "sourceId_OnlyLeafNodes",
+              "optional": true,
+              "type": "string",
+              "validator": "function(value) { return value.match(/^\\[\\s*((\"[^\"]*\"\\s*,\\s*)*(\"[^\"]*\"))?\\s*\\]$/g) || 'Value must be a stringified sequence eg. [\"abc\"]' }"
+            },
+            {
+              "advanced": true,
+              "description": "Check that the event's sourceId is a child or nested child (in the DataSource hierarchy) of one of these dataSources. Eg. [\"ParentSource1\"]",
+              "name": "sourceId_AllChildren",
+              "optional": true,
+              "type": "string",
+              "validator": "function(value) { return value.match(/^\\[\\s*((\"[^\"]*\"\\s*,\\s*)*(\"[^\"]*\"))?\\s*\\]$/g) || 'Value must be a stringified sequence eg. [\"abc\"]' }"
+            },
+            {
+              "advanced": true,
+              "description": "Defines the id used for management of the analytic",
+              "name": "managementId",
+              "optional": true,
               "type": "string"
             }
           ]
@@ -619,6 +746,29 @@ com.industry.analytics.Analytic("Combiner",["Row0:Input0"],["Row0:Channel1"],{})
     const config: Config = fileService.deserializeConfig(apama);
     expect( config.rows.getValue().first().transformers.getValue().first().name).toEqual('Combiner');
     expect(config.rows.getValue().last().transformers.getValue().first().propertyValues.size).toEqual(0);
+  });
+
+  it('should parse sequence string properties', () => {
+    const apama = `\\\\ Name: New one
+\\\\ Description: new one description
+\\\\ Version: 2.0.0.0
+\\\\ Row: 0
+com.industry.analytics.Analytic("Filter",["Row0:Input0"],["Row0:Channel1"],{"sourceId":"[\"sourceId1\", \"sourceId2\"]","!sourceId" : "[\"sourceId3\",\"sourceId4\"]"})`;
+    const config: Config = fileService.deserializeConfig(apama);
+    expect(config.rows.getValue().first().transformers.getValue().first().name).toEqual('Filter');
+    expect(config.rows.getValue().last().transformers.getValue().first().propertyValues.size).toEqual(2);
+  });
+
+  it('should parse sequence and non sequence properties', () => {
+    const apama = `\\\\ Name: New one
+\\\\ Description: new one description
+\\\\ Version: 2.0.0.0
+\\\\ Row: 0
+com.industry.analytics.Analytic("Filter",["Row0:Input0"],["Row0:Channel1"],{"sourceId":"[\"sourceId1\"]","!sourceId" : "[\"sourceId2\"]" , "sValue" : " [ \"a\" , \" b \" ] ","!hasParam":"[\"1\",\"2\",\"3\",\"4\",\"5\"]","sourceId_OnlyLeafNodes":"["my_id"]" })`;
+    const config: Config = fileService.deserializeConfig(apama);
+    expect(config.rows.getValue().first().transformers.getValue().first().name).toEqual('Filter');
+    expect(config.rows.getValue().last().transformers.getValue().first().propertyValues.size).toEqual(5);
+    debugger;
   });
 
   it('should parse multiple properties in an Analytic', () => {

@@ -244,14 +244,14 @@ export class PropertySerializer {
 
 @Injectable()
 export class PropertyDeserializer {
-  readonly validatePropertiesPattern = /^{\s*(("[^"]*"\s*:\s*"[^"]*")(\s*,\s*("[^"]*"\s*:\s*"[^"]*"))*\s*)?}$/;
-  readonly propertiesPattern = /("[^"]*"\s*:\s*"[^"]*")/g;
-  readonly propertyPattern = /"([^"]*)"/g;
+  readonly validatePropertiesPattern = /^{(\s*"[^"]*"\s*:\s*"\s*(?:[^"]*|\[[^\]]*])\s*"(?:\s*,\s*"[^"]*"\s*:\s*"\s*(?:[^"]*|\[[^\]]*])\s*")*\s*)?}$/;
+  readonly propertiesPattern = /("[^"]*"\s*:\s*("\s*\[[^\]]*]\s*"|"[^"]*"))/g;
+  readonly propertyPattern = /(?:"\s*(\[[^\]]*]\s*|[^"]*))"/g;
 
   /**
    *
    * @param transformerDef
-   * @param analyticProperties eg {"a":"2.0d"}
+   * @param analyticProperties eg {"a":"2.0d"} or {"!hasParam":"["a", "b", "c", "d"]"}
    */
   buildProperties(transformerDef: TransformerDef, analyticProperties: string): Property[] {
     if (!analyticProperties.match(this.validatePropertiesPattern)) {
@@ -263,7 +263,7 @@ export class PropertyDeserializer {
       return _.flatMap(properties, property => {
         const data = property.match(this.propertyPattern);
         if (data && data.length == 2) {
-          const [name, value] = data.map(d => d.replace(/"/g, ''));
+          const [name, value] = data.map(d => d.replace(/^"/,'').replace(/"$/,''));
 
           const propertyDef = transformerDef.getProperty(name);
           if (propertyDef) {
