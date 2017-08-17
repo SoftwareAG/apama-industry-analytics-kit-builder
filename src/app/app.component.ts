@@ -2,12 +2,11 @@ import {AfterViewInit, Component, HostListener, ViewChild} from "@angular/core";
 import {AbstractDataService} from "./services/AbstractDataService";
 import {AbstractMetadataService} from "./services/MetadataService";
 import {ResizeEvent} from "angular-resizable-element";
-import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {Http} from "@angular/http";
 import {CookieService} from "ng2-cookies";
 import {SandboxEvalComponent} from "./widgets/sandbox-eval/sandbox-eval.component";
 import {SandboxEvalService} from "./services/SandboxEvalService";
-import {FileService} from "./services/FileService";
+import {AbstractDragService, Dragged, Point} from "./services/AbstractDragService";
 
 @Component({
   selector: 'app-root',
@@ -31,8 +30,8 @@ export class AppComponent implements AfterViewInit {
 
   informationHeightStartPixels = 0;
 
-  constructor(private dataService: AbstractDataService, private metadataService: AbstractMetadataService, public modalService: NgbModal,
-              private http: Http, private cookieService: CookieService, private sandboxEvalService: SandboxEvalService, private fileService: FileService) { }
+  constructor(private dataService: AbstractDataService, private metadataService: AbstractMetadataService, private http: Http,
+              private sandboxEvalService: SandboxEvalService, private dragService: AbstractDragService) { }
 
   @HostListener('window:beforeunload', ['$event'])
   checkforUnsavedConfiguration($event) {
@@ -85,5 +84,37 @@ export class AppComponent implements AfterViewInit {
       this.loadDefaultMetadata();
     });
     this.sandboxEvalService.registerComponent(this.sandboxEvalComponent);
+
+    // TODO: What I want to do is....
+    // When the dragService.dragging is updated
+    // and the dragged item enters the ladder diagram panel
+    // subscribe and listen for currentLocation changes
+    this.dragService.dragging
+      .filter((dragged) => { return !!dragged}) // only interested when we're dragging something
+      .switchMap((dragged: Dragged) => dragged.currentLocation) // once we're dragging something, subscribe to the dragged objects currentLocation changes
+      .subscribe((currentLocation: Point) => {
+
+        // Get the height of the ladder-diagram-panel
+        const ladderDiagramPanelElement:Element | null = document.querySelector('#ladder-diagram-panel');
+        if (ladderDiagramPanelElement) {
+          const ladderDiagramPanelHTMLElement = (ladderDiagramPanelElement as HTMLElement);
+          const ladderDiagramPanelHeight = ladderDiagramPanelHTMLElement.clientHeight;
+
+          // If the mouse y is greater than the ladder-diagram-panel height, scroll the div
+          if (currentLocation.y > ladderDiagramPanelHeight) {
+            // Auto scroll down
+            ladderDiagramPanelHTMLElement.scrollTop += (currentLocation.y - ladderDiagramPanelHeight);
+          }
+
+          // If the mouse y is less than the current scrollTop
+          if (currentLocation.y < ladderDiagramPanelHTMLElement.scrollTop) {
+            console.info(`ladderDiagramPanelHeight is ${ladderDiagramPanelHeight}`);
+            console.info(`currentLocation.y is ${currentLocation.y}`);
+            console.info(`ladderDiagramPanelHTMLElement.scrollTop is ${ladderDiagramPanelHTMLElement.scrollTop}`);
+            // Auto scroll up
+            ladderDiagramPanelHTMLElement.scrollTop -= 20;
+          }
+        }
+    });
   }
 }

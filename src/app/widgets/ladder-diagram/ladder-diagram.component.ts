@@ -23,21 +23,30 @@ import * as _ from "lodash";
 })
 export class LadderDiagramComponent implements OnInit, AfterViewInit   {
   readonly nativeElement;
+  readonly htmlElement;
 
   constructor(myElement: ElementRef, private readonly dataService: AbstractDataService, private readonly selectionService: SelectionService, private readonly dragService: AbstractDragService, private readonly metadataService: AbstractMetadataService) {
     this.nativeElement = myElement.nativeElement;
-  }
-
-  ngAfterViewInit() {
     const el:Element | null = document.querySelector('#ladder-diagram-panel');
     if (el) {
-      const htmlElement = (el as HTMLElement);
-      const outerWidth:number = htmlElement.offsetWidth;
-      const innerWidth:number = (htmlElement.children[0] as HTMLElement).offsetWidth;
-      htmlElement.scrollLeft = (innerWidth - outerWidth) / 2;
+      this.htmlElement = (el as HTMLElement);
     }
   }
 
+  setHorizontalScroll() {
+    const outerWidth:number = this.htmlElement.offsetWidth;
+    const innerWidth:number = (this.htmlElement.children[0] as HTMLElement).offsetWidth;
+    this.htmlElement.scrollLeft = (innerWidth - outerWidth) / 2;
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    this.setHorizontalScroll();
+  }
+
+  ngAfterViewInit() {
+    this.setHorizontalScroll();
+  }
 
   ngOnInit() {
     const component = this;
@@ -70,11 +79,13 @@ export class LadderDiagramComponent implements OnInit, AfterViewInit   {
     const container = svg.append('g')
       .attr('transform', `translate(${padding.left},${padding.top})`);
 
+    // How does this end up on the left of the container?. There's no xy coords
     const inputLine = container.append('line')
       .attr('stroke', 'rgba(0,0,0,0.3)')
       .attr('stroke-width', 2)
       .attr('stroke-dasharray', '2,2');
 
+    // How does this end up on the right of the container?. There's no xy coords
     const outputLine = container.append('line')
       .attr('stroke', 'rgba(0,0,0,0.3)')
       .attr('stroke-width', 2)
