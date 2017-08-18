@@ -7,6 +7,7 @@ import {CookieService} from "ng2-cookies";
 import {SandboxEvalComponent} from "./widgets/sandbox-eval/sandbox-eval.component";
 import {SandboxEvalService} from "./services/SandboxEvalService";
 import {AbstractDragService, Dragged, Point} from "./services/AbstractDragService";
+import * as _ from "lodash";
 
 @Component({
   selector: 'app-root',
@@ -79,42 +80,46 @@ export class AppComponent implements AfterViewInit {
       .catch(err => console.log(err));
   }
 
+  onMouseMoveLadderDiagramPanel(event: MouseEvent) {
+    if (this.dragService.dragging.getValue()) {
+
+      // Get the height of the ladder-diagram-panel
+      const ladderDiagramPanelElement:Element | null = document.querySelector('#ladder-diagram-panel');
+      if (ladderDiagramPanelElement) {
+        const ladderDiagramPanelHTMLElement = (ladderDiagramPanelElement as HTMLElement);
+        const ladderDiagramPanelHeight = ladderDiagramPanelHTMLElement.clientHeight;
+
+        // If the mouse y is greater than the ladder-diagram-panel height, scroll the div
+        if (event.pageY > ladderDiagramPanelHeight) {
+          console.info(`scrolling down..`);
+          console.info(`  ladderDiagramPanelHeight is ${ladderDiagramPanelHeight}`);
+          console.info(`  event.pageY is ${event.pageY}`);
+
+          // TODO: scroll down needs to include the height of the object (analytic) being dragged
+          // Auto scroll down
+          ladderDiagramPanelHTMLElement.scrollTop += (event.pageY - ladderDiagramPanelHeight);
+        }
+
+        // If the mouse y is less than the current scrollTop
+        if ((event.pageY - 75) < ladderDiagramPanelHTMLElement.scrollTop) {
+          console.info(`scrolling up..`);
+          console.info(`  ladderDiagramPanelHeight is ${ladderDiagramPanelHeight}`);
+          console.info(`  event.pageY is ${event.pageY}`);
+          console.info(`  ladderDiagramPanelHTMLElement.scrollTop is ${ladderDiagramPanelHTMLElement.scrollTop}`);
+
+          // Auto scroll up
+          ladderDiagramPanelHTMLElement.scrollTop -= 20;
+        }
+      }
+    }
+  }
+
   ngAfterViewInit() {
     setTimeout(() => {
       this.loadDefaultMetadata();
     });
     this.sandboxEvalService.registerComponent(this.sandboxEvalComponent);
 
-    // TODO: What I want to do is....
-    // When the dragService.dragging is updated
-    // and the dragged item enters the ladder diagram panel
-    // subscribe and listen for currentLocation changes
-    this.dragService.dragging
-      .filter((dragged) => { return !!dragged}) // only interested when we're dragging something
-      .switchMap((dragged: Dragged) => dragged.currentLocation) // once we're dragging something, subscribe to the dragged objects currentLocation changes
-      .subscribe((currentLocation: Point) => {
 
-        // Get the height of the ladder-diagram-panel
-        const ladderDiagramPanelElement:Element | null = document.querySelector('#ladder-diagram-panel');
-        if (ladderDiagramPanelElement) {
-          const ladderDiagramPanelHTMLElement = (ladderDiagramPanelElement as HTMLElement);
-          const ladderDiagramPanelHeight = ladderDiagramPanelHTMLElement.clientHeight;
-
-          // If the mouse y is greater than the ladder-diagram-panel height, scroll the div
-          if (currentLocation.y > ladderDiagramPanelHeight) {
-            // Auto scroll down
-            ladderDiagramPanelHTMLElement.scrollTop += (currentLocation.y - ladderDiagramPanelHeight);
-          }
-
-          // If the mouse y is less than the current scrollTop
-          if (currentLocation.y < ladderDiagramPanelHTMLElement.scrollTop) {
-            console.info(`ladderDiagramPanelHeight is ${ladderDiagramPanelHeight}`);
-            console.info(`currentLocation.y is ${currentLocation.y}`);
-            console.info(`ladderDiagramPanelHTMLElement.scrollTop is ${ladderDiagramPanelHTMLElement.scrollTop}`);
-            // Auto scroll up
-            ladderDiagramPanelHTMLElement.scrollTop -= 20;
-          }
-        }
-    });
   }
 }
