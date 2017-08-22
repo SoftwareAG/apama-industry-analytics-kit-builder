@@ -34,9 +34,11 @@ export class LadderDiagramComponent implements OnInit, AfterViewInit   {
   }
 
   setHorizontalScroll() {
-    const outerWidth:number = this.htmlElement.offsetWidth;
-    const innerWidth:number = (this.htmlElement.children[0] as HTMLElement).offsetWidth;
-    this.htmlElement.scrollLeft = (innerWidth - outerWidth) / 2;
+    if (this.htmlElement) {
+      const outerWidth: number = this.htmlElement.offsetWidth;
+      const innerWidth: number = (this.htmlElement.children[0] as HTMLElement).offsetWidth;
+      this.htmlElement.scrollLeft = (innerWidth - outerWidth) / 2;
+    }
   }
 
   @HostListener('window:resize', ['$event'])
