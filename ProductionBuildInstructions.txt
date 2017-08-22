@@ -3,6 +3,7 @@ Analytics Builder - Production Build Instructions
 =================================================
 
 Download the IndustryAnalyticsKit from svn
+
 Ensure that the samples have been updated in the \IndustryAnalyticsKit\src\metadataSamples folder
 
 cd \IndustryAnalyticsKit\src
@@ -20,20 +21,9 @@ In the dist folder, edit the index.html file
 Append ?v=DDMMYYYY_HHMM to the end of each .js file (where DDMMYYYY_HHMM is the current date and time
 
 e.g.
-src="inline.a225d52840fb3965c5de.bundle.js" becomes src="inline.a225d52840fb3965c5de.bundle.js?v=28062017_1300"
-src="polyfills.4a0ed4d4bd4d370316b6.bundle.js" becomes src="polyfills.4a0ed4d4bd4d370316b6.bundle.js?v=28062017_1300"
-src="vendor.370bc9c440f65632bfc5.bundle.js" becomes src="vendor.370bc9c440f65632bfc5.bundle.js?v=28062017_1300"
-src="main.4fb571099352533d31bf.bundle.js" becomes src="main.4fb571099352533d31bf.bundle.js?v=28062017_1300"
+    src="inline.a225d52840fb3965c5de.bundle.js" becomes src="inline.a225d52840fb3965c5de.bundle.js?v=28062017_1300"
+    src="polyfills.4a0ed4d4bd4d370316b6.bundle.js" becomes src="polyfills.4a0ed4d4bd4d370316b6.bundle.js?v=28062017_1300"
+    src="vendor.370bc9c440f65632bfc5.bundle.js" becomes src="vendor.370bc9c440f65632bfc5.bundle.js?v=28062017_1300"
+    src="main.4fb571099352533d31bf.bundle.js" becomes src="main.4fb571099352533d31bf.bundle.js?v=28062017_1300"
 
 Copy all files including the assets folder to C:\inetpub\wwwroot
-
-
-
-
-
-
-
-
-
-
-

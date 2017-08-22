@@ -1,0 +1,37 @@
+Analytics Builder Deployment Instructions
+=========================================
+
+
+1. To host the Analytics Builder using Internet Information Services (IIS)
+--------------------------------------------------------------------------
+
+    Copy and extract the analytics-builder_2.0.0.1.zip into the c:\inetpub\wwwroot
+
+    Access the Analytics Builder using http:\\localhost
+
+
+2. To use the Analytics Builder with a lightweight web server 
+
+    * Installing a lightweight web server (this only has to be done once)
+ 
+        Download and install npm from : https://www.npmjs.com/get-npm
+
+        Once, npm has been installed :
+ 
+            open a command prompt :
+
+            type : npm install -g http-server
+
+    * Extract and host the Analytics Builder using the local web server application
+    
+        Create a folder on your machine e.g. c:\analytics-builder_2.0.0.1
+
+        Extract the analytics-builder_2.0.0.1.zip into the folder
+    
+        Open a command prompt :
+
+        type : http-server
+
+
+    Access the Analytics Builder web application using http:\\localhost:8080
+
