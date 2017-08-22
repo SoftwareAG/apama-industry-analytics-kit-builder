@@ -7,7 +7,7 @@ $transformer-color: saturate($brand-primary, 20%);
     fill: $transformer-color;
 
     .transformer-bg {
-      filter: url('./#dropshadow');
+      filter: url('#dropshadow');
     }
 
     .channel-circle {

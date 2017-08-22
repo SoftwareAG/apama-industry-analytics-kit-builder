@@ -7,7 +7,7 @@ $transformer-color: saturate($brand-primary, 20%);
     fill: $transformer-color;
 
     .transformer-bg {
-      filter: url('./#dropshadow');
+      filter: url('#dropshadow');
     }
 
     .channel-circle {
@@ -43,7 +43,7 @@ $transformer-color: saturate($brand-primary, 20%);
 
   .row-channel {
     .channel-circle {
-      stroke: url("./#flow-animation");
+      stroke: url("#flow-animation");
       fill: $transformer-color;
     }
 
@@ -71,7 +71,7 @@ $transformer-color: saturate($brand-primary, 20%);
   }
 
   .channel-path {
-    stroke: url("./#flow-animation");
+    stroke: url("#flow-animation");
   }
 
   .drop-target {
