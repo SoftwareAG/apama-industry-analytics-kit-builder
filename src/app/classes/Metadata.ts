@@ -56,7 +56,7 @@ export class Metadata extends AbstractModel<MetadataJsonInterface, never> {
 }
 
 export class MetadataBuilder extends ClassBuilder<Metadata> implements MetadataInterface {
-  version: string = "2.0.0.0";
+  version: string = "2.0.0.1";
   groupOrder: string[] = [];
   samples: string[] = [];
   analytics: TransformerDef[] = [];
