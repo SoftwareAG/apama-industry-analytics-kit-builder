@@ -6,7 +6,7 @@
     <transformer-selector class="left-panel h-100 p-2 d-flex flex-column"></transformer-selector>
     <div class="p-0 h-100 middle-panel w-100">
       <history></history>
-      <div id="ladder-diagram-panel" class="scroll" (mousemove)="onMouseMoveLadderDiagramPanel($event)" [style.height]="ladderDiagramHeightPercentString">
+      <div #ladderDiagramPanel id="ladder-diagram-panel" class="scroll" (mousemove)="onMouseMoveLadderDiagramPanel($event)" [style.height]="ladderDiagramHeightPercentString">
         <ladder-diagram class="w-100" ></ladder-diagram>
       </div>
       <div class="scroll information-panel p-2 d-flex flex-column" mwlResizable

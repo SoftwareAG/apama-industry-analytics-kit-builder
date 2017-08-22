@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, HostListener, ViewChild} from "@angular/core";
+import {AfterViewInit, Component, ElementRef, HostListener, ViewChild} from "@angular/core";
 import {AbstractDataService} from "./services/AbstractDataService";
 import {AbstractMetadataService} from "./services/MetadataService";
 import {ResizeEvent} from "angular-resizable-element";
@@ -17,6 +17,7 @@ import * as _ from "lodash";
 })
 export class AppComponent implements AfterViewInit {
   @ViewChild(SandboxEvalComponent) sandboxEvalComponent: SandboxEvalComponent;
+  @ViewChild('ladderDiagramPanel') ladderDiagramPanelElement: ElementRef;
 
   private readonly _informationHeightMax = 85;
   private readonly _informationHeightMin = 15;
@@ -83,30 +84,15 @@ export class AppComponent implements AfterViewInit {
   onMouseMoveLadderDiagramPanel(event: MouseEvent) {
     if (this.dragService.dragging.getValue()) {
 
-      // Get the height of the ladder-diagram-panel
-      const ladderDiagramPanelElement:Element | null = document.querySelector('#ladder-diagram-panel');
-      if (ladderDiagramPanelElement) {
-        const ladderDiagramPanelHTMLElement = (ladderDiagramPanelElement as HTMLElement);
-        const ladderDiagramPanelHeight = ladderDiagramPanelHTMLElement.clientHeight;
+      if (this.ladderDiagramPanelElement) {
+        const ladderDiagramPanelHTMLElement = (this.ladderDiagramPanelElement.nativeElement as HTMLElement);
 
-        // If the mouse y is greater than the ladder-diagram-panel height, scroll the div
-        if (event.pageY > ladderDiagramPanelHeight) {
-          console.info(`scrolling down..`);
-          console.info(`  ladderDiagramPanelHeight is ${ladderDiagramPanelHeight}`);
-          console.info(`  event.pageY is ${event.pageY}`);
-
-          // TODO: scroll down needs to include the height of the object (analytic) being dragged
+        if (event.pageY > ladderDiagramPanelHTMLElement.offsetTop + (ladderDiagramPanelHTMLElement.offsetHeight * 0.9)) {
           // Auto scroll down
-          ladderDiagramPanelHTMLElement.scrollTop += (event.pageY - ladderDiagramPanelHeight);
+          ladderDiagramPanelHTMLElement.scrollTop += 20;
         }
 
-        // If the mouse y is less than the current scrollTop
-        if ((event.pageY - 75) < ladderDiagramPanelHTMLElement.scrollTop) {
-          console.info(`scrolling up..`);
-          console.info(`  ladderDiagramPanelHeight is ${ladderDiagramPanelHeight}`);
-          console.info(`  event.pageY is ${event.pageY}`);
-          console.info(`  ladderDiagramPanelHTMLElement.scrollTop is ${ladderDiagramPanelHTMLElement.scrollTop}`);
-
+        if (event.pageY < ladderDiagramPanelHTMLElement.offsetTop + (ladderDiagramPanelHTMLElement.offsetHeight * 0.1)) {
           // Auto scroll up
           ladderDiagramPanelHTMLElement.scrollTop -= 20;
         }
