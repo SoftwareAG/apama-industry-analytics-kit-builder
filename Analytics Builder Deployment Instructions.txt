@@ -1,37 +1,46 @@
 Analytics Builder Deployment Instructions
 =========================================
+The Analytics Builder Tool can be deployed using any Webserver.
+The options below outline the deployment instructions for several 
+possible webserver deployments depending on your deployment requirements.
 
-
-1. To host the Analytics Builder using Internet Information Services (IIS)
 --------------------------------------------------------------------------
-
-    Copy and extract the analytics-builder_2.0.0.1.zip into the c:\inetpub\wwwroot
-
-    Access the Analytics Builder using http:\\localhost
-
-
-2. To use the Analytics Builder with a lightweight web server 
-
-    * Installing a lightweight web server (this only has to be done once)
- 
-        Download and install npm from : https://www.npmjs.com/get-npm
-
-        Once, npm has been installed :
- 
-            open a command prompt :
-
-            type : npm install -g http-server
-
-    * Extract and host the Analytics Builder using the local web server application
-    
-        Create a folder on your machine e.g. c:\analytics-builder_2.0.0.1
-
-        Extract the analytics-builder_2.0.0.1.zip into the folder
-    
-        Open a command prompt :
-
-        type : http-server
+Microsofts Internet Information Services (IIS)
+--------------------------------------------------------------------------
+1. Windows IIS must be enabled (NOTE: These steps only have to be done once):
+	1.1. In Windows, access the Control Panel and click Add or Remove Programs.
+	1.2. In the Add or Remove Programs window, click Add/Remove Windows Components.
+	1.3. Select the Internet Information Services (IIS) check box, click Next, then click Finish.
+	1.4. Copy and extract the Analytics Builder Zip file to the webserver root directory:
+		C:\inetpub\wwwroot
+2. The Analytics Builder application can now be accessed using the following URL:
+		http://localhost:8080
 
 
-    Access the Analytics Builder web application using http:\\localhost:8080
+--------------------------------------------------------------------------
+NPMs Lightweight Web Server
+--------------------------------------------------------------------------
+1. Installing a lightweight web server (NOTE: These steps only have to be done once):
+	1.1. Download and install npm from:
+		https://www.npmjs.com/get-npm
+	1.2. Once, npm has been installed open a command prompt and type:
+		npm install -g http-server
+	1.3. Extract the Analytics Builder Zip file 
+2. To run the web server, open a command prompt, and navigate to the directory
+   where you extracted the Analytics Builder previously and type:
+		http-server
+3. The Analytics Builder application can now be accessed using the following URL:
+		http://localhost:8080
+
+
+--------------------------------------------------------------------------
+Apache Tomcat Web Server
+--------------------------------------------------------------------------
+1. Installing Apache Tomcat version 8 (NOTE: These steps only have to be done once):
+	1.1. Download and install Apache Tomcat from: 
+		https://tomcat.apache.org/
+	1.2. Copy and extract the Analytics Builder Zip file to the webserver root directory
+		C:\Program Files\Apache Software Foundation\Tomcat 7.0\webapps
+2. The Analytics Builder application can now be accessed using the following URL:
+		http://localhost:8080
 
