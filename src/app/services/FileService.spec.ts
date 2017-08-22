@@ -768,7 +768,6 @@ com.industry.analytics.Analytic("Filter",["Row0:Input0"],["Row0:Channel1"],{"sou
     const config: Config = fileService.deserializeConfig(apama);
     expect(config.rows.getValue().first().transformers.getValue().first().name).toEqual('Filter');
     expect(config.rows.getValue().last().transformers.getValue().first().propertyValues.size).toEqual(5);
-    debugger;
   });
 
   it('should parse multiple properties in an Analytic', () => {

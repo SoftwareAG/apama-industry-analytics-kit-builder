@@ -165,6 +165,6 @@ export class NavBarComponent {
   }
 
   onClickInformation() {
-    window.open("/assets/index.html", "_blank");
+    window.open("./assets/index.html", "_blank");
   }
 }
