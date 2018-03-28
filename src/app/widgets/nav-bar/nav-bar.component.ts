@@ -26,7 +26,7 @@ export class NavBarComponent {
 
   constructor(public dataService: AbstractDataService, private fileService: FileService, private readonly metadataService: AbstractMetadataService,
               public modalService: NgbModal, private selectionService: SelectionService, private historyService: HistoryService) {
-    this.metadataVersions = new BehaviorSubject(Set.of("2.0.0.1"));
+    this.metadataVersions = new BehaviorSubject(Set.of("2.1.0.0"));
     this.currentMetaVersion = metadataService.metadata.map(metadata => metadata.version);
     this.currentMetaVersion.subscribe(version => this.metadataVersions.next(this.metadataVersions.getValue().add(version)));
     this.configurations = metadataService.metadata.map(metadata => metadata.samples.map((sample:string) => fileService.deserializeConfig(sample).toJson()));
