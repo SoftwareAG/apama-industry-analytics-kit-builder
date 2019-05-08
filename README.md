@@ -1,6 +1,6 @@
 # Industry Analytics Kit Builder
 
-The Industry Analytics Kit Builder is a UI designed for use with the Industry Analytics Kit. It provides an easy to use drag and drop interface to chain the analytics together.
+The Industry Analytics Kit Builder is a UI designed for use with the [Industry Analytics Kit](https://github.com/SoftwareAG/apama-industry-analytics-kit). It provides an easy to use drag and drop interface to chain the analytics together.
 
 [<img src="https://user-images.githubusercontent.com/38696279/57377601-bf4e6900-719a-11e9-815f-e13bf3fab11f.png"/>](https://softwareag.github.io/apama-industry-analytics-kit-builder/)
 
