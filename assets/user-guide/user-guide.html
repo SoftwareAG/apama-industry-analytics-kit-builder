@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type">
+    <title>Analytics Builder User Guide</title>
+    <base href="./">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="../css/styles.css">
+  </head>
+  <body><u><b></b></u>
+    <h1>Analytics Builder User Guide</h1>
+    <br>
+    <br>
+    The Analytics Builder provides a graphical interface which is used to
+    configure the analytics which are supplied with the Industry Analytics Kit. <br>
+    &nbsp;&nbsp;&nbsp; <br>
+    &nbsp;&nbsp;&nbsp; <a href="images/analytics-builder.png">
+      <img alt="Analytics Builder" src="images/analytics-builder.png">
+    </a> <br>
+    <br>
+    The builder consists of five main areas :<br>
+    <br>
+    <ul>
+      <li>Navigation Panel</li>
+    </ul>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; The navigation bar at the top
+    of the screen provides common functionality such as clearing the
+    configuration, loading saved configurations, saving new configurations and
+    loading sample configurations. <br>
+    <br>
+    <ul>
+      <li>Analytics Panel</li>
+    </ul>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The analytics panel
+    on the left of the screen displays the list of available analytics. These analytics
+    have been categorised into groups according to their function.<br>
+    <br>
+    <ul>
+      <li>Configuration Panel</li>
+    </ul>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; In the centre of
+    the screen is the main configuration panel. This is the main work area which
+    is used to create a new configuration or edit a previously saved
+    configuration. <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The configuration
+    panel allows a user to drag in analytics, link them by channels and change
+    the properties of analytics <br>
+    <br>
+    <ul>
+      <li>Documentation Panel</li>
+    </ul>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; At the bottom of
+    the screen is the documentation panel. This panel displays the documentation
+    for the analytic which has been selected either in the Analytics Panel or in
+    the main Configuration Panel <br>
+    <br>
+    <ul>
+      <li>Properties Panel</li>
+    </ul>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; On the right of the
+    screen is the Properties Panel. This either displays the Channel Properties
+    if a channel has been selected in the main Configuration Panel or the
+    Analytic Properties if an analytic has been selected<br>
+    <br>
+    <br>
+    <u>Analytic Samples</u><br>
+    <br>
+    &nbsp;&nbsp;&nbsp; The Analytics Builder is provided with three samples
+    which can be loaded from the 'Samples' dropdown in the navigation bar.<br>
+    <br>
+    &nbsp;&nbsp;&nbsp; Hovering over these samples displays their short
+    description.When a sample is clicked, it is automatically loaded and
+    displayed in the Configuration Panel. <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; <b>Missing Spikes</b> <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; This configuration consists of a Spike
+    Analytic which is receiving data from a channel called <i>RAW_SENSOR_DATA</i>.
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The output from the Spike Analytic is
+    being sent into the <b>Missing Data</b> Analytic which is sending the
+    output to a <i>SENSOR_ANOMALIES</i> channel <br>
+    <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; <b>Peer Analysis</b> <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The <b>Average </b>analytic receives
+    raw data from the <i>Orders </i>channel which is then output to the <i>Average
+      </i>channel. <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Both the raw <i>Orders </i>data and
+    the <i>Average</i> which has been calculated by the <b>Average </b>analytic
+    is fed into the <b>Spread </b>Analytic. The <b>Spread </b>analytic
+    outputs the spread calculated from these two input streams. <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The <b>Threshold </b>analytic
+    receives the output from the <b>Spread </b>analytic and outputs any data
+    which is outside of the threshold (defined in its properties) to the <i>Breaches
+      </i>channel. <br>
+    <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; <b>Volatility Increase</b> <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The data from the <i>RAW_SENSOR_DATA</i>
+    channel is received by the <b>Volatility</b> analytic which calculates the
+    volatility using variance over a default 60 second time window. <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The output is sent to a <b>Threshold</b>
+    analytic which is detecting data breaches with a value greater than or equal
+    to 25. These breaches are output to the <i>SENSOR_ANOMOLIES</i> channel.<b></b><br>
+    <br>
+    <br>
+    <u><b>How to use the Analytics Builder</b></u> <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The analytics supplied with the <i>Industry
+      Analytics Kit</i> are listed under their relevant categories (Detectors,
+    Extensions, Flow Manipulation, GeoLocation, Streaming Calculations,
+    Utilities).<br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The categories can be expanded by
+    clicking on the category name. <br>
+    <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <u>Adding an analytic to the
+      Configuration Panel</u> <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To add an analytic into the
+    confguration panel, left click on the analytic in the Analytic Panel. Whilst
+    holding down the left mouse button, drag and drop the the analytic over one
+    of the grey drop areas in the Configuration Panel. <br>
+    <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <u>Moving an analytic on the
+      Configuration Panel</u> <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To move an analytic from one location
+    to another in the configuration panel, left click on the analytic and drag
+    it to a new grey drop location.<br>
+    <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <u>Copying an analytic</u> <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To copy an analytic which is already
+    in the Configuration Panel, left click to select the analytic. Whilst
+    holding down the left mouse button, hold down the 'ctrl' button on the
+    keyboard. <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; When the analytic is dragged to a new
+    grey drop location, it will be copied and not moved. <br>
+    <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <u>Deleting an analytic from the
+      Configuration Panel</u> <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Left click on the
+    analytic. Hold down the left mouse button and drag the analytic off the
+    configuration panel. &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <b> <i> <br>
+        &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Note: A faster
+        way to delete an analytic is to left click on the analytic. When it has
+        been selected , press the 'del' key on the keyboard to delete the
+        analytic. </i> </b> <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <u>Joining Analytics together </u> <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; When an Analytic is dragged into the
+    Configuration panel, the default input and output channels are automatically
+    linked to the analytics which are to the left and right. <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; If the analytic contains any optional
+    channels, these need to be connected manually by clicking on the small white
+    circle on the analytic.&nbsp; <br>
+    <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <u>Changing Channel names<br>
+    </u>&nbsp;<br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; When an analytic is dropped at the
+    start of end of a row, the input channel name is defaulted to the input
+    channel name defined for that analytic. <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; When an analytic is dropped at the end
+    of a row, the output channel name is defaulted to the output channel name
+    defined for that analytic. <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; These default input and output
+    channels can be renamed.<br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To select an input or output channel,
+    hover the mouse over the channel name or blue circle in the configuration
+    panel. When the mouse cursor changes to a hand pointer, left click to
+    select. <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; When the channel is selected, the
+    right Properties Panel will display the 'Channel Properties' and the Channel
+    Name property will be highlighted. <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Type in the Channel Name input field
+    to change the name of the channel. <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <b> <i> Note: If you need to change
+        more than one channel to the same channel name, update the first one,
+        then select and drag the channel down onto the other channel locations</i>
+    </b> <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <u> Changing the properties on an
+      analytic </u> <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; An analytic can contain multiple
+    properties which can be changed as required. <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To change the properties of an analytic,
+    select the analytic by left clicking on it in the Configuration Panel. When
+    the analytic is selected, the 'Analytic Properties' will be displayed in the
+    Properties Panel. <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To change the property, click on the
+    required field in the Analytic Properties panel. <br>
+    <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <u> Saving a configuration </u> <br>
+    &nbsp;&nbsp;&nbsp; <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To save the configuration, click on
+    the 'SAVE' option in the navigation bar. Enter a name and description and
+    click on 'Save Changes'. <br>
+    <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <u> Loading a configuration </u> <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To load a previously saved
+    configuration. click on the 'LOAD' option in the navigation bar. Select the
+    .evt file and click on 'Open'. The file will be loaded in to the
+    configuration panel. <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To see the description for the
+    configuration, hover over the filename in the navigation bar. <br>
+    <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <u> Clearing the current
+      configuration </u> <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To clear the current configuration
+    from the configuration panel, click on the 'NEW' option in the menu bar. If
+    you have unsaved changes, a dialog will display with a warning. <br>
+    <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <u> Additional Features </u> <br>
+    <br>
+    <ul>
+      <li>Undo / Redo </li>
+    </ul>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The configuration
+    panel contains undo / redo functionality which ensures that you are able to
+    reverse any changes you have made whilst in the configuration panel. <br>
+    <br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The undo / redo
+    will reverse any changes to the channel names, analytics drag and drop
+    positions plus any analytic property changes. <br>
+    <br>
+    <br>
+  </body>
+</html>
